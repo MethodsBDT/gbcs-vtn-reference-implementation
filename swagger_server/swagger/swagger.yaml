@@ -43,10 +43,17 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.0
 servers:
-- url: https://virtserver.swaggerhub.com/francisrsandoval/OpenADR-3.0/1.0.0
+- url: https://virtserver.swaggerhub.com/openadr3/OADR-3.0.0/1.0.0
   description: SwaggerHub API Auto Mocking
-- url: https://virtserver.swaggerhub.com/pajarito/OpenAPI-3.0/1.0.0
+- url: http://localhost:8081/openadr/3.0.0
+  description: base path
+- url: https://virtserver.swaggerhub.com/openadr/3.0.0
   description: SwaggerHub API Auto Mocking
+#- url: https://virtserver.swaggerhub.com/francisrsandoval/OpenADR-3.0/1.0.0
+#  description: SwaggerHub API Auto Mocking
+#- url: https://virtserver.swaggerhub.com/pajarito/OpenAPI-3.0/1.0.0
+#  description: SwaggerHub API Auto Mocking
+#- url: https://virtserver.swaggerhub.com/oadr3/OpenAPI-3.0/1.0.0
 paths:
   /programs:
     get:
@@ -1589,7 +1596,7 @@ paths:
         explode: false
         schema:
           type: string
-          example: ven_client
+          example: ven_client_99
       - name: clientSecret
         in: header
         description: client secret to exchange for bearer token.
@@ -1597,8 +1604,8 @@ paths:
         style: simple
         explode: false
         schema:
-          type: integer
-          example: 999
+          type: string
+          example: ven_secret_99
       responses:
         "200":
           description: OK.
