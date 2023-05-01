@@ -8,26 +8,29 @@ is an example of building a swagger-enabled Flask server.
 This example uses the [Connexion](https://github.com/zalando/connexion) library on top of Flask.
 
 ## Requirements
-Python 3.5.2+
+Python 3.5.2+ (tested on 3.9.0)
 
 ## Usage
 To run the server, please execute the following from the root directory:
 
 ```
+virtualenv venv
+source venv/bin/activate
 pip3 install -r requirements.txt
-python3 -m swagger_server
+python -m swagger_server
 ```
 
 and open your browser to here:
 
 ```
-http://localhost:8080/pajarito/OpenAPI-3.0/1.0.0/ui/
-```
-
-Your Swagger definition lives here:
+http://localhost:8080/francisrsandoval/OpenADR-3.0/1.0.0/ui/
 
 ```
-http://localhost:8080/pajarito/OpenAPI-3.0/1.0.0/swagger.json
+
+Your Swagger definition lives here (not currently available:
+
+```
+http://localhost:8080/francisrsandoval/OpenADR-3.0/1.0.0/swagger.json
 ```
 
 To launch the integration tests, use tox:
