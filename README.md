@@ -23,7 +23,7 @@ python -m swagger_server
 and open your browser to here:
 
 ```
-http://localhost:8080/francisrsandoval/OpenADR-3.0/1.0.0/ui/
+http://localhost:8080/openadr3/OADR-3.0.0/1.0.0/ui/
 
 ```
 
