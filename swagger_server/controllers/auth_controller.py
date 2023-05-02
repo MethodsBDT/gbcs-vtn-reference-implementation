@@ -6,18 +6,16 @@ from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server import util
 
 
-def fetch_token(client_id, client_secret):  # noqa: E501
+def fetch_token():  # noqa: E501
     """fetch a token
 
     Return an access token based on clientID and clientSecret. # noqa: E501
 
-    :param client_id: client ID to exchange for bearer token.
-    :type client_id: str
-    :param client_secret: client secret to exchange for bearer token.
-    :type client_secret: str
-
     :rtype: str
     """
+    client_id = connexion.request.headers['clientID']
+    client_secret = connexion.request.headers['clientSecret']
+
     logging.debug(f"fetch_token: client_id={client_id} client_secret={client_secret}")
     if client_id == 'ven_client' and client_secret == '999':
         logging.debug(f"fetch_token: ven_token client_id={client_id} client_secret={client_secret}")
