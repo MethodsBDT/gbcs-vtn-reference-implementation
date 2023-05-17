@@ -30,7 +30,7 @@ http://localhost:8080/openadr3/OADR-3.0.0/1.0.0/ui/
 Your Swagger definition lives here (not currently available:
 
 ```
-http://localhost:8080/francisrsandoval/OpenADR-3.0/1.0.0/swagger.json
+http://localhost:8080/openadr3/OADR-3.0.0/1.0.0/swagger.json
 ```
 
 To launch the integration tests, use tox:

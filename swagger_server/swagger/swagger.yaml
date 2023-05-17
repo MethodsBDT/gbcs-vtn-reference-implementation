@@ -45,15 +45,10 @@ info:
 servers:
 - url: https://virtserver.swaggerhub.com/openadr3/OADR-3.0.0/1.0.0
   description: SwaggerHub API Auto Mocking
-- url: http://localhost:8081/openadr/3.0.0
+- url: http://localhost:8081/openadr3
   description: base path
-- url: https://virtserver.swaggerhub.com/openadr/3.0.0
+- url: https://virtserver.swaggerhub.com/openadr3
   description: SwaggerHub API Auto Mocking
-#- url: https://virtserver.swaggerhub.com/francisrsandoval/OpenADR-3.0/1.0.0
-#  description: SwaggerHub API Auto Mocking
-#- url: https://virtserver.swaggerhub.com/pajarito/OpenAPI-3.0/1.0.0
-#  description: SwaggerHub API Auto Mocking
-#- url: https://virtserver.swaggerhub.com/oadr3/OpenAPI-3.0/1.0.0
 paths:
   /programs:
     get:
@@ -121,6 +116,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - read_all
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.programs_controller
     post:
       tags:
@@ -165,6 +161,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_programs
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.programs_controller
   /programs/{programID}:
     get:
@@ -217,6 +214,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - read_all
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.programs_controller
     put:
       tags:
@@ -266,6 +264,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_programs
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.programs_controller
     delete:
       tags:
@@ -309,6 +308,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_programs
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.programs_controller
   /reports:
     get:
@@ -397,6 +397,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - read_all
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.reports_controller
     post:
       tags:
@@ -435,6 +436,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_reports
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.reports_controller
   /reports/{reportID}:
     get:
@@ -487,6 +489,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - read_all
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.reports_controller
     put:
       tags:
@@ -536,6 +539,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_reports
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.reports_controller
     delete:
       tags:
@@ -579,6 +583,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_reports
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.reports_controller
   /events:
     get:
@@ -656,6 +661,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - read_all
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.events_controller
     post:
       tags:
@@ -700,6 +706,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_events
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.events_controller
   /events/{eventID}:
     get:
@@ -755,6 +762,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - read_all
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.events_controller
     put:
       tags:
@@ -804,6 +812,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_events
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.events_controller
     delete:
       tags:
@@ -848,6 +857,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_events
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.events_controller
   /subscriptions:
     get:
@@ -944,6 +954,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - read_all
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.subscriptions_controller
     post:
       tags:
@@ -995,6 +1006,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_subscriptions
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.subscriptions_controller
   /subscriptions/{subscriptionID}:
     get:
@@ -1037,6 +1049,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - read_all
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.subscriptions_controller
     put:
       tags:
@@ -1056,6 +1069,12 @@ paths:
           type: integer
           format: int32
           example: 999
+      requestBody:
+        description: subscription item to update.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/subscription'
       responses:
         "200":
           description: OK.
@@ -1078,6 +1097,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_subscriptions
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.subscriptions_controller
     delete:
       tags:
@@ -1119,6 +1139,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_subscriptions
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.subscriptions_controller
   /vens:
     get:
@@ -1176,6 +1197,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - read_all
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.vens_controller
     post:
       tags:
@@ -1214,6 +1236,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_vens
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.vens_controller
   /vens/{venID}:
     get:
@@ -1255,6 +1278,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - read_all
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.vens_controller
     put:
       tags:
@@ -1273,6 +1297,12 @@ paths:
           type: integer
           format: int32
           example: 999
+      requestBody:
+        description: ven item to update.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ven'
       responses:
         "200":
           description: OK.
@@ -1295,6 +1325,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_vens
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.vens_controller
     delete:
       tags:
@@ -1335,6 +1366,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_vens
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.vens_controller
   /vens/{venID}/resources:
     get:
@@ -1376,6 +1408,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - read_all
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.vens_controller
     post:
       tags:
@@ -1425,6 +1458,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_vens
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.vens_controller
   /vens/{venID}/resources/{resourceID}:
     get:
@@ -1477,6 +1511,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - read_all
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.vens_controller
     put:
       tags:
@@ -1506,6 +1541,12 @@ paths:
           type: integer
           format: int32
           example: 999
+      requestBody:
+        description: resource item to update.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/resource'
       responses:
         "200":
           description: OK.
@@ -1528,6 +1569,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_vens
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.vens_controller
     delete:
       tags:
@@ -1579,6 +1621,7 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - write_vens
+      - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.vens_controller
   /auth/token:
     get:
@@ -1711,7 +1754,7 @@ components:
             - $ref: '#/components/schemas/reportPayloadDescriptor'
       description: Provides program specific metadata from VTN to VEN.
       example:
-        programName: {}
+        programName: ResTOU
     report:
       required:
       - clientID
@@ -1828,7 +1871,7 @@ components:
       example:
         programID: 99
         intervals:
-          ID: 0
+        - ID: 0
           payloads:
           - payloadType: SIMPLE
             values:
@@ -1914,7 +1957,7 @@ components:
       description: |
         Ven represents a client with the ven role.
       example:
-        venID: 999
+        venID: VEN_999
     resource:
       type: object
       properties:
@@ -1947,7 +1990,7 @@ components:
       description: |
         A resource is an energy device or system subject to control by a VEN.
       example:
-        resourceID: 99
+        resourceID: resource_99
     interval:
       required:
       - ID
@@ -2020,7 +2063,7 @@ components:
           example:
           - 0.17
           items:
-            oneOf:
+            anyOf:
             - type: number
             - type: integer
             - type: string
@@ -2311,8 +2354,8 @@ components:
       properties:
         resourceID:
           type: integer
-          description: User provided resource ID. A negative value indicates an aggregation
-            of multiple resources.
+          description: String identifier for resource. A negative value indicates
+            an aggregation of multiple resources.
           format: int32
           example: 99
         intervalPeriod:
@@ -2388,4 +2431,9 @@ components:
             write_vens: VENS and BL can write to vens and resources
       x-tokenInfoFunc: swagger_server.controllers.authorization_controller.check_oAuth2ClientCredentials
       x-scopeValidateFunc: swagger_server.controllers.authorization_controller.validate_scope_oAuth2ClientCredentials
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      x-bearerInfoFunc: swagger_server.controllers.authorization_controller.check_bearerAuth
 

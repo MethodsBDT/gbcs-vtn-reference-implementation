@@ -18,3 +18,5 @@ def validate_scope_oAuth2ClientCredentials(required_scopes, token_scopes):
     return set(required_scopes).issubset(set(token_scopes))
 
 
+def check_bearerAuth(token):
+    return {'test_key': 'test_value'}
