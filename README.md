@@ -20,10 +20,16 @@ pip3 install -r requirements.txt
 python -m swagger_server
 ```
 
-and open your browser to here:
+To view interactive API documentation, open your browser to here:
 
 ```
 http://localhost:8080/openadr3/OADR-3.0.0/1.0.0/ui/
+
+Before interacting with API, select Authorize button at top Right of API operations.
+(Just above Auth GET section).
+
+In dialog, type one of two pre-defined tokens, "ven_token" or "bl_token", into BearerAuth value text box.
+Select Authorize, and Close.
 
 ```
 
