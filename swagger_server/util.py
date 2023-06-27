@@ -140,21 +140,3 @@ def _deserialize_dict(data, boxed_type):
     """
     return {k: _deserialize(v, boxed_type)
             for k, v in six.iteritems(data)}
-
-def remove_none(model):
-    #     """create an object without attributes equal to None
-    #
-    #     :param model: original model instance.
-    #     :type model: class
-    #
-    #     :return: dict with no values=None.
-    #     :rtype: dict
-    #     """
-
-    # TBD: this is a very simpy way to remove attributes with None values. Does not remove all defaults or treat sub-objects
-    obj = {}
-    modelDict = model.to_dict()
-    for key in modelDict:
-        if modelDict[key] != None:
-            obj |= {key: modelDict[key]}
-    return (obj)

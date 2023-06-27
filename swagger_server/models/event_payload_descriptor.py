@@ -14,9 +14,11 @@ class EventPayloadDescriptor(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, payload_type: str=None, units: str=None, currency: str=None):  # noqa: E501
+    def __init__(self, object_type: str='EVENT_PAYLOAD_DESCRIPTOR', payload_type: str=None, units: str='KWH', currency: str='USD'):  # noqa: E501
         """EventPayloadDescriptor - a model defined in Swagger
 
+        :param object_type: The object_type of this EventPayloadDescriptor.  # noqa: E501
+        :type object_type: str
         :param payload_type: The payload_type of this EventPayloadDescriptor.  # noqa: E501
         :type payload_type: str
         :param units: The units of this EventPayloadDescriptor.  # noqa: E501
@@ -25,16 +27,19 @@ class EventPayloadDescriptor(Model):
         :type currency: str
         """
         self.swagger_types = {
+            'object_type': str,
             'payload_type': str,
             'units': str,
             'currency': str
         }
 
         self.attribute_map = {
+            'object_type': 'objectType',
             'payload_type': 'payloadType',
             'units': 'units',
             'currency': 'currency'
         }
+        self._object_type = object_type
         self._payload_type = payload_type
         self._units = units
         self._currency = currency
@@ -49,6 +54,29 @@ class EventPayloadDescriptor(Model):
         :rtype: EventPayloadDescriptor
         """
         return util.deserialize_model(dikt, cls)
+
+    @property
+    def object_type(self) -> str:
+        """Gets the object_type of this EventPayloadDescriptor.
+
+        Used as discriminator, e.g. program.payloadDescriptors  # noqa: E501
+
+        :return: The object_type of this EventPayloadDescriptor.
+        :rtype: str
+        """
+        return self._object_type
+
+    @object_type.setter
+    def object_type(self, object_type: str):
+        """Sets the object_type of this EventPayloadDescriptor.
+
+        Used as discriminator, e.g. program.payloadDescriptors  # noqa: E501
+
+        :param object_type: The object_type of this EventPayloadDescriptor.
+        :type object_type: str
+        """
+
+        self._object_type = object_type
 
     @property
     def payload_type(self) -> str:
@@ -70,6 +98,8 @@ class EventPayloadDescriptor(Model):
         :param payload_type: The payload_type of this EventPayloadDescriptor.
         :type payload_type: str
         """
+        if payload_type is None:
+            raise ValueError("Invalid value for `payload_type`, must not be `None`")  # noqa: E501
 
         self._payload_type = payload_type
 

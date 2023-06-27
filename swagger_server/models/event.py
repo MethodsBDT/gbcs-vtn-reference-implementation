@@ -9,9 +9,11 @@ from swagger_server.models.base_model_ import Model
 from swagger_server.models.event_payload_descriptor import EventPayloadDescriptor  # noqa: F401,E501
 from swagger_server.models.interval import Interval  # noqa: F401,E501
 from swagger_server.models.interval_period import IntervalPeriod  # noqa: F401,E501
+from swagger_server.models.model_date_time import ModelDateTime  # noqa: F401,E501
 from swagger_server.models.object_id import ObjectID  # noqa: F401,E501
 from swagger_server.models.report_descriptor import ReportDescriptor  # noqa: F401,E501
 from swagger_server.models.target import Target  # noqa: F401,E501
+import re  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -20,15 +22,17 @@ class Event(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: ObjectID=None, created_date_time: str=None, modification_date_time: str=None, program_id: ObjectID=None, name: str='None', priority: int=None, targets: List[Target]=None, report_descriptors: List[ReportDescriptor]=None, payload_descriptors: List[EventPayloadDescriptor]=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None):  # noqa: E501
+    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, program_id: ObjectID=None, name: str=None, priority: int=None, targets: List[Target]=None, report_descriptors: List[ReportDescriptor]=None, payload_descriptors: List[EventPayloadDescriptor]=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None):  # noqa: E501
         """Event - a model defined in Swagger
 
         :param id: The id of this Event.  # noqa: E501
         :type id: ObjectID
         :param created_date_time: The created_date_time of this Event.  # noqa: E501
-        :type created_date_time: str
+        :type created_date_time: ModelDateTime
         :param modification_date_time: The modification_date_time of this Event.  # noqa: E501
-        :type modification_date_time: str
+        :type modification_date_time: ModelDateTime
+        :param object_type: The object_type of this Event.  # noqa: E501
+        :type object_type: str
         :param program_id: The program_id of this Event.  # noqa: E501
         :type program_id: ObjectID
         :param name: The name of this Event.  # noqa: E501
@@ -48,8 +52,9 @@ class Event(Model):
         """
         self.swagger_types = {
             'id': ObjectID,
-            'created_date_time': str,
-            'modification_date_time': str,
+            'created_date_time': ModelDateTime,
+            'modification_date_time': ModelDateTime,
+            'object_type': str,
             'program_id': ObjectID,
             'name': str,
             'priority': int,
@@ -61,9 +66,10 @@ class Event(Model):
         }
 
         self.attribute_map = {
-            'id': 'ID',
+            'id': 'id',
             'created_date_time': 'createdDateTime',
             'modification_date_time': 'modificationDateTime',
+            'object_type': 'objectType',
             'program_id': 'programID',
             'name': 'name',
             'priority': 'priority',
@@ -76,6 +82,7 @@ class Event(Model):
         self._id = id
         self._created_date_time = created_date_time
         self._modification_date_time = modification_date_time
+        self._object_type = object_type
         self._program_id = program_id
         self._name = name
         self._priority = priority
@@ -118,50 +125,75 @@ class Event(Model):
         self._id = id
 
     @property
-    def created_date_time(self) -> str:
+    def created_date_time(self) -> ModelDateTime:
         """Gets the created_date_time of this Event.
 
-        Creation time for object. Server provisions timestamp string on object creation.   # noqa: E501
 
         :return: The created_date_time of this Event.
-        :rtype: str
+        :rtype: ModelDateTime
         """
         return self._created_date_time
 
     @created_date_time.setter
-    def created_date_time(self, created_date_time: str):
+    def created_date_time(self, created_date_time: ModelDateTime):
         """Sets the created_date_time of this Event.
 
-        Creation time for object. Server provisions timestamp string on object creation.   # noqa: E501
 
         :param created_date_time: The created_date_time of this Event.
-        :type created_date_time: str
+        :type created_date_time: ModelDateTime
         """
 
         self._created_date_time = created_date_time
 
     @property
-    def modification_date_time(self) -> str:
+    def modification_date_time(self) -> ModelDateTime:
         """Gets the modification_date_time of this Event.
 
-        Modification time for object. Server provisions timestamp string on object modification.   # noqa: E501
 
         :return: The modification_date_time of this Event.
-        :rtype: str
+        :rtype: ModelDateTime
         """
         return self._modification_date_time
 
     @modification_date_time.setter
-    def modification_date_time(self, modification_date_time: str):
+    def modification_date_time(self, modification_date_time: ModelDateTime):
         """Sets the modification_date_time of this Event.
 
-        Modification time for object. Server provisions timestamp string on object modification.   # noqa: E501
 
         :param modification_date_time: The modification_date_time of this Event.
-        :type modification_date_time: str
+        :type modification_date_time: ModelDateTime
         """
 
         self._modification_date_time = modification_date_time
+
+    @property
+    def object_type(self) -> str:
+        """Gets the object_type of this Event.
+
+        Used as discriminator, e.g. notification.object  # noqa: E501
+
+        :return: The object_type of this Event.
+        :rtype: str
+        """
+        return self._object_type
+
+    @object_type.setter
+    def object_type(self, object_type: str):
+        """Sets the object_type of this Event.
+
+        Used as discriminator, e.g. notification.object  # noqa: E501
+
+        :param object_type: The object_type of this Event.
+        :type object_type: str
+        """
+        allowed_values = ["EVENT"]  # noqa: E501
+        if object_type not in allowed_values:
+            raise ValueError(
+                "Invalid value for `object_type` ({0}), must be one of {1}"
+                .format(object_type, allowed_values)
+            )
+
+        self._object_type = object_type
 
     @property
     def program_id(self) -> ObjectID:
@@ -236,7 +268,7 @@ class Event(Model):
     def targets(self) -> List[Target]:
         """Gets the targets of this Event.
 
-        An array of target objects.  # noqa: E501
+        A list of target objects.  # noqa: E501
 
         :return: The targets of this Event.
         :rtype: List[Target]
@@ -247,7 +279,7 @@ class Event(Model):
     def targets(self, targets: List[Target]):
         """Sets the targets of this Event.
 
-        An array of target objects.  # noqa: E501
+        A list of target objects.  # noqa: E501
 
         :param targets: The targets of this Event.
         :type targets: List[Target]
@@ -259,7 +291,7 @@ class Event(Model):
     def report_descriptors(self) -> List[ReportDescriptor]:
         """Gets the report_descriptors of this Event.
 
-        An array of reportDescriptor objects. Used to request reports from VEN.  # noqa: E501
+        A list of reportDescriptor objects. Used to request reports from VEN.  # noqa: E501
 
         :return: The report_descriptors of this Event.
         :rtype: List[ReportDescriptor]
@@ -270,7 +302,7 @@ class Event(Model):
     def report_descriptors(self, report_descriptors: List[ReportDescriptor]):
         """Sets the report_descriptors of this Event.
 
-        An array of reportDescriptor objects. Used to request reports from VEN.  # noqa: E501
+        A list of reportDescriptor objects. Used to request reports from VEN.  # noqa: E501
 
         :param report_descriptors: The report_descriptors of this Event.
         :type report_descriptors: List[ReportDescriptor]
@@ -282,7 +314,7 @@ class Event(Model):
     def payload_descriptors(self) -> List[EventPayloadDescriptor]:
         """Gets the payload_descriptors of this Event.
 
-        An array of payloadDescriptor objects.  # noqa: E501
+        A list of payloadDescriptor objects.  # noqa: E501
 
         :return: The payload_descriptors of this Event.
         :rtype: List[EventPayloadDescriptor]
@@ -293,7 +325,7 @@ class Event(Model):
     def payload_descriptors(self, payload_descriptors: List[EventPayloadDescriptor]):
         """Sets the payload_descriptors of this Event.
 
-        An array of payloadDescriptor objects.  # noqa: E501
+        A list of payloadDescriptor objects.  # noqa: E501
 
         :param payload_descriptors: The payload_descriptors of this Event.
         :type payload_descriptors: List[EventPayloadDescriptor]
@@ -326,7 +358,7 @@ class Event(Model):
     def intervals(self) -> List[Interval]:
         """Gets the intervals of this Event.
 
-        An array of interval objects.  # noqa: E501
+        A list of interval objects.  # noqa: E501
 
         :return: The intervals of this Event.
         :rtype: List[Interval]
@@ -337,7 +369,7 @@ class Event(Model):
     def intervals(self, intervals: List[Interval]):
         """Sets the intervals of this Event.
 
-        An array of interval objects.  # noqa: E501
+        A list of interval objects.  # noqa: E501
 
         :param intervals: The intervals of this Event.
         :type intervals: List[Interval]

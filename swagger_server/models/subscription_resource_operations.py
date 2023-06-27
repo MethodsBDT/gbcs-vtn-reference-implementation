@@ -6,6 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.resource_types import ResourceTypes  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -14,11 +15,11 @@ class SubscriptionResourceOperations(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, resources: List[str]=None, operations: List[str]=None, callback_url: str=None, bearer_token: str=None):  # noqa: E501
+    def __init__(self, resources: List[ResourceTypes]=None, operations: List[str]=None, callback_url: str=None, bearer_token: str=None):  # noqa: E501
         """SubscriptionResourceOperations - a model defined in Swagger
 
         :param resources: The resources of this SubscriptionResourceOperations.  # noqa: E501
-        :type resources: List[str]
+        :type resources: List[ResourceTypes]
         :param operations: The operations of this SubscriptionResourceOperations.  # noqa: E501
         :type operations: List[str]
         :param callback_url: The callback_url of this SubscriptionResourceOperations.  # noqa: E501
@@ -27,7 +28,7 @@ class SubscriptionResourceOperations(Model):
         :type bearer_token: str
         """
         self.swagger_types = {
-            'resources': List[str],
+            'resources': List[ResourceTypes],
             'operations': List[str],
             'callback_url': str,
             'bearer_token': str
@@ -56,32 +57,27 @@ class SubscriptionResourceOperations(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def resources(self) -> List[str]:
+    def resources(self) -> List[ResourceTypes]:
         """Gets the resources of this SubscriptionResourceOperations.
 
-        list of resource types to subscribe to.  # noqa: E501
+        list of resources to subscribe to.  # noqa: E501
 
         :return: The resources of this SubscriptionResourceOperations.
-        :rtype: List[str]
+        :rtype: List[ResourceTypes]
         """
         return self._resources
 
     @resources.setter
-    def resources(self, resources: List[str]):
+    def resources(self, resources: List[ResourceTypes]):
         """Sets the resources of this SubscriptionResourceOperations.
 
-        list of resource types to subscribe to.  # noqa: E501
+        list of resources to subscribe to.  # noqa: E501
 
         :param resources: The resources of this SubscriptionResourceOperations.
-        :type resources: List[str]
+        :type resources: List[ResourceTypes]
         """
-        allowed_values = ["PROGRAM", "EVENT", "REPORT", "SUBSCRIPTION", "VEN", "RESOURCE"]  # noqa: E501
-        if not set(resources).issubset(set(allowed_values)):
-            raise ValueError(
-                "Invalid values for `resources` [{0}], must be a subset of [{1}]"  # noqa: E501
-                .format(", ".join(map(str, set(resources) - set(allowed_values))),  # noqa: E501
-                        ", ".join(map(str, allowed_values)))
-            )
+        if resources is None:
+            raise ValueError("Invalid value for `resources`, must not be `None`")  # noqa: E501
 
         self._resources = resources
 
@@ -135,6 +131,8 @@ class SubscriptionResourceOperations(Model):
         :param callback_url: The callback_url of this SubscriptionResourceOperations.
         :type callback_url: str
         """
+        if callback_url is None:
+            raise ValueError("Invalid value for `callback_url`, must not be `None`")  # noqa: E501
 
         self._callback_url = callback_url
 

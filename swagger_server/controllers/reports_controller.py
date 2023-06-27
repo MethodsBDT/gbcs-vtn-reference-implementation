@@ -5,9 +5,10 @@ import logging
 import requests
 import six
 
-from swagger_server.models.report import Report  # noqa: E501
+from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
-from swagger_server.controllers.subscriptions_controller import subscriptions  # noqa: E501
+from swagger_server.models.report import Report  # noqa: E501
+from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server import util
 
 reports = []
@@ -22,7 +23,7 @@ def create_report(body=None):  # noqa: E501
     :param body: report item to add.
     :type body: dict | bytes
 
-    :rtype: List[Report]
+    :rtype: Report
     """
     logging.info(f"create_report():")
     reportBody = None
@@ -37,12 +38,12 @@ def create_report(body=None):  # noqa: E501
     current_time = now.strftime("%H:%M:%S")
 
     report = Report(
-        id=reportID,
+        id=str(reportID),
         created_date_time=current_time,
         modification_date_time=None,
         program_id=reportBody.program_id,
         event_id=reportBody.event_id,
-        client_id=reportBody.client_id,
+        client_name=reportBody.client_name,
         name=reportBody.name,
         payload_descriptors=reportBody.payload_descriptors,
         resources=reportBody.resources
@@ -54,14 +55,7 @@ def create_report(body=None):  # noqa: E501
     reports.append(report)
     logging.debug(f"create_report(): report={report}")
 
-    for subscription in subscriptions:
-        resource = next((resource for resource in subscription.resource_operations if
-                         "REPORT" in resource.resources and "POST" in resource.operations), None)
-        if resource is not None:
-            logging.debug(f"create_report(): resource={resource}")
-            response = requests.post(resource.callback_url, json=json.dumps(event.to_dict()))
-            if response.status_code != 200:
-                logging.warning(f"create_report: callback response.status_code={response.status_code}")
+    subscription_callback("REPORT", "POST", report)
 
     return report
 
@@ -71,10 +65,10 @@ def delete_report(report_id):  # noqa: E501
 
     Delete the program specified by the reportID in path. # noqa: E501
 
-    :param report_id: Numeric ID of a report.
-    :type report_id: int
+    :param report_id: object ID of a report.
+    :type report_id: dict | bytes
 
-    :rtype: List[Report]
+    :rtype: Report
     """
     logging.info(f"delete_report(): report_id={report_id}")
     report = next((report for report in reports if report.id == report_id), None)
@@ -82,33 +76,24 @@ def delete_report(report_id):  # noqa: E501
         reports.remove(report)
         logging.debug(f"delete_report(): report={report}")
 
-        for subscription in subscriptions:
-            resource = next((resource for resource in subscription.resource_operations if
-                             "REPORT" in resource.resources and "DELETE" in resource.operations), None)
-            if resource is not None:
-                logging.debug(f"delete_report(): resource={resource}")
-                response = requests.post(resource.callback_url, json=json.dumps(event.to_dict()))
-                if response.status_code != 200:
-                    logging.warning(f"delete_report: callback response.status_code={response.status_code}")
+        subscription_callback("REPORT", "DELETE", report)
 
         return report
     else:
         problem = Problem(title="Not Found", status="404")
         logging.warning(f"delete_report(): problem={problem}")
-        return problem
+        return problem, 404
 
 
-def search_all_reports(program_id=None, client_id=None, no_defaults=None, skip=None, limit=None):  # noqa: E501
+def search_all_reports(program_id=None, client_name=None, skip=None, limit=None):  # noqa: E501
     """searches all reports
 
-    List all reports known to the server. May filter results by programID and clientID as query param. Use no_defaults query param to view representation w no default values. Use skip and pagination query params to limit reponse size.  # noqa: E501
+    List all reports known to the server. May filter results by programID and client_name as query param. Use skip and pagination query params to limit reponse size.  # noqa: E501
 
-    :param program_id: Numeric ID of the associated program.
-    :type program_id: int
-    :param client_id: Numeric ID of the associated program.
-    :type client_id: int
-    :param no_defaults: return representations that do not include attributes with default values.
-    :type no_defaults: bool
+    :param program_id: filter results to reports with programID.
+    :type program_id: dict | bytes
+    :param client_name: filter results to reports with clientname.
+    :type client_name: str
     :param skip: number of records to skip for pagination.
     :type skip: int
     :param limit: maximum number of records to return.
@@ -123,15 +108,13 @@ def search_all_reports(program_id=None, client_id=None, no_defaults=None, skip=N
         return tempreports
     return reports
 
-def search_reports_by_report_id(report_id, no_defaults=None):  # noqa: E501
+def search_reports_by_report_id(report_id):  # noqa: E501
     """searches reports by reportID
 
-    Fetch the report specified by the reportID in path. Use no_defaults query param to view representation w no default values.  # noqa: E501
+    Fetch the report specified by the reportID in path. # noqa: E501
 
-    :param report_id: Numeric ID of a report.
-    :type report_id: int
-    :param no_defaults: return representations that do not include attributes with default values.
-    :type no_defaults: bool
+    :param report_id: object ID of a report.
+    :type report_id: dict | bytes
 
     :rtype: Report
     """
@@ -145,12 +128,12 @@ def update_report(report_id, body=None):  # noqa: E501
 
     Update the report specified by the reportID in path. # noqa: E501
 
-    :param report_id: Numeric ID of a report.
-    :type report_id: int
+    :param report_id: object ID of a report.
+    :type report_id: dict | bytes
     :param body: Report item to update.
     :type body: dict | bytes
 
-    :rtype: List[Report]
+    :rtype: Report
     """
     logging.info(f"update_report(): report_id={report_id}")
     reportBody = None
@@ -172,11 +155,11 @@ def update_report(report_id, body=None):  # noqa: E501
         if reportBody.program_id != report.program_id:
             problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
             logging.warning(f"update_report(): problem={problem}")
-            return problem
+            return problem, 400
         if reportBody.event_id is not None:
             report.event_id = reportBody.event_id
-        if reportBody.client_id is not None:
-            report.client_id = reportBody.client_id
+        if reportBody.client_name is not None:
+            report.client_name = reportBody.client_name
         if reportBody.name is not None:
             report.name = reportBody.name
         if reportBody.name is not None:
@@ -185,14 +168,7 @@ def update_report(report_id, body=None):  # noqa: E501
         reports.append(report)
         logging.debug(f"update_report(): report={report}")
 
-        for subscription in subscriptions:
-            resource = next((resource for resource in subscription.resource_operations if
-                             "REPORT" in resource.resources and "PUT" in resource.operations), None)
-            if resource is not None:
-                logging.debug(f"update_report(): resource={resource}")
-                response = requests.post(resource.callback_url, json=json.dumps(report.to_dict()))
-                if response.status_code != 200:
-                    logging.warning(f"update_report: callback response.status_code={response.status_code}")
+        subscription_callback("REPORT", "PUT", report)
 
         return (report)
 
