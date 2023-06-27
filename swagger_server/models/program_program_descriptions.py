@@ -44,6 +44,7 @@ class ProgramProgramDescriptions(Model):
     def url(self) -> str:
         """Gets the url of this ProgramProgramDescriptions.
 
+        A human or machine readable program description  # noqa: E501
 
         :return: The url of this ProgramProgramDescriptions.
         :rtype: str
@@ -54,6 +55,7 @@ class ProgramProgramDescriptions(Model):
     def url(self, url: str):
         """Sets the url of this ProgramProgramDescriptions.
 
+        A human or machine readable program description  # noqa: E501
 
         :param url: The url of this ProgramProgramDescriptions.
         :type url: str

@@ -14,9 +14,11 @@ class ReportPayloadDescriptor(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, payload_type: str='None', reading_type: str='DIRECT_READ', units: str='None', accuracy: float=None, confidence: int=None):  # noqa: E501
+    def __init__(self, object_type: str='REPORT_PAYLOAD_DESCRIPTOR', payload_type: str=None, reading_type: str='DIRECT_READ', units: str='KWH', accuracy: float=0, confidence: int=100):  # noqa: E501
         """ReportPayloadDescriptor - a model defined in Swagger
 
+        :param object_type: The object_type of this ReportPayloadDescriptor.  # noqa: E501
+        :type object_type: str
         :param payload_type: The payload_type of this ReportPayloadDescriptor.  # noqa: E501
         :type payload_type: str
         :param reading_type: The reading_type of this ReportPayloadDescriptor.  # noqa: E501
@@ -29,6 +31,7 @@ class ReportPayloadDescriptor(Model):
         :type confidence: int
         """
         self.swagger_types = {
+            'object_type': str,
             'payload_type': str,
             'reading_type': str,
             'units': str,
@@ -37,12 +40,14 @@ class ReportPayloadDescriptor(Model):
         }
 
         self.attribute_map = {
+            'object_type': 'objectType',
             'payload_type': 'payloadType',
             'reading_type': 'readingType',
             'units': 'units',
             'accuracy': 'accuracy',
             'confidence': 'confidence'
         }
+        self._object_type = object_type
         self._payload_type = payload_type
         self._reading_type = reading_type
         self._units = units
@@ -59,6 +64,29 @@ class ReportPayloadDescriptor(Model):
         :rtype: ReportPayloadDescriptor
         """
         return util.deserialize_model(dikt, cls)
+
+    @property
+    def object_type(self) -> str:
+        """Gets the object_type of this ReportPayloadDescriptor.
+
+        Used as discriminator, e.g. program.payloadDescriptors  # noqa: E501
+
+        :return: The object_type of this ReportPayloadDescriptor.
+        :rtype: str
+        """
+        return self._object_type
+
+    @object_type.setter
+    def object_type(self, object_type: str):
+        """Sets the object_type of this ReportPayloadDescriptor.
+
+        Used as discriminator, e.g. program.payloadDescriptors  # noqa: E501
+
+        :param object_type: The object_type of this ReportPayloadDescriptor.
+        :type object_type: str
+        """
+
+        self._object_type = object_type
 
     @property
     def payload_type(self) -> str:
@@ -80,6 +108,8 @@ class ReportPayloadDescriptor(Model):
         :param payload_type: The payload_type of this ReportPayloadDescriptor.
         :type payload_type: str
         """
+        if payload_type is None:
+            raise ValueError("Invalid value for `payload_type`, must not be `None`")  # noqa: E501
 
         self._payload_type = payload_type
 

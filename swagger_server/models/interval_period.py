@@ -6,6 +6,8 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.duration import Duration  # noqa: F401,E501
+from swagger_server.models.model_date_time import ModelDateTime  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -14,20 +16,20 @@ class IntervalPeriod(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, start: str='None', duration: str='None', randomize_start: str='None'):  # noqa: E501
+    def __init__(self, start: ModelDateTime=None, duration: Duration=None, randomize_start: Duration=None):  # noqa: E501
         """IntervalPeriod - a model defined in Swagger
 
         :param start: The start of this IntervalPeriod.  # noqa: E501
-        :type start: str
+        :type start: ModelDateTime
         :param duration: The duration of this IntervalPeriod.  # noqa: E501
-        :type duration: str
+        :type duration: Duration
         :param randomize_start: The randomize_start of this IntervalPeriod.  # noqa: E501
-        :type randomize_start: str
+        :type randomize_start: Duration
         """
         self.swagger_types = {
-            'start': str,
-            'duration': str,
-            'randomize_start': str
+            'start': ModelDateTime,
+            'duration': Duration,
+            'randomize_start': Duration
         }
 
         self.attribute_map = {
@@ -51,70 +53,66 @@ class IntervalPeriod(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def start(self) -> str:
+    def start(self) -> ModelDateTime:
         """Gets the start of this IntervalPeriod.
 
-        The start time of an interval or set of intervals.  # noqa: E501
 
         :return: The start of this IntervalPeriod.
-        :rtype: str
+        :rtype: ModelDateTime
         """
         return self._start
 
     @start.setter
-    def start(self, start: str):
+    def start(self, start: ModelDateTime):
         """Sets the start of this IntervalPeriod.
 
-        The start time of an interval or set of intervals.  # noqa: E501
 
         :param start: The start of this IntervalPeriod.
-        :type start: str
+        :type start: ModelDateTime
         """
+        if start is None:
+            raise ValueError("Invalid value for `start`, must not be `None`")  # noqa: E501
 
         self._start = start
 
     @property
-    def duration(self) -> str:
+    def duration(self) -> Duration:
         """Gets the duration of this IntervalPeriod.
 
-        The duration of an interval or set of intervals.  # noqa: E501
 
         :return: The duration of this IntervalPeriod.
-        :rtype: str
+        :rtype: Duration
         """
         return self._duration
 
     @duration.setter
-    def duration(self, duration: str):
+    def duration(self, duration: Duration):
         """Sets the duration of this IntervalPeriod.
 
-        The duration of an interval or set of intervals.  # noqa: E501
 
         :param duration: The duration of this IntervalPeriod.
-        :type duration: str
+        :type duration: Duration
         """
 
         self._duration = duration
 
     @property
-    def randomize_start(self) -> str:
+    def randomize_start(self) -> Duration:
         """Gets the randomize_start of this IntervalPeriod.
 
-        Indicates a randomization time that may be applied to start.  # noqa: E501
 
         :return: The randomize_start of this IntervalPeriod.
-        :rtype: str
+        :rtype: Duration
         """
         return self._randomize_start
 
     @randomize_start.setter
-    def randomize_start(self, randomize_start: str):
+    def randomize_start(self, randomize_start: Duration):
         """Sets the randomize_start of this IntervalPeriod.
 
-        Indicates a randomization time that may be applied to start.  # noqa: E501
 
         :param randomize_start: The randomize_start of this IntervalPeriod.
-        :type randomize_start: str
+        :type randomize_start: Duration
         """
 
         self._randomize_start = randomize_start

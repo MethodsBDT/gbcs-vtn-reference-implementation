@@ -14,7 +14,7 @@ class Target(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, target_type: str='None', values: List[str]=None):  # noqa: E501
+    def __init__(self, target_type: str=None, values: List[str]=None):  # noqa: E501
         """Target - a model defined in Swagger
 
         :param target_type: The target_type of this Target.  # noqa: E501
@@ -65,6 +65,8 @@ class Target(Model):
         :param target_type: The target_type of this Target.
         :type target_type: str
         """
+        if target_type is None:
+            raise ValueError("Invalid value for `target_type`, must not be `None`")  # noqa: E501
 
         self._target_type = target_type
 
@@ -72,7 +74,7 @@ class Target(Model):
     def values(self) -> List[str]:
         """Gets the values of this Target.
 
-        a sequence of targeting values. Most often a singular value such as a resourceID, but could be a list of GPS coordinates or other.   # noqa: E501
+        A list of values.  # noqa: E501
 
         :return: The values of this Target.
         :rtype: List[str]
@@ -83,10 +85,12 @@ class Target(Model):
     def values(self, values: List[str]):
         """Sets the values of this Target.
 
-        a sequence of targeting values. Most often a singular value such as a resourceID, but could be a list of GPS coordinates or other.   # noqa: E501
+        A list of values.  # noqa: E501
 
         :param values: The values of this Target.
         :type values: List[str]
         """
+        if values is None:
+            raise ValueError("Invalid value for `values`, must not be `None`")  # noqa: E501
 
         self._values = values

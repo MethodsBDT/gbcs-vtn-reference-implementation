@@ -7,7 +7,7 @@ from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
 from swagger_server.models.interval_period import IntervalPeriod  # noqa: F401,E501
-from swagger_server.models.payload import Payload  # noqa: F401,E501
+from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -16,7 +16,7 @@ class Interval(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=0, interval_period: IntervalPeriod=None, payloads: List[Payload]=None):  # noqa: E501
+    def __init__(self, id: int=None, interval_period: IntervalPeriod=None, payloads: List[ValuesMap]=None):  # noqa: E501
         """Interval - a model defined in Swagger
 
         :param id: The id of this Interval.  # noqa: E501
@@ -24,16 +24,16 @@ class Interval(Model):
         :param interval_period: The interval_period of this Interval.  # noqa: E501
         :type interval_period: IntervalPeriod
         :param payloads: The payloads of this Interval.  # noqa: E501
-        :type payloads: List[Payload]
+        :type payloads: List[ValuesMap]
         """
         self.swagger_types = {
             'id': int,
             'interval_period': IntervalPeriod,
-            'payloads': List[Payload]
+            'payloads': List[ValuesMap]
         }
 
         self.attribute_map = {
-            'id': 'ID',
+            'id': 'id',
             'interval_period': 'intervalPeriod',
             'payloads': 'payloads'
         }
@@ -99,24 +99,24 @@ class Interval(Model):
         self._interval_period = interval_period
 
     @property
-    def payloads(self) -> List[Payload]:
+    def payloads(self) -> List[ValuesMap]:
         """Gets the payloads of this Interval.
 
-        An array of payload objects.  # noqa: E501
+        A list of valuesMap objects.  # noqa: E501
 
         :return: The payloads of this Interval.
-        :rtype: List[Payload]
+        :rtype: List[ValuesMap]
         """
         return self._payloads
 
     @payloads.setter
-    def payloads(self, payloads: List[Payload]):
+    def payloads(self, payloads: List[ValuesMap]):
         """Sets the payloads of this Interval.
 
-        An array of payload objects.  # noqa: E501
+        A list of valuesMap objects.  # noqa: E501
 
         :param payloads: The payloads of this Interval.
-        :type payloads: List[Payload]
+        :type payloads: List[ValuesMap]
         """
         if payloads is None:
             raise ValueError("Invalid value for `payloads`, must not be `None`")  # noqa: E501

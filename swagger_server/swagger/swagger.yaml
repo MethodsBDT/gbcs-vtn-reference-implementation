@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
-  title: OpenADR REST Demand Response API
+  title: OpenADR 3.0.0 API
   description: |
-    The OpenADR REST API supports energy retailer to energy customer Demand Response programs.
+    The OpenADR 3.0.0 API supports energy retailer to energy customer Demand Response programs.
     The API includes the following capabilities and operations:
 
     __Manage programs:__
@@ -41,14 +41,10 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.0
+  version: 3.0.0
 servers:
-- url: https://virtserver.swaggerhub.com/openadr3/OADR-3.0.0/1.0.0
-  description: SwaggerHub API Auto Mocking
-- url: http://localhost:8081/openadr3
+- url: http://localhost:8080/openadr3/OADR-3.0.0/1.0.0/
   description: base path
-- url: https://virtserver.swaggerhub.com/openadr3
-  description: SwaggerHub API Auto Mocking
 paths:
   /programs:
     get:
@@ -57,19 +53,19 @@ paths:
       summary: searches all programs
       description: |
         List all programs known to the server.
-        Use no_defaults query param to view representation w no default values.
-        Use skip and pagination query params to limit reponse size.
+        Use skip and pagination query params to limit response size.
       operationId: search_all_programs
       parameters:
-      - name: no_defaults
+      - name: targets
         in: query
-        description: return representations that do not include attributes with default
-          values.
+        description: return programs that match requested targets
         required: false
         style: form
         explode: true
         schema:
-          type: boolean
+          type: array
+          items:
+            $ref: '#/components/schemas/target'
       - name: skip
         in: query
         description: number of records to skip for pagination.
@@ -103,6 +99,12 @@ paths:
                 x-content-type: application/json
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
           content:
             application/json:
               schema:
@@ -136,18 +138,22 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/program'
-                x-content-type: application/json
+                $ref: '#/components/schemas/program'
         "400":
           description: Bad Request.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
         "409":
-          description: Conflict. A program with the same programName already exists.
+          description: Conflict. Implementation dependent response if program with
+            the same programName exists.
           content:
             application/json:
               schema:
@@ -170,28 +176,16 @@ paths:
       summary: searches programs by program ID
       description: |
         Fetch the program specified by the programID in path.
-        Use no_defaults query param to view representation w no default values.
       operationId: search_program_by_program_id
       parameters:
       - name: programID
         in: path
-        description: Numeric ID of the program object.
+        description: Object ID of the program object.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-        example: 999
-      - name: no_defaults
-        in: query
-        description: return representations that do not include attributes with default
-          values.
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: boolean
+          $ref: '#/components/schemas/objectID'
       responses:
         "200":
           description: OK.
@@ -201,6 +195,12 @@ paths:
                 $ref: '#/components/schemas/program'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
           content:
             application/json:
               schema:
@@ -225,14 +225,12 @@ paths:
       parameters:
       - name: programID
         in: path
-        description: Numeric ID of the program object.
+        description: Object ID of the program object.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-        example: 999
+          $ref: '#/components/schemas/objectID'
       requestBody:
         description: program item to update.
         content:
@@ -245,12 +243,22 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/program'
-                x-content-type: application/json
+                $ref: '#/components/schemas/program'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "409":
+          description: Conflict. Implementation dependent response if program with
+            the same programName exists.
           content:
             application/json:
               schema:
@@ -275,26 +283,27 @@ paths:
       parameters:
       - name: programID
         in: path
-        description: Numeric ID of the program object.
+        description: Object ID of the program object.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-        example: 999
+          $ref: '#/components/schemas/objectID'
       responses:
         "200":
           description: OK.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/program'
-                x-content-type: application/json
+                $ref: '#/components/schemas/program'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
           content:
             application/json:
               schema:
@@ -318,39 +327,27 @@ paths:
       description: |
         List all reports known to the server.
         May filter results by programID and clientID as query param.
-        Use no_defaults query param to view representation w no default values.
-        Use skip and pagination query params to limit reponse size.
+        Use skip and pagination query params to limit response size.
       operationId: search_all_reports
       parameters:
       - name: programID
         in: query
-        description: Numeric ID of the associated program.
+        description: filter results to reports with programID.
         required: false
         style: form
         explode: true
         schema:
-          type: integer
-          format: int32
-        example: 999
-      - name: clientID
+          $ref: '#/components/schemas/objectID'
+        example: program-999
+      - name: clientName
         in: query
-        description: Numeric ID of the associated program.
+        description: filter results to reports with clientIdentifier.
         required: false
         style: form
         explode: true
         schema:
-          type: integer
-          format: int32
+          type: string
         example: 999
-      - name: no_defaults
-        in: query
-        description: return representations that do not include attributes with default
-          values.
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: boolean
       - name: skip
         in: query
         description: number of records to skip for pagination.
@@ -384,6 +381,12 @@ paths:
                 x-content-type: application/json
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
           content:
             application/json:
               schema:
@@ -417,12 +420,22 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/report'
-                x-content-type: application/json
+                $ref: '#/components/schemas/report'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "409":
+          description: Conflict. Implementation dependent response if identical report
+            exists.
           content:
             application/json:
               schema:
@@ -445,28 +458,16 @@ paths:
       summary: searches reports by reportID
       description: |
         Fetch the report specified by the reportID in path.
-        Use no_defaults query param to view representation w no default values.
       operationId: search_reports_by_report_id
       parameters:
       - name: reportID
         in: path
-        description: Numeric ID of a report.
+        description: object ID of a report.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-        example: 888
-      - name: no_defaults
-        in: query
-        description: return representations that do not include attributes with default
-          values.
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: boolean
+          $ref: '#/components/schemas/objectID'
       responses:
         "200":
           description: OK.
@@ -476,6 +477,12 @@ paths:
                 $ref: '#/components/schemas/report'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
           content:
             application/json:
               schema:
@@ -500,14 +507,12 @@ paths:
       parameters:
       - name: reportID
         in: path
-        description: Numeric ID of a report.
+        description: object ID of a report.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-        example: 888
+          $ref: '#/components/schemas/objectID'
       requestBody:
         description: Report item to update.
         content:
@@ -520,12 +525,22 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/report'
-                x-content-type: application/json
+                $ref: '#/components/schemas/report'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "409":
+          description: Conflict. Implementation dependent response if program with
+            the same programName exists.
           content:
             application/json:
               schema:
@@ -550,26 +565,27 @@ paths:
       parameters:
       - name: reportID
         in: path
-        description: Numeric ID of a report.
+        description: object ID of a report.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-        example: 888
+          $ref: '#/components/schemas/objectID'
       responses:
         "200":
           description: OK.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/report'
-                x-content-type: application/json
+                $ref: '#/components/schemas/report'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
           content:
             application/json:
               schema:
@@ -592,29 +608,28 @@ paths:
       summary: searches all events
       description: |
         List all events known to the server. May filter results by programID query param.
-        Use skip and pagination query params to limit reponse size.
-        Use no_defaults query param to view represenation w no default values.
+        Use skip and pagination query params to limit response size.
       operationId: search_all_events
       parameters:
       - name: programID
         in: query
-        description: Numeric ID of the associated program.
+        description: filter results to events with programID.
         required: false
         style: form
         explode: true
         schema:
-          type: integer
-          format: int32
-        example: 999
-      - name: no_defaults
+          $ref: '#/components/schemas/objectID'
+        example: program-999
+      - name: targets
         in: query
-        description: return representations that do not include attributes with default
-          values.
+        description: return programs that match requested targets
         required: false
         style: form
         explode: true
         schema:
-          type: boolean
+          type: array
+          items:
+            $ref: '#/components/schemas/target'
       - name: skip
         in: query
         description: number of records to skip for pagination.
@@ -648,6 +663,12 @@ paths:
                 x-content-type: application/json
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
           content:
             application/json:
               schema:
@@ -681,18 +702,22 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/event'
-                x-content-type: application/json
+                $ref: '#/components/schemas/event'
         "400":
           description: Bad Request.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
         "409":
-          description: Conflict. An event with the same name already exists.
+          description: Conflict. Implementation dependent response if event with  same
+            name already exists.
           content:
             application/json:
               schema:
@@ -715,28 +740,16 @@ paths:
       summary: search events by ID
       description: |
         Fetch event associated with the eventID in path.
-        Use no_defaults query param to view representation w no default values.
       operationId: search_events_by_id
       parameters:
       - name: eventID
         in: path
-        description: event ID.
+        description: object ID of event.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-        example: 999
-      - name: no_defaults
-        in: query
-        description: return representations that do not include attributes with default
-          values.
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: boolean
+          $ref: '#/components/schemas/objectID'
       responses:
         "200":
           description: OK.
@@ -749,6 +762,12 @@ paths:
                 x-content-type: application/json
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
           content:
             application/json:
               schema:
@@ -773,14 +792,12 @@ paths:
       parameters:
       - name: eventID
         in: path
-        description: event ID.
+        description: object ID of event.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-        example: 999
+          $ref: '#/components/schemas/objectID'
       requestBody:
         description: event item to update.
         content:
@@ -793,12 +810,22 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/event'
-                x-content-type: application/json
+                $ref: '#/components/schemas/event'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "409":
+          description: Conflict. Implementation dependent response if program with
+            the same programName exists.
           content:
             application/json:
               schema:
@@ -824,26 +851,27 @@ paths:
       parameters:
       - name: eventID
         in: path
-        description: event ID.
+        description: object ID of event.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-        example: 999
+          $ref: '#/components/schemas/objectID'
       responses:
         "200":
           description: OK.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/event'
-                x-content-type: application/json
+                $ref: '#/components/schemas/event'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
           content:
             application/json:
               schema:
@@ -867,47 +895,46 @@ paths:
       description: |
         List all subscriptions.
         May filter results by programID and clientID as query params.
-        May filter results by resourceTypes as query param. ResoureTypes are PROGRAM, REPORT, EVENT.
-        Use skip and pagination query params to limit reponse size.
+        May filter results by resourceTypes as query param. See resoureTypes schema.
+        Use skip and pagination query params to limit response size.
       operationId: search_subscriptions
       parameters:
       - name: programID
         in: query
-        description: filter results to subscriptions with programID of associated
-          value.
+        description: filter results to subscriptions with programID.
         required: false
         style: form
         explode: true
         schema:
-          type: integer
-          format: int32
-          example: 0
-      - name: clientID
+          $ref: '#/components/schemas/objectID'
+      - name: clientName
         in: query
-        description: filter results to subscriptions with clientID of associated value.
+        description: filter results to subscriptions with clientIdentifier.
         required: false
         style: form
         explode: true
         schema:
-          type: integer
-          format: int32
-          example: 0
-      - name: resourceTypes
+          type: string
+      - name: targets
         in: query
-        description: filter results to subscriptions with resourceTypes of associated
-          values.
+        description: return programs that match requested targets
         required: false
         style: form
-        explode: false
+        explode: true
         schema:
           type: array
           items:
-            type: string
-            enum:
-            - PROGRAM
-            - REPORT
-            - EVENT
-        example: "resourceTypes=PROGRAM, EVENT"
+            $ref: '#/components/schemas/target'
+      - name: resourceTypes
+        in: query
+        description: list of resources to subscribe to.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/resourceTypes'
       - name: skip
         in: query
         description: number of records to skip for pagination.
@@ -945,6 +972,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
         "500":
           description: Internal Server Error.
           content:
@@ -974,12 +1007,22 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/subscription'
-                x-content-type: application/json
+                $ref: '#/components/schemas/subscription'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "409":
+          description: Conflict. Implementation dependent response if identical object
+            already exists.
           content:
             application/json:
               schema:
@@ -1019,14 +1062,12 @@ paths:
       parameters:
       - name: subscriptionID
         in: path
-        description: Numeric ID of the associated subscription.
+        description: object ID of the associated subscription.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-          example: 999
+          $ref: '#/components/schemas/objectID'
       responses:
         "200":
           description: OK.
@@ -1036,6 +1077,12 @@ paths:
                 $ref: '#/components/schemas/subscription'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
           content:
             application/json:
               schema:
@@ -1061,14 +1108,12 @@ paths:
       parameters:
       - name: subscriptionID
         in: path
-        description: Numeric ID of the associated subscription.
+        description: object ID of the associated subscription.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-          example: 999
+          $ref: '#/components/schemas/objectID'
       requestBody:
         description: subscription item to update.
         content:
@@ -1084,6 +1129,19 @@ paths:
                 $ref: '#/components/schemas/subscription'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "409":
+          description: Conflict. Implementation dependent response if program with
+            the same programName exists.
           content:
             application/json:
               schema:
@@ -1109,14 +1167,12 @@ paths:
       parameters:
       - name: subscriptionID
         in: path
-        description: Numeric ID of the associated subscription.
+        description: object ID of the associated subscription.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-          example: 999
+          $ref: '#/components/schemas/objectID'
       responses:
         "200":
           description: OK.
@@ -1126,6 +1182,12 @@ paths:
                 $ref: '#/components/schemas/subscription'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
           content:
             application/json:
               schema:
@@ -1148,9 +1210,19 @@ paths:
       summary: search vens
       description: |
         List all vens.
-        Use skip and pagination query params to limit reponse size.
+        Use skip and pagination query params to limit response size.
       operationId: search_vens
       parameters:
+      - name: targets
+        in: query
+        description: return vens that match requested targets
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/target'
       - name: skip
         in: query
         description: number of records to skip for pagination.
@@ -1188,6 +1260,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
         "500":
           description: Internal Server Error.
           content:
@@ -1217,12 +1295,22 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ven'
-                x-content-type: application/json
+                $ref: '#/components/schemas/ven'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "409":
+          description: Conflict. Implementation dependent response if ven with same
+            venIdentifier already exists.
           content:
             application/json:
               schema:
@@ -1248,14 +1336,12 @@ paths:
       parameters:
       - name: venID
         in: path
-        description: Numeric ID of the associated ven.
+        description: object ID of ven.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-          example: 999
+          $ref: '#/components/schemas/objectID'
       responses:
         "200":
           description: OK.
@@ -1265,6 +1351,12 @@ paths:
                 $ref: '#/components/schemas/ven'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
           content:
             application/json:
               schema:
@@ -1289,14 +1381,12 @@ paths:
       parameters:
       - name: venID
         in: path
-        description: Numeric ID of the associated ven.
+        description: object ID of ven.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-          example: 999
+          $ref: '#/components/schemas/objectID'
       requestBody:
         description: ven item to update.
         content:
@@ -1312,6 +1402,19 @@ paths:
                 $ref: '#/components/schemas/ven'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "409":
+          description: Conflict. Implementation dependent response if program with
+            the same programName exists.
           content:
             application/json:
               schema:
@@ -1336,14 +1439,12 @@ paths:
       parameters:
       - name: venID
         in: path
-        description: Numeric ID of the associated ven.
+        description: object ID of ven.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-          example: 999
+          $ref: '#/components/schemas/objectID'
       responses:
         "200":
           description: OK.
@@ -1353,6 +1454,12 @@ paths:
                 $ref: '#/components/schemas/ven'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
           content:
             application/json:
               schema:
@@ -1378,14 +1485,43 @@ paths:
       parameters:
       - name: venID
         in: path
-        description: Numeric ID of the associated ven.
+        description: Numeric ID of ven.
         required: true
         style: simple
         explode: false
         schema:
+          $ref: '#/components/schemas/objectID'
+      - name: targets
+        in: query
+        description: return programs that match requested targets
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/target'
+      - name: skip
+        in: query
+        description: number of records to skip for pagination.
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 0
           type: integer
           format: int32
-          example: 999
+      - name: limit
+        in: query
+        description: maximum number of records to return.
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 50
+          minimum: 0
+          type: integer
+          format: int32
       responses:
         "200":
           description: OK.
@@ -1395,6 +1531,12 @@ paths:
                 $ref: '#/components/schemas/resource'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
           content:
             application/json:
               schema:
@@ -1419,14 +1561,12 @@ paths:
       parameters:
       - name: venID
         in: path
-        description: Numeric ID of the associated ven.
+        description: Numeric ID of ven.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-          example: 999
+          $ref: '#/components/schemas/objectID'
       requestBody:
         content:
           application/json:
@@ -1439,12 +1579,22 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/resource'
-                x-content-type: application/json
+                $ref: '#/components/schemas/resource'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "409":
+          description: Conflict. Implementation dependent response if resource with  same
+            resourceIdentifier already exists.
           content:
             application/json:
               schema:
@@ -1471,24 +1621,20 @@ paths:
       parameters:
       - name: venID
         in: path
-        description: Numeric ID of the associated ven.
+        description: object ID of the associated ven.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-          example: 999
+          $ref: '#/components/schemas/objectID'
       - name: resourceID
         in: path
-        description: Numeric ID of the associated resource.
+        description: object ID of the resource.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-          example: 999
+          $ref: '#/components/schemas/objectID'
       responses:
         "200":
           description: OK.
@@ -1498,6 +1644,12 @@ paths:
                 $ref: '#/components/schemas/resource'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
           content:
             application/json:
               schema:
@@ -1523,24 +1675,20 @@ paths:
       parameters:
       - name: venID
         in: path
-        description: Numeric ID of the associated ven.
+        description: object ID of the associated ven.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-          example: 999
+          $ref: '#/components/schemas/objectID'
       - name: resourceID
         in: path
-        description: Numeric ID of the associated resource.
+        description: object ID of the resource.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-          example: 999
+          $ref: '#/components/schemas/objectID'
       requestBody:
         description: resource item to update.
         content:
@@ -1553,9 +1701,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ven'
+                $ref: '#/components/schemas/resource'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "409":
+          description: Conflict. Implementation dependent response if program with
+            the same programName exists.
           content:
             application/json:
               schema:
@@ -1581,33 +1742,35 @@ paths:
       parameters:
       - name: venID
         in: path
-        description: Numeric ID of the associated ven.
+        description: object ID of the associated ven.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-          example: 999
+          $ref: '#/components/schemas/objectID'
       - name: resourceID
         in: path
-        description: Numeric ID of the associated resource.
+        description: object ID of the resource.
         required: true
         style: simple
         explode: false
         schema:
-          type: integer
-          format: int32
-          example: 999
+          $ref: '#/components/schemas/objectID'
       responses:
         "200":
           description: OK.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ven'
+                $ref: '#/components/schemas/resource'
         "400":
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
           content:
             application/json:
               schema:
@@ -1663,6 +1826,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
+        "403":
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
         "500":
           description: Internal Server Error.
           content:
@@ -1677,312 +1846,560 @@ components:
       - programName
       type: object
       properties:
-        ID:
+        id:
           $ref: '#/components/schemas/objectID'
         createdDateTime:
-          type: string
-          description: |
-            Creation time for object.
-            Server provisions timestamp string on object creation.
-          example: 01012022:010000
+          $ref: '#/components/schemas/dateTime'
         modificationDateTime:
+          $ref: '#/components/schemas/dateTime'
+        objectType:
           type: string
-          description: |
-            Modification time for object.
-            Server provisions timestamp string on object modification.
-          example: 01012022:010000
+          description: "Used as discriminator, e.g. notification.object"
+          enum:
+          - PROGRAM
         programName:
           type: string
           description: Short name to uniquely identify program.
           example: ResTOU
-          default: None
         programLongName:
           type: string
           description: Long name of program for human readability.
+          nullable: true
           example: Residential Time of Use-A
-          default: None
         retailerName:
           type: string
           description: Short name of energy retailer providing the program.
+          nullable: true
           example: ACME
-          default: None
         retailerLongName:
           type: string
           description: Long name of energy retailer for human readability.
+          nullable: true
           example: ACME Electric Inc.
-          default: None
         programType:
           type: string
           description: A program defined categorization.
+          nullable: true
           example: PRICING_TARIFF
-          default: None
         country:
           type: string
           description: Alpha-2 code per ISO 3166-1.
+          nullable: true
           example: US
-          default: None
         principalSubdivision:
           type: string
           description: Coding per ISO 3166-2. E.g. state in US.
+          nullable: true
           example: CO
-          default: None
         timeZoneOffset:
-          type: string
-          description: Number of hours different from UTC for the standard time applicable
-            to the program.
-          example: PT7H
+          $ref: '#/components/schemas/duration'
         intervalPeriod:
           $ref: '#/components/schemas/intervalPeriod'
         programDescriptions:
           type: array
-          description: List of URLs to human and/or machine readable content.
+          description: A list of programDescriptions
+          nullable: true
           items:
             $ref: '#/components/schemas/program_programDescriptions'
         bindingEvents:
           type: boolean
           description: True if events are fixed once transmitted.
+          example: false
           default: false
         localPrice:
           type: boolean
           description: True if events have been adapted from a grid event.
+          example: false
           default: false
         payloadDescriptors:
           type: array
+          description: A list of payloadDescriptors.
+          nullable: true
           items:
+            discriminator:
+              propertyName: objectType
             anyOf:
             - $ref: '#/components/schemas/eventPayloadDescriptor'
             - $ref: '#/components/schemas/reportPayloadDescriptor'
+        targets:
+          type: array
+          description: A list of target objects.
+          nullable: true
+          items:
+            $ref: '#/components/schemas/target'
       description: Provides program specific metadata from VTN to VEN.
       example:
+        country: US
+        programType: PRICING_TARIFF
+        bindingEvents: false
+        programLongName: Residential Time of Use-A
+        timeZoneOffset: PT1H
+        createdDateTime: 2023-06-15T09:30:00.000Z
+        modificationDateTime: null
+        targets:
+        - values:
+          - RESOURCE-999
+          - RESOURCE-999
+          targetType: VEN_ID
+        - values:
+          - RESOURCE-999
+          - RESOURCE-999
+          targetType: VEN_ID
+        objectType: PROGRAM
+        payloadDescriptors:
+        - ""
+        - ""
+        principalSubdivision: CO
         programName: ResTOU
+        retailerName: ACME
+        id: object-999
+        programDescriptions:
+        - URL: www.myCorporation.com/myProgramDescription
+        - URL: www.myCorporation.com/myProgramDescription
+        intervalPeriod:
+          duration: null
+          randomizeStart: null
+          start: null
+        localPrice: false
+        retailerLongName: ACME Electric Inc.
     report:
       required:
-      - clientID
+      - clientName
       - eventID
       - programID
+      - resources
       type: object
       properties:
-        ID:
+        id:
           $ref: '#/components/schemas/objectID'
         createdDateTime:
-          type: string
-          description: |
-            Creation time for object.
-            Server provisions timestamp string on object creation.
-          example: 01012022:010000
+          $ref: '#/components/schemas/dateTime'
         modificationDateTime:
+          $ref: '#/components/schemas/dateTime'
+        objectType:
           type: string
-          description: |
-            Modification time for object.
-            Server provisions timestamp string on object modification.
-          example: 01012022:010000
+          description: "Used as discriminator, e.g. notification.object"
+          enum:
+          - REPORT
         programID:
           $ref: '#/components/schemas/objectID'
         eventID:
           $ref: '#/components/schemas/objectID'
-        clientID:
-          description: "Numeric or string ID of client, may be VEN ID provisioned\
-            \ during program enrollment."
-          example: 99
-          oneOf:
-          - type: integer
-          - type: string
-          default: None
+        clientName:
+          type: string
+          description: User generated identifier; may be VEN ID provisioned during
+            program enrollment.
+          nullable: true
+          example: VEN-999
         name:
           type: string
           description: User defined string for use in debugging or User Interface.
+          nullable: true
           example: Battery_usage_04112023
-          default: None
         payloadDescriptors:
           type: array
+          description: A list of reportPayloadDescriptors.
+          nullable: true
           items:
             $ref: '#/components/schemas/reportPayloadDescriptor'
         resources:
           type: array
-          description: An array of objects containing report data for a set of resources.
-          example:
-          - resourceID: 0
-            intervalPeriod: None
-            intervals: None
+          description: A list of objects containing report data for a set of resources.
           items:
             $ref: '#/components/schemas/report_resources'
       description: report object.
       example:
-        programID: 99
-        eventID: 99
-        clientID: 999
+        payloadDescriptors:
+        - payloadType: USAGE
+          confidence: 100
+          accuracy: 0
+          units: KWH
+          readingType: DIRECT_READ
+          objectType: REPORT_PAYLOAD_DESCRIPTOR
+        - payloadType: USAGE
+          confidence: 100
+          accuracy: 0
+          units: KWH
+          readingType: DIRECT_READ
+          objectType: REPORT_PAYLOAD_DESCRIPTOR
+        eventID: null
+        clientName: VEN-999
+        name: Battery_usage_04112023
+        createdDateTime: 2023-06-15T09:30:00.000Z
+        resources:
+        - intervals:
+          - payloads:
+            - values:
+              - 0.17
+              type: PRICE
+            - values:
+              - 0.17
+              type: PRICE
+            id: 0
+            intervalPeriod: null
+          - payloads:
+            - values:
+              - 0.17
+              type: PRICE
+            - values:
+              - 0.17
+              type: PRICE
+            id: 0
+            intervalPeriod: null
+          resourceName: RESOURCE-999
+          intervalPeriod:
+            duration: null
+            randomizeStart: null
+            start: null
+        - intervals:
+          - payloads:
+            - values:
+              - 0.17
+              type: PRICE
+            - values:
+              - 0.17
+              type: PRICE
+            id: 0
+            intervalPeriod: null
+          - payloads:
+            - values:
+              - 0.17
+              type: PRICE
+            - values:
+              - 0.17
+              type: PRICE
+            id: 0
+            intervalPeriod: null
+          resourceName: RESOURCE-999
+          intervalPeriod:
+            duration: null
+            randomizeStart: null
+            start: null
+        id: object-999
+        modificationDateTime: null
+        programID: null
+        objectType: REPORT
     event:
       required:
       - intervals
       - programID
       type: object
       properties:
-        ID:
+        id:
           $ref: '#/components/schemas/objectID'
         createdDateTime:
-          type: string
-          description: |
-            Creation time for object.
-            Server provisions timestamp string on object creation.
-          example: 01012022:010000
+          $ref: '#/components/schemas/dateTime'
         modificationDateTime:
+          $ref: '#/components/schemas/dateTime'
+        objectType:
           type: string
-          description: |
-            Modification time for object.
-            Server provisions timestamp string on object modification.
-          example: 01012022:010000
+          description: "Used as discriminator, e.g. notification.object"
+          enum:
+          - EVENT
         programID:
           $ref: '#/components/schemas/objectID'
         name:
           type: string
           description: User defined string for use in debugging or User Interface.
+          nullable: true
           example: price event 11-18-2022
-          default: None
         priority:
           type: integer
           description: Relative priority of event. A lower number is a higher priority.
+          nullable: true
           example: 0
         targets:
           type: array
-          description: An array of target objects.
+          description: A list of target objects.
+          nullable: true
           items:
             $ref: '#/components/schemas/target'
         reportDescriptors:
           type: array
-          description: An array of reportDescriptor objects. Used to request reports
+          description: A list of reportDescriptor objects. Used to request reports
             from VEN.
+          nullable: true
           items:
             $ref: '#/components/schemas/reportDescriptor'
         payloadDescriptors:
           type: array
-          description: An array of payloadDescriptor objects.
+          description: A list of payloadDescriptor objects.
+          nullable: true
           items:
             $ref: '#/components/schemas/eventPayloadDescriptor'
         intervalPeriod:
           $ref: '#/components/schemas/intervalPeriod'
         intervals:
           type: array
-          description: An array of interval objects.
+          description: A list of interval objects.
           items:
             $ref: '#/components/schemas/interval'
       description: |
         Event object to communicate a Demand Response request to VEN.
         If intervalPeriod is present, sets start time and duration of intervals.
       example:
-        programID: 99
+        payloadDescriptors:
+        - payloadType: PRICE
+          currency: USD
+          units: KWH
+          objectType: EVENT_PAYLOAD_DESCRIPTOR
+        - payloadType: PRICE
+          currency: USD
+          units: KWH
+          objectType: EVENT_PAYLOAD_DESCRIPTOR
+        reportDescriptors:
+        - payloadType: USAGE
+          startInterval: -1
+          numIntervals: -1
+          repeat: 1
+          historical: true
+          readingType: DIRECT_READ
+          targets:
+          - null
+          - null
+          aggregate: false
+          frequency: -1
+        - payloadType: USAGE
+          startInterval: -1
+          numIntervals: -1
+          repeat: 1
+          historical: true
+          readingType: DIRECT_READ
+          targets:
+          - null
+          - null
+          aggregate: false
+          frequency: -1
         intervals:
-        - ID: 0
-          payloads:
-          - payloadType: SIMPLE
-            values:
-            - 0
+        - payloads:
+          - values:
+            - 0.17
+            type: PRICE
+          - values:
+            - 0.17
+            type: PRICE
+          id: 0
+          intervalPeriod: null
+        - payloads:
+          - values:
+            - 0.17
+            type: PRICE
+          - values:
+            - 0.17
+            type: PRICE
+          id: 0
+          intervalPeriod: null
+        name: price event 11-18-2022
+        createdDateTime: 2023-06-15T09:30:00.000Z
+        id: object-999
+        priority: 0
+        modificationDateTime: null
+        targets:
+        - values:
+          - RESOURCE-999
+          - RESOURCE-999
+          targetType: VEN_ID
+        - values:
+          - RESOURCE-999
+          - RESOURCE-999
+          targetType: VEN_ID
+        programID: null
+        intervalPeriod:
+          duration: null
+          randomizeStart: null
+          start: null
+        objectType: EVENT
     subscription:
       required:
-      - clientID
+      - clientName
       - programID
       - resourceOperations
       type: object
       properties:
-        ID:
+        id:
           $ref: '#/components/schemas/objectID'
         createdDateTime:
-          type: string
-          description: |
-            Creation time for object.
-            Server provisions timestamp string on object creation.
-          example: 01012022:010000
+          $ref: '#/components/schemas/dateTime'
         modificationDateTime:
+          $ref: '#/components/schemas/dateTime'
+        objectType:
           type: string
-          description: |
-            Modification time for object.
-            Server provisions timestamp string on object modification.
-          example: 01012022:010000
-        clientID:
-          $ref: '#/components/schemas/objectID'
+          description: "Used as discriminator, e.g. notification.object"
+          enum:
+          - SUBSCRIPTION
+        clientName:
+          type: string
+          description: "User generated identifier, may be VEN identifier provisioned\
+            \ during program enrollment."
+          nullable: true
+          example: VEN-999
         programID:
           $ref: '#/components/schemas/objectID'
         resourceOperations:
           type: array
           description: list of resources and operations to subscribe to.
-          example:
-          - resources:
-            - EVENT
-            - PROGRAM
-            operations:
-            - CREATE
-            - UPDATE
-            callbackUrl: https://myserver.com/send/callback/here
           items:
             $ref: '#/components/schemas/subscription_resourceOperations'
+        targets:
+          type: array
+          description: A list of target objects.
+          nullable: true
+          items:
+            $ref: '#/components/schemas/target'
       description: |
         An object created by a client to receive notification of operations on objects.
         Clients may subscribe to be notified when a type of resource is created,
         updated, or deleted.
       example:
-        clientID: 99
-        programID: 999
-        resourceOperations: []
+        resourceOperations:
+        - operations:
+          - POST
+          - POST
+          bearerToken: NCEJGI9E8ER9802UT9HUG
+          resources:
+          - EVENT
+          - EVENT
+          callbackUrl: https://myserver.com/send/callback/here
+        - operations:
+          - POST
+          - POST
+          bearerToken: NCEJGI9E8ER9802UT9HUG
+          resources:
+          - EVENT
+          - EVENT
+          callbackUrl: https://myserver.com/send/callback/here
+        clientName: VEN-999
+        createdDateTime: 2023-06-15T09:30:00.000Z
+        id: object-999
+        modificationDateTime: null
+        targets:
+        - values:
+          - RESOURCE-999
+          - RESOURCE-999
+          targetType: VEN_ID
+        - values:
+          - RESOURCE-999
+          - RESOURCE-999
+          targetType: VEN_ID
+        programID: null
+        objectType: SUBSCRIPTION
     ven:
+      required:
+      - venName
       type: object
       properties:
-        ID:
+        id:
           $ref: '#/components/schemas/objectID'
         createdDateTime:
-          type: string
-          description: |
-            Creation time for object.
-            Server provisions timestamp string on object creation.
-          example: 01012022:010000
+          $ref: '#/components/schemas/dateTime'
         modificationDateTime:
+          $ref: '#/components/schemas/dateTime'
+        objectType:
           type: string
-          description: |
-            Modification time for object.
-            Server provisions timestamp string on object modification.
-          example: 01012022:010000
-        venID:
+          description: "Used as discriminator, e.g. notification.object."
+          enum:
+          - VEN
+        venName:
           type: string
-          description: String identifier for VEN. VEN may be configured with ID out-of-band.
-          example: VENID_0999
+          description: "User generated identifier, may be VEN identifier provisioned\
+            \ during program enrollment."
+          nullable: true
+          example: VEN-999
+        attributes:
+          type: array
+          description: A list of valuesMap objects describing attributes.
+          items:
+            $ref: '#/components/schemas/valuesMap'
         targetValues:
           type: array
+          description: A list of targetValues.
+          nullable: true
           items:
             type: string
             description: A string representing a target identifier.
+            nullable: true
             example: group1
         resources:
           type: array
-          description: An array of resource objects representing end-devices or systems.
+          description: A list of resource objects representing end-devices or systems.
+          nullable: true
           items:
             $ref: '#/components/schemas/resource'
-      description: |
-        Ven represents a client with the ven role.
+      description: Ven represents a client with the ven role.
       example:
-        venID: VEN_999
+        venName: VEN-999
+        targetValues:
+        - group1
+        - group1
+        createdDateTime: 2023-06-15T09:30:00.000Z
+        resources:
+        - venID: null
+          targetValues:
+          - group1
+          - group1
+          createdDateTime: null
+          resourceName: RESOURCE-999
+          attributes:
+          - null
+          - null
+          id: null
+          modificationDateTime: null
+          objectType: RESOURCE
+        - venID: null
+          targetValues:
+          - group1
+          - group1
+          createdDateTime: null
+          resourceName: RESOURCE-999
+          attributes:
+          - null
+          - null
+          id: null
+          modificationDateTime: null
+          objectType: RESOURCE
+        attributes:
+        - values:
+          - 0.17
+          type: PRICE
+        - values:
+          - 0.17
+          type: PRICE
+        id: object-999
+        modificationDateTime: null
+        objectType: VEN
     resource:
+      required:
+      - resourceName
       type: object
       properties:
-        ID:
+        id:
           $ref: '#/components/schemas/objectID'
         createdDateTime:
-          type: string
-          description: |
-            Creation time for object.
-            Server provisions timestamp string on object creation.
-          example: 01012022:010000
+          $ref: '#/components/schemas/dateTime'
         modificationDateTime:
+          $ref: '#/components/schemas/dateTime'
+        objectType:
           type: string
-          description: |
-            Modification time for object.
-            Server provisions timestamp string on object modification.
-          example: 01012022:010000
-        resourceID:
+          description: "Used as discriminator, e.g. notification.object"
+          enum:
+          - RESOURCE
+        resourceName:
           type: string
-          description: String identifier for resource. resource may be configured
-            with ID out-of-band.
-          example: RESOURCEID_0999
-          default: None
+          description: "User generated identifier, resource may be configured with\
+            \ identifier out-of-band."
+          nullable: true
+          example: RESOURCE-999
+        venID:
+          $ref: '#/components/schemas/objectID'
+        attributes:
+          type: array
+          description: A list of valuesMap objects describing attributes.
+          items:
+            $ref: '#/components/schemas/valuesMap'
         targetValues:
           type: array
+          description: A list of targetValues.
+          nullable: true
           items:
             type: string
             description: A string representing a target identifier.
@@ -1990,76 +2407,85 @@ components:
       description: |
         A resource is an energy device or system subject to control by a VEN.
       example:
-        resourceID: resource_99
+        venID: null
+        targetValues:
+        - group1
+        - group1
+        createdDateTime: null
+        resourceName: RESOURCE-999
+        attributes:
+        - null
+        - null
+        id: null
+        modificationDateTime: null
+        objectType: RESOURCE
     interval:
       required:
-      - ID
+      - id
       - payloads
       type: object
       properties:
-        ID:
+        id:
           type: integer
           description: A client generated number assigned an interval object. Not
             a sequence number.
           format: int32
           example: 0
-          default: 0
         intervalPeriod:
           $ref: '#/components/schemas/intervalPeriod'
         payloads:
           type: array
-          description: An array of payload objects.
+          description: A list of valuesMap objects.
           items:
-            $ref: '#/components/schemas/payload'
+            $ref: '#/components/schemas/valuesMap'
       description: |
-        An object defining a temporal window and a list of payloads.
+        An object defining a temporal window and a list of valuesMaps.
         if intervalPeriod present may set temporal aspects of interval or override event.intervalPeriod.
       example:
-        ID: 0
         payloads:
-        - payloadType: SIMPLE
-          values:
-          - 0
+        - values:
+          - 0.17
+          type: PRICE
+        - values:
+          - 0.17
+          type: PRICE
+        id: 0
+        intervalPeriod: null
     intervalPeriod:
+      required:
+      - start
       type: object
       properties:
         start:
-          type: string
-          description: The start time of an interval or set of intervals.
-          example: 2001-12-17T09:30:47.000Z
-          default: None
+          $ref: '#/components/schemas/dateTime'
         duration:
-          type: string
-          description: The duration of an interval or set of intervals.
-          example: PT1H
-          default: None
+          $ref: '#/components/schemas/duration'
         randomizeStart:
-          type: string
-          description: Indicates a randomization time that may be applied to start.
-          example: PT5M
-          default: None
-      description: Defines temporal aspects of intervals.
+          $ref: '#/components/schemas/duration'
+      description: |
+        Defines temporal aspects of intervals.
+        A duration of default null indicates infinity.
+        A randomizeStart of default null indicates no randomization.
       example:
-        start: 2023-02-10T00:00:00.000Z
-        duration: PT1H
-        randomizeStart: PT5S
-    payload:
+        duration: null
+        randomizeStart: null
+        start: null
+    valuesMap:
       required:
-      - payloadType
+      - type
       - values
       type: object
       properties:
-        payloadType:
+        type:
           type: string
           description: |
             Enumerated or private string signifying the nature of values.
-            For example, "PRICE" indicates value is to be interpreted as a currency.
+            E.G. "PRICE" indicates value is to be interpreted as a currency.
           example: PRICE
-          default: None
         values:
           type: array
-          description: A sequence of data points. Most often a singular value such
-            as a price.
+          description: A list of data points. Most often a singular value such as
+            a price.
           example:
           - 0.17
           items:
@@ -2069,34 +2495,41 @@ components:
             - type: string
             - type: boolean
             - $ref: '#/components/schemas/point'
-            default: None
       description: |
         Represents one or more values associated with a type.
         E.g. a type of PRICE contains a single float value.
       example:
-        payloadType: PRICE
         values:
         - 0.17
+        type: PRICE
     point:
+      required:
+      - x
+      - "y"
       type: object
       properties:
         x:
           type: number
           description: A value on an x axis.
           format: float
+          nullable: true
           example: 1
         "y":
           type: number
           description: A value on a y axis.
           format: float
+          nullable: true
           example: 2
       description: A pair of floats typically used as a point on a 2 dimensional grid.
-      example:
-        x: 1
-        "y": 2
     eventPayloadDescriptor:
+      required:
+      - payloadType
       type: object
       properties:
+        objectType:
+          type: string
+          description: "Used as discriminator, e.g. program.payloadDescriptors"
+          default: EVENT_PAYLOAD_DESCRIPTOR
         payloadType:
           type: string
           description: Enumerated or private string signifying the nature of values.
@@ -2105,26 +2538,34 @@ components:
           type: string
           description: Units of measure.
           example: KWH
+          default: KWH
         currency:
           type: string
           description: Currency of price payload.
           example: USD
+          default: USD
       description: |
-        Contextual information used to interpret event payload values.
+        Contextual information used to interpret event valuesMap values.
         E.g. a PRICE payload simply contains a price value, an
         associated descriptor provides necessary context such as units and currency.
       example:
         payloadType: PRICE
-        units: KWH
         currency: USD
+        units: KWH
+        objectType: EVENT_PAYLOAD_DESCRIPTOR
     reportPayloadDescriptor:
+      required:
+      - payloadType
       type: object
       properties:
+        objectType:
+          type: string
+          description: "Used as discriminator, e.g. program.payloadDescriptors"
+          default: REPORT_PAYLOAD_DESCRIPTOR
         payloadType:
           type: string
           description: Enumerated or private string signifying the nature of values.
           example: USAGE
-          default: None
         readingType:
           type: string
           description: Enumerated or private string signifying the type of reading.
@@ -2134,25 +2575,32 @@ components:
           type: string
           description: Units of measure.
           example: KWH
-          default: None
+          default: KWH
         accuracy:
           type: number
           description: A quantification of the accuracy of a set of payload values.
           format: float
           example: 0
+          default: 0
         confidence:
+          maximum: 100
+          minimum: 0
           type: integer
           description: A quantification of the confidence in a set of payload values.
           format: int32
           example: 100
+          default: 100
       description: |
         Contextual information used to interpret report payload values.
         E.g. a USAGE payload simply contains a usage value, an
         associated descriptor provides necessary context such as units and data quality.
       example:
         payloadType: USAGE
-        readingType: DIRECT_READ
+        confidence: 100
+        accuracy: 0
         units: KWH
+        readingType: DIRECT_READ
+        objectType: REPORT_PAYLOAD_DESCRIPTOR
     reportDescriptor:
       required:
       - payloadType
@@ -2166,12 +2614,11 @@ components:
           type: string
           description: Enumerated or private string signifying the type of reading.
           example: DIRECT_READ
+          default: DIRECT_READ
         targets:
           type: array
-          description: An array of target objects.
-          example:
-          - type: ei:venid
-            ID: VENID999
+          description: A list of target objects.
+          nullable: true
           items:
             $ref: '#/components/schemas/target'
         aggregate:
@@ -2201,7 +2648,7 @@ components:
           type: boolean
           description: |
             True indicates report on intervals preceding startInterval.
-            False indcates report on intervals folowing startInterval (e.g. forecast).
+            False indicates report on intervals following startInterval (e.g. forecast).
           example: true
           default: true
         frequency:
@@ -2226,53 +2673,58 @@ components:
         See OpenADR REST User Guide for detailed description of how configure a report request.
       example:
         payloadType: USAGE
+        startInterval: -1
+        numIntervals: -1
+        repeat: 1
+        historical: true
         readingType: DIRECT_READ
-        reportingRate: PT1D
-        targets: None
+        targets:
+        - null
+        - null
+        aggregate: false
+        frequency: -1
     target:
+      required:
+      - targetType
+      - values
       type: object
       properties:
         targetType:
           type: string
           description: Enumerated or private string signifying the type of target.
           example: VEN_ID
-          default: None
         values:
           type: array
-          description: |
-            a sequence of targeting values.
-            Most often a singular value such as a resourceID,
-            but could be a list of GPS coordinates or other.
-          example:
-          - VENID999
+          description: A list of values.
           items:
             type: string
-      description: Indicates a type of target and corresponding resource ID.
+            description: |
+              A targeting value.
+              Most often a singular value such as a resourceID,
+              but could be a list of GPS coordinates or other.
+            example: RESOURCE-999
+      description: Indicates a target type and target value.
       example:
-        targetType: VEN_ID
         values:
-        - VENID999
+        - RESOURCE-999
+        - RESOURCE-999
+        targetType: VEN_ID
     objectID:
-      description: VTN assigned object ID.
-      example: 0
-      oneOf:
-      - type: integer
-      - pattern: "^[0123456789abcdef\\-]+$"
-        type: string
+      maxLength: 128
+      minLength: 1
+      pattern: "^[a-zA-Z0-9_-]*$"
+      type: string
+      description: URL safe VTN assigned object ID.
+      example: object-999
     notification:
+      required:
+      - object
+      - objectType
+      - operation
       type: object
       properties:
         objectType:
-          type: string
-          description: "type of object being returned, i.e. PROGRAM, EVENT, REPORT."
-          example: EVENT
-          enum:
-          - PROGRAM
-          - EVENT
-          - REPORT
-          - SUBSCRIPTION
-          - VEN
-          - RESOURCE
+          $ref: '#/components/schemas/resourceTypes'
         operation:
           type: string
           description: the operation on on object that triggered the notification.
@@ -2281,10 +2733,18 @@ components:
           - POST
           - PUT
           - DELETE
+        targets:
+          type: array
+          description: A list of target objects.
+          nullable: true
+          items:
+            $ref: '#/components/schemas/target'
         object:
           type: object
           description: the object that is the subject of the notification.
           example: {}
+          discriminator:
+            propertyName: objectType
           oneOf:
           - $ref: '#/components/schemas/program'
           - $ref: '#/components/schemas/report'
@@ -2292,11 +2752,29 @@ components:
           - $ref: '#/components/schemas/subscription'
           - $ref: '#/components/schemas/ven'
           - $ref: '#/components/schemas/resource'
-      description: An object that is the subject of the notification.
-      example:
-        objectType: EVENT
-        operation: POST
-        object: {}
+      description: |
+        VTN generated object included in request to subscription callbackUrl.
+    resourceTypes:
+      type: string
+      description: resource type to subscribe to.
+      example: EVENT
+      enum:
+      - PROGRAM
+      - EVENT
+      - REPORT
+      - SUBSCRIPTION
+      - VEN
+      - RESOURCE
+    dateTime:
+      type: string
+      description: datetime in ISO 8601 format
+      nullable: true
+      example: 2023-06-15T09:30:00.000Z
+    duration:
+      type: string
+      description: duration in ISO 8601 format
+      nullable: true
+      example: PT1H
     problem:
       type: object
       properties:
@@ -2345,52 +2823,71 @@ components:
       properties:
         URL:
           type: string
+          description: A human or machine readable program description
           format: uri
           example: www.myCorporation.com/myProgramDescription
+      example:
+        URL: www.myCorporation.com/myProgramDescription
     report_resources:
       required:
-      - resourceID
+      - intervals
+      - resourceName
       type: object
       properties:
-        resourceID:
-          type: integer
-          description: String identifier for resource. A negative value indicates
-            an aggregation of multiple resources.
-          format: int32
-          example: 99
+        resourceName:
+          type: string
+          description: User generated identifier. A value of AGGREGATED_REPORT indicates
+            an aggregation of more that one resource's data
+          nullable: true
+          example: RESOURCE-999
         intervalPeriod:
           $ref: '#/components/schemas/intervalPeriod'
         intervals:
           type: array
-          description: An array of interval objects.
+          description: A list of interval objects.
           items:
             $ref: '#/components/schemas/interval'
       description: Report data associated with a resource.
+      example:
+        intervals:
+        - payloads:
+          - values:
+            - 0.17
+            type: PRICE
+          - values:
+            - 0.17
+            type: PRICE
+          id: 0
+          intervalPeriod: null
+        - payloads:
+          - values:
+            - 0.17
+            type: PRICE
+          - values:
+            - 0.17
+            type: PRICE
+          id: 0
+          intervalPeriod: null
+        resourceName: RESOURCE-999
+        intervalPeriod:
+          duration: null
+          randomizeStart: null
+          start: null
     subscription_resourceOperations:
+      required:
+      - callbackUrl
+      - operations
+      - resources
       type: object
       properties:
         resources:
           type: array
-          description: list of resource types to subscribe to.
-          example:
-          - PROGRAM
-          - EVENT
+          description: list of resources to subscribe to.
           items:
-            type: string
-            description: resource type to subscribe to.
-            example: EVENT
-            enum:
-            - PROGRAM
-            - EVENT
-            - REPORT
-            - SUBSCRIPTION
-            - VEN
-            - RESOURCE
+            $ref: '#/components/schemas/resourceTypes'
         operations:
           type: array
           description: list of resource operations to subscribe to.
-          example:
-          - POST
           items:
             type: string
             description: resource operation to subscribe to.
@@ -2410,11 +2907,18 @@ components:
             User provided token.
             To avoid custom integrations, callback endpoints
             should accept the provided bearer token to authenticate VTN requests.
+          nullable: true
           example: NCEJGI9E8ER9802UT9HUG
       description: "resource type, operations, and callbackUrl."
-      example: "{\"resources\":[\"PROGRAM\",\"EVENT\"],\"operations\":[\"POST\",\"\
-        PUT\",\"DELETE\"],\"callbackUrl\":\"https://myserver.com/send/callback/here\"\
-        }"
+      example:
+        operations:
+        - POST
+        - POST
+        bearerToken: NCEJGI9E8ER9802UT9HUG
+        resources:
+        - EVENT
+        - EVENT
+        callbackUrl: https://myserver.com/send/callback/here
   securitySchemes:
     oAuth2ClientCredentials:
       type: oauth2

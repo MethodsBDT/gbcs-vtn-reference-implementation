@@ -15,7 +15,7 @@ class ReportDescriptor(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, payload_type: str=None, reading_type: str=None, targets: List[Target]=None, aggregate: bool=False, start_interval: int=-1, num_intervals: int=-1, historical: bool=True, frequency: int=-1, repeat: int=1):  # noqa: E501
+    def __init__(self, payload_type: str=None, reading_type: str='DIRECT_READ', targets: List[Target]=None, aggregate: bool=False, start_interval: int=-1, num_intervals: int=-1, historical: bool=True, frequency: int=-1, repeat: int=1):  # noqa: E501
         """ReportDescriptor - a model defined in Swagger
 
         :param payload_type: The payload_type of this ReportDescriptor.  # noqa: E501
@@ -133,7 +133,7 @@ class ReportDescriptor(Model):
     def targets(self) -> List[Target]:
         """Gets the targets of this ReportDescriptor.
 
-        An array of target objects.  # noqa: E501
+        A list of target objects.  # noqa: E501
 
         :return: The targets of this ReportDescriptor.
         :rtype: List[Target]
@@ -144,7 +144,7 @@ class ReportDescriptor(Model):
     def targets(self, targets: List[Target]):
         """Sets the targets of this ReportDescriptor.
 
-        An array of target objects.  # noqa: E501
+        A list of target objects.  # noqa: E501
 
         :param targets: The targets of this ReportDescriptor.
         :type targets: List[Target]
@@ -225,7 +225,7 @@ class ReportDescriptor(Model):
     def historical(self) -> bool:
         """Gets the historical of this ReportDescriptor.
 
-        True indicates report on intervals preceding startInterval. False indcates report on intervals folowing startInterval (e.g. forecast).   # noqa: E501
+        True indicates report on intervals preceding startInterval. False indicates report on intervals following startInterval (e.g. forecast).   # noqa: E501
 
         :return: The historical of this ReportDescriptor.
         :rtype: bool
@@ -236,7 +236,7 @@ class ReportDescriptor(Model):
     def historical(self, historical: bool):
         """Sets the historical of this ReportDescriptor.
 
-        True indicates report on intervals preceding startInterval. False indcates report on intervals folowing startInterval (e.g. forecast).   # noqa: E501
+        True indicates report on intervals preceding startInterval. False indicates report on intervals following startInterval (e.g. forecast).   # noqa: E501
 
         :param historical: The historical of this ReportDescriptor.
         :type historical: bool

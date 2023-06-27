@@ -65,6 +65,8 @@ class Point(Model):
         :param x: The x of this Point.
         :type x: float
         """
+        if x is None:
+            raise ValueError("Invalid value for `x`, must not be `None`")  # noqa: E501
 
         self._x = x
 
@@ -88,5 +90,7 @@ class Point(Model):
         :param y: The y of this Point.
         :type y: float
         """
+        if y is None:
+            raise ValueError("Invalid value for `y`, must not be `None`")  # noqa: E501
 
         self._y = y

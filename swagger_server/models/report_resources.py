@@ -16,28 +16,28 @@ class ReportResources(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, resource_id: int=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None):  # noqa: E501
+    def __init__(self, resource_name: str=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None):  # noqa: E501
         """ReportResources - a model defined in Swagger
 
-        :param resource_id: The resource_id of this ReportResources.  # noqa: E501
-        :type resource_id: int
+        :param resource_name: The resource_name of this ReportResources.  # noqa: E501
+        :type resource_name: str
         :param interval_period: The interval_period of this ReportResources.  # noqa: E501
         :type interval_period: IntervalPeriod
         :param intervals: The intervals of this ReportResources.  # noqa: E501
         :type intervals: List[Interval]
         """
         self.swagger_types = {
-            'resource_id': int,
+            'resource_name': str,
             'interval_period': IntervalPeriod,
             'intervals': List[Interval]
         }
 
         self.attribute_map = {
-            'resource_id': 'resourceID',
+            'resource_name': 'resourceName',
             'interval_period': 'intervalPeriod',
             'intervals': 'intervals'
         }
-        self._resource_id = resource_id
+        self._resource_name = resource_name
         self._interval_period = interval_period
         self._intervals = intervals
 
@@ -53,29 +53,29 @@ class ReportResources(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def resource_id(self) -> int:
-        """Gets the resource_id of this ReportResources.
+    def resource_name(self) -> str:
+        """Gets the resource_name of this ReportResources.
 
-        User provided resource ID. A negative value indicates an aggregation of multiple resources.  # noqa: E501
+        User generated identifier. A value of AGGREGATED_REPORT indicates an aggregation of more that one resource's data  # noqa: E501
 
-        :return: The resource_id of this ReportResources.
-        :rtype: int
+        :return: The resource_name of this ReportResources.
+        :rtype: str
         """
-        return self._resource_id
+        return self._resource_name
 
-    @resource_id.setter
-    def resource_id(self, resource_id: int):
-        """Sets the resource_id of this ReportResources.
+    @resource_name.setter
+    def resource_name(self, resource_name: str):
+        """Sets the resource_name of this ReportResources.
 
-        User provided resource ID. A negative value indicates an aggregation of multiple resources.  # noqa: E501
+        User generated identifier. A value of AGGREGATED_REPORT indicates an aggregation of more that one resource's data  # noqa: E501
 
-        :param resource_id: The resource_id of this ReportResources.
-        :type resource_id: int
+        :param resource_name: The resource_name of this ReportResources.
+        :type resource_name: str
         """
-        if resource_id is None:
-            raise ValueError("Invalid value for `resource_id`, must not be `None`")  # noqa: E501
+        if resource_name is None:
+            raise ValueError("Invalid value for `resource_name`, must not be `None`")  # noqa: E501
 
-        self._resource_id = resource_id
+        self._resource_name = resource_name
 
     @property
     def interval_period(self) -> IntervalPeriod:
@@ -102,7 +102,7 @@ class ReportResources(Model):
     def intervals(self) -> List[Interval]:
         """Gets the intervals of this ReportResources.
 
-        An array of interval objects.  # noqa: E501
+        A list of interval objects.  # noqa: E501
 
         :return: The intervals of this ReportResources.
         :rtype: List[Interval]
@@ -113,10 +113,12 @@ class ReportResources(Model):
     def intervals(self, intervals: List[Interval]):
         """Sets the intervals of this ReportResources.
 
-        An array of interval objects.  # noqa: E501
+        A list of interval objects.  # noqa: E501
 
         :param intervals: The intervals of this ReportResources.
         :type intervals: List[Interval]
         """
+        if intervals is None:
+            raise ValueError("Invalid value for `intervals`, must not be `None`")  # noqa: E501
 
         self._intervals = intervals

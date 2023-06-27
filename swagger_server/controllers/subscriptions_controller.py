@@ -5,8 +5,12 @@ import logging
 import requests
 import six
 
+from swagger_server.models.notification import Notification  # noqa: E501
+from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
+from swagger_server.models.resource_types import ResourceTypes  # noqa: E501
 from swagger_server.models.subscription import Subscription  # noqa: E501
+from swagger_server.models.target import Target  # noqa: E501
 from swagger_server import util
 
 subscriptions = []
@@ -18,17 +22,17 @@ def create_subscription(body):  # noqa: E501
 
     Create a new subscription. # noqa: E501
 
-    :param body:
+    :param body: 
     :type body: dict | bytes
 
-    :rtype: List[Subscription]
+    :rtype: Subscription
     """
-    logging.info(f"create_program_subscription():")
+    logging.info(f"create_subscription():")
 
     subscriptionBody = None
     if connexion.request.is_json:
         subscriptionBody = Subscription.from_dict(connexion.request.get_json())  # noqa: E501
-        logging.debug(f"create_program_subscription(): subscriptionBody={subscriptionBody}")
+        logging.debug(f"create_subscription(): subscriptionBody={subscriptionBody}")
     if subscriptionBody is None:
         return []
 
@@ -37,18 +41,22 @@ def create_subscription(body):  # noqa: E501
     current_time = now.strftime("%H:%M:%S")
 
     subscription = Subscription(
-        id=subscriptionID,
+        id=str(subscriptionID),
         created_date_time=current_time,
-        client_id=subscriptionBody.client_id,
+        client_name=subscriptionBody.client_name,
         program_id=subscriptionBody.program_id,
-        resource_operations=subscriptionBody.resource_operations
+        resource_operations=subscriptionBody.resource_operations,
+        targets = subscriptionBody.targets
     )
 
     # bump Subscription ID
     subscriptionID += 1
 
     subscriptions.append(subscription)
-    logging.debug(f"create_program_subscription(): subscription={subscription}")
+    logging.debug(f"create_subscription(): subscription={subscription}")
+    logging.info(f"create_subscription(): subscription={subscription}")
+
+    subscription_callback("SUBSCRIPTION", "POST", subscription)
 
     return subscription
 
@@ -58,8 +66,8 @@ def delete_subscription(subscription_id):  # noqa: E501
 
     Delete the subscription specified by subscriptionID specified in path. # noqa: E501
 
-    :param subscription_id: Numeric ID of the associated subscription.
-    :type subscription_id: int
+    :param subscription_id: object ID of the associated subscription.
+    :type subscription_id: dict | bytes
 
     :rtype: Subscription
     """
@@ -69,19 +77,22 @@ def delete_subscription(subscription_id):  # noqa: E501
     if subscription is not None:
         subscriptions.remove(subscription)
         logging.debug(f"delete_subscription(): subscription={subscription}")
+
+        subscription_callback("SUBSCRIPTION", "DELETE", subscription)
+
         return subscription
     else:
         problem = Problem(title="Not Found", status="404")
         logging.warning(f"delete_subscription(): logging={logging}")
-        return problem
+        return problem, 404
 
 def search_subscription_by_id(subscription_id):  # noqa: E501
     """search subscriptions by ID
 
     Return the subscription specified by subscriptionID specified in path. # noqa: E501
 
-    :param subscription_id: Numeric ID of the associated subscription.
-    :type subscription_id: int
+    :param subscription_id: object ID of the associated subscription.
+    :type subscription_id: dict | bytes
 
     :rtype: Subscription
     """
@@ -91,25 +102,27 @@ def search_subscription_by_id(subscription_id):  # noqa: E501
     logging.debug(f"search_subscription_by_id(): subscription={subscription}")
     return subscription
 
-def search_subscriptions(program_id=None, client_id=None, resource_types=None, skip=None, limit=None):  # noqa: E501
+def search_subscriptions(program_id=None, client_name=None, targets=None, resource_types=None, skip=None, limit=None):  # noqa: E501
     """search subscriptions
 
-    List all subscriptions. May filter results by programID and clientID as query params. May filter results by resourceTypes as query param. ResoureTypes are PROGRAM, REPORT, EVENT. Use skip and pagination query params to limit reponse size.  # noqa: E501
-
-    :param program_id: filter results to subscriptions with programID of associated value.
-    :type program_id: int
-    :param client_id: filter results to subscriptions with clientID of associated value.
-    :type client_id: int
-    :param resource_types: filter results to subscriptions with resourceTypes of associated values.
-    :type resource_types: List[str]
-    :param skip: number of records to skip for pagination.
+    List all subscriptions. May filter results by programID and clientID as query params. May filter results by resourceTypes as query param. See resoureTypes schema. Use skip and pagination query params to limit response size.  # noqa: E501
+    
+    :param program_id: filter results to subscriptions with programID.
+    :type program_id: dict | bytes
+    :param client_name: filter results to subscriptions with clientIdentifier.
+    :type client_name: str
+    :param targets: return programs that match requested targets
+    :type targets: list | bytes
+    :param resource_types: list of resources to subscribe to.
+    :type resource_types: list | bytes
+     :param skip: number of records to skip for pagination.
     :type skip: int
     :param limit: maximum number of records to return.
     :type limit: int
 
     :rtype: List[Subscription]
     """
-    logging.info(f"search_subscriptions(): program_id={program_id} client_id={client_id} resource_types{resource_types}")
+    logging.info(f"search_subscriptions(): program_id={program_id} client_name={client_name} resource_types{resource_types}")
 
     # TBD: implement client_id, resource_types
     if program_id is not None:
@@ -118,13 +131,15 @@ def search_subscriptions(program_id=None, client_id=None, resource_types=None, s
         return tempSubscriptions
     return subscriptions
 
-def update_subscription(subscription_id):  # noqa: E501
+def update_subscription(subscription_id, body=None):  # noqa: E501
     """update  subscription
 
     Update the subscription specified by subscriptionID specified in path. # noqa: E501
 
-    :param subscription_id: Numeric ID of the associated subscription.
-    :type subscription_id: int
+    :param subscription_id: object ID of the associated subscription.
+    :type subscription_id: dict | bytes
+    :param body: subscription item to update.
+    :type body: dict | bytes
 
     :rtype: Subscription
     """
@@ -148,24 +163,61 @@ def update_subscription(subscription_id):  # noqa: E501
         if subscriptionBody.program_id != subscription.program_id:
             problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
             logging.warning(f"update_subscription(): problem={problem}")
-            return problem
-        if subscriptionBody.client_id is not None:
-            subscription.client_id = subscriptionBody.client_id
+            return problem, 400
+        if subscriptionBody.client_name is not None:
+            subscription.client_name = subscriptionBody.client_name
         if subscriptionBody.resource_operations is not None:
             subscription.resourceOperations = subscriptionBody.resource_operations
+        if subscriptionBody.targets is not None:
+            subscription.targets = subscriptionBody.targets
 
         subscriptions.append(subscription)
         logging.debug(f"update_subscription(): subscription={subscription}")
 
-        for subscription in subscriptions:
-            resource = next((resource for resource in subscription.resource_operations if
-                             "SUBSCRIPTION" in resource.resources and "PUT" in resource.operations), None)
-            if resource is not None:
-                logging.debug(f"update_subscription(): resource={resource}")
-                response = requests.post(resource.callback_url, json=json.dumps(subscription.to_dict()))
-                if response.status_code != 200:
-                    logging.warning(f"update_subscription: callback response.status_code={response.status_code}")
+        subscription_callback("SUBSCRIPTION", "PUT", subscription)
 
         return (subscription)
 
     return None
+
+
+def subscription_callback(resourceName, operation, object):
+    logging.info(f"subscription_callback(): resourceName={resourceName}, operation={operation}, object={object}")
+    # print(f"subscription_callback(): subscriptions={subscriptions}")
+
+    for subscription in subscriptions:
+        # print(f"subscription_callback(): subscription={subscription}")
+        resource = next((resource for resource in subscription.resource_operations if
+                         resourceName in resource.resources and operation in resource.operations), None)
+        if resource is not None:
+            # print(f"    subscription_callback(): resource={resource}")
+            if object.targets is not None and subscription.targets is not None:
+                for target in object.targets:
+                    # print(f"        subscription_callback(): target={target}")
+                    targetObj = next((targetObj for targetObj in subscription.targets if
+                                     targetObj.targetType in target.targetType), None)
+                    if targetObj is not None:
+                        # print(f"            subscription_callback(): targetObj={targetObj}")
+                        if target.values is not None:
+                            for value in target.values:
+                                # print(f"subscription_callback(): value={value}")
+                                targetValue = next((targetValue for targetValue in targetObj.values if
+                                       value in targetValue), None)
+
+                            # print(f"                subscription_callback(): targetValue={targetValue}")
+                            if targetValue is None:
+                                logging.debug(f"subscription_callback: no matching targets")
+                                return None
+                    else:
+                        logging.debug(f"subscription_callback: no matching targets")
+                        return None
+
+
+            notification = Notification(object_type=resourceName, operation=operation, targets=None, object=object)
+
+            logging.debug(f"subscription_callback(): notification={notification}")
+            logging.info(f"subscription_callback(): notification={notification}")
+
+            response = requests.post(resource.callback_url, json=json.dumps(notification.to_dict()))
+            if response.status_code != 200:
+                logging.warning(f"subscription_callback: callback response.status_code={response.status_code}")

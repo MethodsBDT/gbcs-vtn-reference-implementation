@@ -5,9 +5,11 @@ import logging
 import requests
 import six
 
+from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.program import Program  # noqa: E501
-from swagger_server.controllers.subscriptions_controller import subscriptions  # noqa: E501
+from swagger_server.models.target import Target  # noqa: E501
+from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server import util
 
 programs = []
@@ -22,7 +24,7 @@ def create_program(body=None):  # noqa: E501
     :param body: program item to add.
     :type body: dict | bytes
 
-    :rtype: List[Program]
+    :rtype: Program
     """
     logging.info(f"create_program():")
     programBody = None
@@ -37,7 +39,7 @@ def create_program(body=None):  # noqa: E501
     current_time = now.strftime("%H:%M:%S")
 
     program = Program(
-        id=programID,
+        id=str(programID),
         created_date_time=current_time,
         modification_date_time=None,
         program_name=programBody.program_name,
@@ -61,41 +63,19 @@ def create_program(body=None):  # noqa: E501
     programs.append(program)
     logging.debug(f"create_program(): program={program}")
 
-    # for subscription in subscriptions:
-    #     resource = next((resource for resource in subscription.resource_operations if
-    #                      "PROGRAM" in resource.resources and "CREATE" in resource.operations), None)
-    #     if resource is not None:
-    #         logging.debug(f"create_program(): resource={resource}")
-    #         response = requests.post(resource.callback_url, json=json.dumps(program.to_dict()))
-    #         if response.status_code != 200:
-    #             logging.warning(f"create_program: callback response.status_code={response.status_code}")
-    #
-
-    callback("PROGRAM", "POST", program)
+    subscription_callback("PROGRAM", "POST", program)
 
     return program
-
-def callback(resourceName, operation, object):
-    logging.info(f"callback(): resourceName={resourceName}, operation={operation}, object={object}")
-
-    for subscription in subscriptions:
-        resource = next((resource for resource in subscription.resource_operations if
-                         resourceName in resource.resources and operation in resource.operations), None)
-        if resource is not None:
-            logging.debug(f"callback(): resource={resource}")
-            response = requests.post(resource.callback_url, json=json.dumps(object.to_dict()))
-            if response.status_code != 200:
-                logging.warning(f"callback: callback response.status_code={response.status_code}")
 
 def delete_program(program_id):  # noqa: E501
     """delete a program
 
     Delete an existing program with the programID in path. # noqa: E501
 
-    :param program_id: Numeric ID of the program object.
-    :type program_id: int
+    :param program_id: Object ID of the program object.
+    :type program_id: dict | bytes
 
-    :rtype: List[Program]
+    :rtype: Program
     """
     logging.info(f"delete_program(): program_id={program_id}")
     program = next((program for program in programs if program.id == program_id), None)
@@ -103,29 +83,22 @@ def delete_program(program_id):  # noqa: E501
         programs.remove(program)
         logging.debug(f"delete_program(): program={program}")
 
-        for subscription in subscriptions:
-            resource = next((resource for resource in subscription.resource_operations if
-                             "PROGRAM" in resource.resources and "DELETE" in resource.operations), None)
-            if resource is not None:
-                logging.debug(f"delete_program(): resource={resource}")
-                response = requests.post(resource.callback_url, json=json.dumps(program.to_dict()))
-                if response.status_code != 200:
-                    logging.warning(f"delete_program: callback response.status_code={response.status_code}")
+        subscription_callback("PROGRAM", "DELETE", program)
 
         return program
     else:
         problem = Problem(title="Not Found", status="404")
         logging.warning(f"delete_program(): problem={problem}")
-        return problem
+        return problem, 404
 
 
-def search_all_programs(no_defaults=None, skip=None, limit=None):  # noqa: E501
+def search_all_programs(targets=None, skip=None, limit=None):  # noqa: E501
     """searches all programs
 
-    List all programs known to the server. Use no_defaults query param to view representation w no default values. Use skip and pagination query params to limit reponse size.  # noqa: E501
+    List all programs known to the server. Use skip and pagination query params to limit reponse size.  # noqa: E501
 
-    :param no_defaults: return representations that do not include attributes with default values.
-    :type no_defaults: bool
+    :param targets: return programs that match requested targets
+    :type targets: list | bytes
     :param skip: number of records to skip for pagination.
     :type skip: int
     :param limit: maximum number of records to return.
@@ -138,15 +111,13 @@ def search_all_programs(no_defaults=None, skip=None, limit=None):  # noqa: E501
     return programs
 
 
-def search_program_by_program_id(program_id, no_defaults=None):  # noqa: E501
+def search_program_by_program_id(program_id):  # noqa: E501
     """searches programs by program ID
 
-    Fetch the program specified by the programID in path. Use no_defaults query param to view representation w no default values.  # noqa: E501
+    Fetch the program specified by the programID in path. # noqa: E501
 
-    :param program_id: Numeric ID of the program object.
-    :type program_id: int
-    :param no_defaults: return representations that do not include attributes with default values.
-    :type no_defaults: bool
+    :param program_id: Object ID of the program object.
+    :type program_id: dict | bytes
 
     :rtype: Program
     """
@@ -161,12 +132,12 @@ def update_program(program_id, body=None):  # noqa: E501
 
     Update an existing program with the programID in path. # noqa: E501
 
-    :param program_id: Numeric ID of the program object.
-    :type program_id: int
+    :param program_id: Object ID of the program object.
+    :type program_id: dict | bytes
     :param body: program item to update.
     :type body: dict | bytes
 
-    :rtype: List[Program]
+    :rtype: Program
     """
     logging.info(f"update_program(): program_id={program_id}")
     programBody = None
@@ -215,14 +186,7 @@ def update_program(program_id, body=None):  # noqa: E501
         programs.append(program)
         logging.debug(f"update_program: program={program}")
 
-        for subscription in subscriptions:
-            resource = next((resource for resource in subscription.resource_operations if
-                             "PROGRAM" in resource.resources and "PUT" in resource.operations), None)
-            if resource is not None:
-                logging.debug(f"update_program(): resource={resource}")
-                response = requests.post(resource.callback_url, json=json.dumps(program.to_dict()))
-                if response.status_code != 200:
-                    logging.warning(f"update_program: callback response.status_code={response.status_code}")
+        subscription_callback("PROGRAM", "PUT", program)
 
         return program
 
