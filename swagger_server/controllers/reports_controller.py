@@ -44,7 +44,7 @@ def create_report(body=None):  # noqa: E501
         program_id=reportBody.program_id,
         event_id=reportBody.event_id,
         client_name=reportBody.client_name,
-        name=reportBody.name,
+        report_name=reportBody.report_name,
         payload_descriptors=reportBody.payload_descriptors,
         resources=reportBody.resources
     )
@@ -88,11 +88,11 @@ def delete_report(report_id):  # noqa: E501
 def search_all_reports(program_id=None, client_name=None, skip=None, limit=None):  # noqa: E501
     """searches all reports
 
-    List all reports known to the server. May filter results by programID and client_name as query param. Use skip and pagination query params to limit reponse size.  # noqa: E501
+    List all reports known to the server. May filter results by programID and clientName as query param. Use skip and pagination query params to limit response size.  # noqa: E501
 
     :param program_id: filter results to reports with programID.
     :type program_id: dict | bytes
-    :param client_name: filter results to reports with clientname.
+    :param client_name: filter results to reports with clientName.
     :type client_name: str
     :param skip: number of records to skip for pagination.
     :type skip: int
@@ -160,9 +160,9 @@ def update_report(report_id, body=None):  # noqa: E501
             report.event_id = reportBody.event_id
         if reportBody.client_name is not None:
             report.client_name = reportBody.client_name
-        if reportBody.name is not None:
-            report.name = reportBody.name
-        if reportBody.name is not None:
+        if reportBody.report_name is not None:
+            report.report_name = reportBody.report_name
+        if reportBody.resources is not None:
             report.resources = reportBody.resources
 
         reports.append(report)

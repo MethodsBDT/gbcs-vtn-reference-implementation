@@ -283,7 +283,7 @@ def search_ven_resources(ven_id, targets=None, skip=None, limit=None):  # noqa: 
 
     :param ven_id: Numeric ID of ven.
     :type ven_id: dict | bytes
-    :param targets: return programs that match requested targets
+    :param targets: return resources that match requested targets
     :type targets: list | bytes
     :param skip: number of records to skip for pagination.
     :type skip: int

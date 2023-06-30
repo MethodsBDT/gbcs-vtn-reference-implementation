@@ -8,7 +8,7 @@ import six
 from swagger_server.models.notification import Notification  # noqa: E501
 from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
-from swagger_server.models.resource_types import ResourceTypes  # noqa: E501
+from swagger_server.models.object_types import ObjectTypes  # noqa: E501
 from swagger_server.models.subscription import Subscription  # noqa: E501
 from swagger_server.models.target import Target  # noqa: E501
 from swagger_server import util
@@ -45,7 +45,7 @@ def create_subscription(body):  # noqa: E501
         created_date_time=current_time,
         client_name=subscriptionBody.client_name,
         program_id=subscriptionBody.program_id,
-        resource_operations=subscriptionBody.resource_operations,
+        object_operations=subscriptionBody.object_operations,
         targets = subscriptionBody.targets
     )
 
@@ -89,23 +89,40 @@ def delete_subscription(subscription_id):  # noqa: E501
 def search_subscription_by_id(subscription_id):  # noqa: E501
     """search subscriptions by ID
 
-    Return the subscription specified by subscriptionID specified in path. # noqa: E501
+    List all subscriptions. May filter results by programID and clientID as query params. May filter results by objects as query param. See objectTypes schema. Use skip and pagination query params to limit response size.  # noqa: E501
 
-    :param subscription_id: object ID of the associated subscription.
-    :type subscription_id: dict | bytes
+    :param program_id: filter results to subscriptions with programID.
+    :type program_id: dict | bytes
+    :param client_name: filter results to subscriptions with clientName.
+    :type client_name: str
+    :param targets: return programs that match requested targets
+    :type targets: list | bytes
+    :param objects: list of objects to subscribe to.
+    :type objects: list | bytes
+    :param skip: number of records to skip for pagination.
+    :type skip: int
+    :param limit: maximum number of records to return.
+    :type limit: int
 
-    :rtype: Subscription
+    :rtype: List[Subscription]
     """
     logging.info(f"search_subscription_by_id(): subscription_id={subscription_id}")
+
+    if connexion.request.is_json:
+        program_id = ObjectID.from_dict(connexion.request.get_json())  # noqa: E501
+    if connexion.request.is_json:
+        targets = [Target.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
+    if connexion.request.is_json:
+        objects = [ObjectTypes.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
 
     subscription = next((subscription for subscription in subscriptions if subscription.id == subscription_id), None)
     logging.debug(f"search_subscription_by_id(): subscription={subscription}")
     return subscription
 
-def search_subscriptions(program_id=None, client_name=None, targets=None, resource_types=None, skip=None, limit=None):  # noqa: E501
+def search_subscriptions(program_id=None, client_name=None, targets=None, objects=None, skip=None, limit=None):  # noqa: E501
     """search subscriptions
 
-    List all subscriptions. May filter results by programID and clientID as query params. May filter results by resourceTypes as query param. See resoureTypes schema. Use skip and pagination query params to limit response size.  # noqa: E501
+    List all subscriptions. May filter results by programID and clientID as query params. May filter results by objects as query param. See objectTypes schema. Use skip and pagination query params to limit response size.  # noqa: E501
     
     :param program_id: filter results to subscriptions with programID.
     :type program_id: dict | bytes
@@ -113,8 +130,8 @@ def search_subscriptions(program_id=None, client_name=None, targets=None, resour
     :type client_name: str
     :param targets: return programs that match requested targets
     :type targets: list | bytes
-    :param resource_types: list of resources to subscribe to.
-    :type resource_types: list | bytes
+    :param objects: list of objects to subscribe to.
+    :type objects: list | bytes
      :param skip: number of records to skip for pagination.
     :type skip: int
     :param limit: maximum number of records to return.
@@ -122,9 +139,9 @@ def search_subscriptions(program_id=None, client_name=None, targets=None, resour
 
     :rtype: List[Subscription]
     """
-    logging.info(f"search_subscriptions(): program_id={program_id} client_name={client_name} resource_types{resource_types}")
+    logging.info(f"search_subscriptions(): program_id={program_id} client_name={client_name} objects{objects}")
 
-    # TBD: implement client_id, resource_types
+    # TBD: implement client_id, objects
     if program_id is not None:
         tempSubscriptions = [subscription for subscription in subscriptions if subscription.program_id == program_id]
         logging.debug(f"search_subscriptions(): tempSubscriptions={tempSubscriptions}")
@@ -166,8 +183,8 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
             return problem, 400
         if subscriptionBody.client_name is not None:
             subscription.client_name = subscriptionBody.client_name
-        if subscriptionBody.resource_operations is not None:
-            subscription.resourceOperations = subscriptionBody.resource_operations
+        if subscriptionBody.object_operations is not None:
+            subscription.object_operations = subscriptionBody.object_operations
         if subscriptionBody.targets is not None:
             subscription.targets = subscriptionBody.targets
 
@@ -187,8 +204,8 @@ def subscription_callback(resourceName, operation, object):
 
     for subscription in subscriptions:
         # print(f"subscription_callback(): subscription={subscription}")
-        resource = next((resource for resource in subscription.resource_operations if
-                         resourceName in resource.resources and operation in resource.operations), None)
+        resource = next((resource for resource in subscription.object_operations if
+                         resourceName in resource.objects and operation in resource.operations), None)
         if resource is not None:
             # print(f"    subscription_callback(): resource={resource}")
             if object.targets is not None and subscription.targets is not None:

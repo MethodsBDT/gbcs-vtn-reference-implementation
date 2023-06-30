@@ -8,7 +8,7 @@ from typing import List, Dict  # noqa: F401
 from swagger_server.models.base_model_ import Model
 from swagger_server.models.model_date_time import ModelDateTime  # noqa: F401,E501
 from swagger_server.models.object_id import ObjectID  # noqa: F401,E501
-from swagger_server.models.subscription_resource_operations import SubscriptionResourceOperations  # noqa: F401,E501
+from swagger_server.models.subscription_object_operations import SubscriptionObjectOperations  # noqa: F401,E501
 from swagger_server.models.target import Target  # noqa: F401,E501
 import re  # noqa: F401,E501
 from swagger_server import util
@@ -19,7 +19,7 @@ class Subscription(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, client_name: str=None, program_id: ObjectID=None, resource_operations: List[SubscriptionResourceOperations]=None, targets: List[Target]=None):  # noqa: E501
+    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, client_name: str=None, program_id: ObjectID=None, object_operations: List[SubscriptionObjectOperations]=None, targets: List[Target]=None):  # noqa: E501
         """Subscription - a model defined in Swagger
 
         :param id: The id of this Subscription.  # noqa: E501
@@ -34,8 +34,8 @@ class Subscription(Model):
         :type client_name: str
         :param program_id: The program_id of this Subscription.  # noqa: E501
         :type program_id: ObjectID
-        :param resource_operations: The resource_operations of this Subscription.  # noqa: E501
-        :type resource_operations: List[SubscriptionResourceOperations]
+        :param object_operations: The object_operations of this Subscription.  # noqa: E501
+        :type object_operations: List[SubscriptionObjectOperations]
         :param targets: The targets of this Subscription.  # noqa: E501
         :type targets: List[Target]
         """
@@ -46,7 +46,7 @@ class Subscription(Model):
             'object_type': str,
             'client_name': str,
             'program_id': ObjectID,
-            'resource_operations': List[SubscriptionResourceOperations],
+            'object_operations': List[SubscriptionObjectOperations],
             'targets': List[Target]
         }
 
@@ -57,7 +57,7 @@ class Subscription(Model):
             'object_type': 'objectType',
             'client_name': 'clientName',
             'program_id': 'programID',
-            'resource_operations': 'resourceOperations',
+            'object_operations': 'objectOperations',
             'targets': 'targets'
         }
         self._id = id
@@ -66,7 +66,7 @@ class Subscription(Model):
         self._object_type = object_type
         self._client_name = client_name
         self._program_id = program_id
-        self._resource_operations = resource_operations
+        self._object_operations = object_operations
         self._targets = targets
 
     @classmethod
@@ -221,29 +221,29 @@ class Subscription(Model):
         self._program_id = program_id
 
     @property
-    def resource_operations(self) -> List[SubscriptionResourceOperations]:
-        """Gets the resource_operations of this Subscription.
+    def object_operations(self) -> List[SubscriptionObjectOperations]:
+        """Gets the object_operations of this Subscription.
 
-        list of resources and operations to subscribe to.  # noqa: E501
+        list of objects and operations to subscribe to.  # noqa: E501
 
-        :return: The resource_operations of this Subscription.
-        :rtype: List[SubscriptionResourceOperations]
+        :return: The object_operations of this Subscription.
+        :rtype: List[SubscriptionObjectOperations]
         """
-        return self._resource_operations
+        return self._object_operations
 
-    @resource_operations.setter
-    def resource_operations(self, resource_operations: List[SubscriptionResourceOperations]):
-        """Sets the resource_operations of this Subscription.
+    @object_operations.setter
+    def object_operations(self, object_operations: List[SubscriptionObjectOperations]):
+        """Sets the object_operations of this Subscription.
 
-        list of resources and operations to subscribe to.  # noqa: E501
+        list of objects and operations to subscribe to.  # noqa: E501
 
-        :param resource_operations: The resource_operations of this Subscription.
-        :type resource_operations: List[SubscriptionResourceOperations]
+        :param object_operations: The object_operations of this Subscription.
+        :type object_operations: List[SubscriptionObjectOperations]
         """
-        if resource_operations is None:
-            raise ValueError("Invalid value for `resource_operations`, must not be `None`")  # noqa: E501
+        if object_operations is None:
+            raise ValueError("Invalid value for `object_operations`, must not be `None`")  # noqa: E501
 
-        self._resource_operations = resource_operations
+        self._object_operations = object_operations
 
     @property
     def targets(self) -> List[Target]:

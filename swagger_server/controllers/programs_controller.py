@@ -54,7 +54,8 @@ def create_program(body=None):  # noqa: E501
         program_descriptions=programBody.program_descriptions,
         binding_events=programBody.binding_events,
         local_price=programBody.local_price,
-        payload_descriptors=programBody.payload_descriptors
+        payload_descriptors=programBody.payload_descriptors,
+        targets = programBody.targets
     )
 
     # bump program ID
@@ -106,7 +107,7 @@ def search_all_programs(targets=None, skip=None, limit=None):  # noqa: E501
 
     :rtype: List[Program]
     """
-    logging.info(f"search_all_programs(): ")
+    logging.info(f"search_all_programs(): targets={targets}")
     logging.debug(f"search_all_programs(): programs={programs}")
     return programs
 
@@ -182,6 +183,8 @@ def update_program(program_id, body=None):  # noqa: E501
             program.local_price = programBody.local_price
         if programBody.payload_descriptors is not None:
             program.payload_descriptors = programBody.payload_descriptors
+        if programBody.targets is not None:
+            program.targets = programBody.targets
 
         programs.append(program)
         logging.debug(f"update_program: program={program}")

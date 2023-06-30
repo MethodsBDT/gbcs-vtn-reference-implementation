@@ -13,6 +13,7 @@ from swagger_server.models.interval_period import IntervalPeriod
 from swagger_server.models.model_date_time import ModelDateTime
 from swagger_server.models.notification import Notification
 from swagger_server.models.object_id import ObjectID
+from swagger_server.models.object_types import ObjectTypes
 from swagger_server.models.one_ofnotification_object import OneOfnotificationObject
 from swagger_server.models.point import Point
 from swagger_server.models.problem import Problem
@@ -23,9 +24,8 @@ from swagger_server.models.report_descriptor import ReportDescriptor
 from swagger_server.models.report_payload_descriptor import ReportPayloadDescriptor
 from swagger_server.models.report_resources import ReportResources
 from swagger_server.models.resource import Resource
-from swagger_server.models.resource_types import ResourceTypes
 from swagger_server.models.subscription import Subscription
-from swagger_server.models.subscription_resource_operations import SubscriptionResourceOperations
+from swagger_server.models.subscription_object_operations import SubscriptionObjectOperations
 from swagger_server.models.target import Target
 from swagger_server.models.values_map import ValuesMap
 from swagger_server.models.ven import Ven

@@ -19,7 +19,7 @@ class Report(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, program_id: ObjectID=None, event_id: ObjectID=None, client_name: str=None, name: str=None, payload_descriptors: List[ReportPayloadDescriptor]=None, resources: List[ReportResources]=None):  # noqa: E501
+    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, program_id: ObjectID=None, event_id: ObjectID=None, client_name: str=None, report_name: str=None, payload_descriptors: List[ReportPayloadDescriptor]=None, resources: List[ReportResources]=None):  # noqa: E501
         """Report - a model defined in Swagger
 
         :param id: The id of this Report.  # noqa: E501
@@ -36,8 +36,8 @@ class Report(Model):
         :type event_id: ObjectID
         :param client_name: The client_name of this Report.  # noqa: E501
         :type client_name: str
-        :param name: The name of this Report.  # noqa: E501
-        :type name: str
+        :param report_name: The report_name of this Report.  # noqa: E501
+        :type report_name: str
         :param payload_descriptors: The payload_descriptors of this Report.  # noqa: E501
         :type payload_descriptors: List[ReportPayloadDescriptor]
         :param resources: The resources of this Report.  # noqa: E501
@@ -51,7 +51,7 @@ class Report(Model):
             'program_id': ObjectID,
             'event_id': ObjectID,
             'client_name': str,
-            'name': str,
+            'report_name': str,
             'payload_descriptors': List[ReportPayloadDescriptor],
             'resources': List[ReportResources]
         }
@@ -64,7 +64,7 @@ class Report(Model):
             'program_id': 'programID',
             'event_id': 'eventID',
             'client_name': 'clientName',
-            'name': 'name',
+            'report_name': 'reportName',
             'payload_descriptors': 'payloadDescriptors',
             'resources': 'resources'
         }
@@ -75,7 +75,7 @@ class Report(Model):
         self._program_id = program_id
         self._event_id = event_id
         self._client_name = client_name
-        self._name = name
+        self._report_name = report_name
         self._payload_descriptors = payload_descriptors
         self._resources = resources
 
@@ -254,27 +254,27 @@ class Report(Model):
         self._client_name = client_name
 
     @property
-    def name(self) -> str:
-        """Gets the name of this Report.
+    def report_name(self) -> str:
+        """Gets the report_name of this Report.
 
         User defined string for use in debugging or User Interface.  # noqa: E501
 
-        :return: The name of this Report.
+        :return: The report_name of this Report.
         :rtype: str
         """
-        return self._name
+        return self._report_name
 
-    @name.setter
-    def name(self, name: str):
-        """Sets the name of this Report.
+    @report_name.setter
+    def report_name(self, report_name: str):
+        """Sets the report_name of this Report.
 
         User defined string for use in debugging or User Interface.  # noqa: E501
 
-        :param name: The name of this Report.
-        :type name: str
+        :param report_name: The report_name of this Report.
+        :type report_name: str
         """
 
-        self._name = name
+        self._report_name = report_name
 
     @property
     def payload_descriptors(self) -> List[ReportPayloadDescriptor]:

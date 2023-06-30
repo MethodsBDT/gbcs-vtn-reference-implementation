@@ -6,7 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.resource_types import ResourceTypes  # noqa: F401,E501
+from swagger_server.models.object_types import ObjectTypes  # noqa: F401,E501
 from swagger_server.models.target import Target  # noqa: F401,E501
 from swagger_server.models.one_ofnotification_object import OneOfnotificationObject  # noqa: F401,E501
 from swagger_server import util
@@ -17,11 +17,11 @@ class Notification(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, object_type: ResourceTypes=None, operation: str=None, targets: List[Target]=None, object: OneOfnotificationObject=None):  # noqa: E501
+    def __init__(self, object_type: ObjectTypes=None, operation: str=None, targets: List[Target]=None, object: OneOfnotificationObject=None):  # noqa: E501
         """Notification - a model defined in Swagger
 
         :param object_type: The object_type of this Notification.  # noqa: E501
-        :type object_type: ResourceTypes
+        :type object_type: ObjectTypes
         :param operation: The operation of this Notification.  # noqa: E501
         :type operation: str
         :param targets: The targets of this Notification.  # noqa: E501
@@ -30,7 +30,7 @@ class Notification(Model):
         :type object: OneOfnotificationObject
         """
         self.swagger_types = {
-            'object_type': ResourceTypes,
+            'object_type': ObjectTypes,
             'operation': str,
             'targets': List[Target],
             'object': OneOfnotificationObject
@@ -59,22 +59,22 @@ class Notification(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def object_type(self) -> ResourceTypes:
+    def object_type(self) -> ObjectTypes:
         """Gets the object_type of this Notification.
 
 
         :return: The object_type of this Notification.
-        :rtype: ResourceTypes
+        :rtype: ObjectTypes
         """
         return self._object_type
 
     @object_type.setter
-    def object_type(self, object_type: ResourceTypes):
+    def object_type(self, object_type: ObjectTypes):
         """Sets the object_type of this Notification.
 
 
         :param object_type: The object_type of this Notification.
-        :type object_type: ResourceTypes
+        :type object_type: ObjectTypes
         """
         if object_type is None:
             raise ValueError("Invalid value for `object_type`, must not be `None`")  # noqa: E501

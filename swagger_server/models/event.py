@@ -22,7 +22,7 @@ class Event(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, program_id: ObjectID=None, name: str=None, priority: int=None, targets: List[Target]=None, report_descriptors: List[ReportDescriptor]=None, payload_descriptors: List[EventPayloadDescriptor]=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None):  # noqa: E501
+    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, program_id: ObjectID=None, event_name: str=None, priority: int=None, targets: List[Target]=None, report_descriptors: List[ReportDescriptor]=None, payload_descriptors: List[EventPayloadDescriptor]=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None):  # noqa: E501
         """Event - a model defined in Swagger
 
         :param id: The id of this Event.  # noqa: E501
@@ -35,8 +35,8 @@ class Event(Model):
         :type object_type: str
         :param program_id: The program_id of this Event.  # noqa: E501
         :type program_id: ObjectID
-        :param name: The name of this Event.  # noqa: E501
-        :type name: str
+        :param event_name: The event_name of this Event.  # noqa: E501
+        :type event_name: str
         :param priority: The priority of this Event.  # noqa: E501
         :type priority: int
         :param targets: The targets of this Event.  # noqa: E501
@@ -56,7 +56,7 @@ class Event(Model):
             'modification_date_time': ModelDateTime,
             'object_type': str,
             'program_id': ObjectID,
-            'name': str,
+            'event_name': str,
             'priority': int,
             'targets': List[Target],
             'report_descriptors': List[ReportDescriptor],
@@ -71,7 +71,7 @@ class Event(Model):
             'modification_date_time': 'modificationDateTime',
             'object_type': 'objectType',
             'program_id': 'programID',
-            'name': 'name',
+            'event_name': 'eventName',
             'priority': 'priority',
             'targets': 'targets',
             'report_descriptors': 'reportDescriptors',
@@ -84,7 +84,7 @@ class Event(Model):
         self._modification_date_time = modification_date_time
         self._object_type = object_type
         self._program_id = program_id
-        self._name = name
+        self._event_name = event_name
         self._priority = priority
         self._targets = targets
         self._report_descriptors = report_descriptors
@@ -219,27 +219,27 @@ class Event(Model):
         self._program_id = program_id
 
     @property
-    def name(self) -> str:
-        """Gets the name of this Event.
+    def event_name(self) -> str:
+        """Gets the event_name of this Event.
 
         User defined string for use in debugging or User Interface.  # noqa: E501
 
-        :return: The name of this Event.
+        :return: The event_name of this Event.
         :rtype: str
         """
-        return self._name
+        return self._event_name
 
-    @name.setter
-    def name(self, name: str):
-        """Sets the name of this Event.
+    @event_name.setter
+    def event_name(self, event_name: str):
+        """Sets the event_name of this Event.
 
         User defined string for use in debugging or User Interface.  # noqa: E501
 
-        :param name: The name of this Event.
-        :type name: str
+        :param event_name: The event_name of this Event.
+        :type event_name: str
         """
 
-        self._name = name
+        self._event_name = event_name
 
     @property
     def priority(self) -> int:

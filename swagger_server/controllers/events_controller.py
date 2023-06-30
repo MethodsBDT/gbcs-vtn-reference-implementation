@@ -44,7 +44,7 @@ def create_event(body=None):  # noqa: E501
         created_date_time=current_time,
         modification_date_time=None,
         program_id=eventBody.program_id,
-        name=eventBody.name,
+        event_name=eventBody.event_name,
         priority=eventBody.priority,
         targets=eventBody.targets,
         report_descriptors=eventBody.report_descriptors,
@@ -166,8 +166,8 @@ def update_event(event_id, body=None):  # noqa: E501
         if eventBody.program_id != event.program_id:
             problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
             return problem, 400
-        if eventBody.name is not None:
-            event.name = eventBody.name
+        if eventBody.event_name is not None:
+            event.event_name = eventBody.event_name
         if eventBody.priority is not None:
             event.priority = eventBody.priority
         if eventBody.targets is not None:

@@ -326,7 +326,7 @@ paths:
       summary: searches all reports
       description: |
         List all reports known to the server.
-        May filter results by programID and clientID as query param.
+        May filter results by programID and clientName as query param.
         Use skip and pagination query params to limit response size.
       operationId: search_all_reports
       parameters:
@@ -341,7 +341,7 @@ paths:
         example: program-999
       - name: clientName
         in: query
-        description: filter results to reports with clientIdentifier.
+        description: filter results to reports with clientName.
         required: false
         style: form
         explode: true
@@ -895,7 +895,7 @@ paths:
       description: |
         List all subscriptions.
         May filter results by programID and clientID as query params.
-        May filter results by resourceTypes as query param. See resoureTypes schema.
+        May filter results by objects as query param. See objectTypes schema.
         Use skip and pagination query params to limit response size.
       operationId: search_subscriptions
       parameters:
@@ -909,7 +909,7 @@ paths:
           $ref: '#/components/schemas/objectID'
       - name: clientName
         in: query
-        description: filter results to subscriptions with clientIdentifier.
+        description: filter results to subscriptions with clientName.
         required: false
         style: form
         explode: true
@@ -925,16 +925,16 @@ paths:
           type: array
           items:
             $ref: '#/components/schemas/target'
-      - name: resourceTypes
+      - name: objects
         in: query
-        description: list of resources to subscribe to.
+        description: list of objects to subscribe to.
         required: false
         style: form
         explode: true
         schema:
           type: array
           items:
-            $ref: '#/components/schemas/resourceTypes'
+            $ref: '#/components/schemas/objectTypes'
       - name: skip
         in: query
         description: number of records to skip for pagination.
@@ -1493,7 +1493,7 @@ paths:
           $ref: '#/components/schemas/objectID'
       - name: targets
         in: query
-        description: return programs that match requested targets
+        description: return resources that match requested targets
         required: false
         style: form
         explode: true
@@ -1991,7 +1991,7 @@ components:
             program enrollment.
           nullable: true
           example: VEN-999
-        name:
+        reportName:
           type: string
           description: User defined string for use in debugging or User Interface.
           nullable: true
@@ -2023,8 +2023,8 @@ components:
           readingType: DIRECT_READ
           objectType: REPORT_PAYLOAD_DESCRIPTOR
         eventID: null
+        reportName: Battery_usage_04112023
         clientName: VEN-999
-        name: Battery_usage_04112023
         createdDateTime: 2023-06-15T09:30:00.000Z
         resources:
         - intervals:
@@ -2098,7 +2098,7 @@ components:
           - EVENT
         programID:
           $ref: '#/components/schemas/objectID'
-        name:
+        eventName:
           type: string
           description: User defined string for use in debugging or User Interface.
           nullable: true
@@ -2189,8 +2189,8 @@ components:
             type: PRICE
           id: 0
           intervalPeriod: null
-        name: price event 11-18-2022
         createdDateTime: 2023-06-15T09:30:00.000Z
+        eventName: price event 11-18-2022
         id: object-999
         priority: 0
         modificationDateTime: null
@@ -2212,8 +2212,8 @@ components:
     subscription:
       required:
       - clientName
+      - objectOperations
       - programID
-      - resourceOperations
       type: object
       properties:
         id:
@@ -2235,11 +2235,11 @@ components:
           example: VEN-999
         programID:
           $ref: '#/components/schemas/objectID'
-        resourceOperations:
+        objectOperations:
           type: array
-          description: list of resources and operations to subscribe to.
+          description: list of objects and operations to subscribe to.
           items:
-            $ref: '#/components/schemas/subscription_resourceOperations'
+            $ref: '#/components/schemas/subscription_objectOperations'
         targets:
           type: array
           description: A list of target objects.
@@ -2248,15 +2248,15 @@ components:
             $ref: '#/components/schemas/target'
       description: |
         An object created by a client to receive notification of operations on objects.
-        Clients may subscribe to be notified when a type of resource is created,
+        Clients may subscribe to be notified when a type of object is created,
         updated, or deleted.
       example:
-        resourceOperations:
+        objectOperations:
         - operations:
           - POST
           - POST
           bearerToken: NCEJGI9E8ER9802UT9HUG
-          resources:
+          objects:
           - EVENT
           - EVENT
           callbackUrl: https://myserver.com/send/callback/here
@@ -2264,7 +2264,7 @@ components:
           - POST
           - POST
           bearerToken: NCEJGI9E8ER9802UT9HUG
-          resources:
+          objects:
           - EVENT
           - EVENT
           callbackUrl: https://myserver.com/send/callback/here
@@ -2724,7 +2724,7 @@ components:
       type: object
       properties:
         objectType:
-          $ref: '#/components/schemas/resourceTypes'
+          $ref: '#/components/schemas/objectTypes'
         operation:
           type: string
           description: the operation on on object that triggered the notification.
@@ -2754,9 +2754,9 @@ components:
           - $ref: '#/components/schemas/resource'
       description: |
         VTN generated object included in request to subscription callbackUrl.
-    resourceTypes:
+    objectTypes:
       type: string
-      description: resource type to subscribe to.
+      description: Types of objects addressable through API.
       example: EVENT
       enum:
       - PROGRAM
@@ -2873,24 +2873,24 @@ components:
           duration: null
           randomizeStart: null
           start: null
-    subscription_resourceOperations:
+    subscription_objectOperations:
       required:
       - callbackUrl
+      - objects
       - operations
-      - resources
       type: object
       properties:
-        resources:
+        objects:
           type: array
-          description: list of resources to subscribe to.
+          description: list of objects to subscribe to.
           items:
-            $ref: '#/components/schemas/resourceTypes'
+            $ref: '#/components/schemas/objectTypes'
         operations:
           type: array
-          description: list of resource operations to subscribe to.
+          description: list of operations to subscribe to.
           items:
             type: string
-            description: resource operation to subscribe to.
+            description: object operation to subscribe to.
             example: POST
             enum:
             - POST
@@ -2909,13 +2909,13 @@ components:
             should accept the provided bearer token to authenticate VTN requests.
           nullable: true
           example: NCEJGI9E8ER9802UT9HUG
-      description: "resource type, operations, and callbackUrl."
+      description: "object type, operations, and callbackUrl."
       example:
         operations:
         - POST
         - POST
         bearerToken: NCEJGI9E8ER9802UT9HUG
-        resources:
+        objects:
         - EVENT
         - EVENT
         callbackUrl: https://myserver.com/send/callback/here
