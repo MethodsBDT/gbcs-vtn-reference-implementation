@@ -15,7 +15,7 @@ from swagger_server import util
 
 subscriptions = []
 subscriptionID = 0
-
+MAX_SUBSCRIPTIONS=3
 
 def create_subscription(body):  # noqa: E501
     """create subscription
@@ -29,12 +29,19 @@ def create_subscription(body):  # noqa: E501
     """
     logging.info(f"create_subscription():")
 
+    if len(subscriptions) >= MAX_SUBSCRIPTIONS:
+        problem = Problem(title="Insufficient Storage", status="507")
+        logging.warning(f"create_subscription(): problem={problem}")
+        return problem, 507
+
     subscriptionBody = None
     if connexion.request.is_json:
         subscriptionBody = Subscription.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"create_subscription(): subscriptionBody={subscriptionBody}")
     if subscriptionBody is None:
-        return []
+        problem = Problem(title="Bad Request: No request body", status="400")
+        logging.warning(f"create_subscription(): problem={problem}")
+        return problem, 400
 
     global subscriptionID
     now = datetime.now()
@@ -43,6 +50,7 @@ def create_subscription(body):  # noqa: E501
     subscription = Subscription(
         id=str(subscriptionID),
         created_date_time=current_time,
+        object_type='SUBSCRIPTION',
         client_name=subscriptionBody.client_name,
         program_id=subscriptionBody.program_id,
         object_operations=subscriptionBody.object_operations,
@@ -72,6 +80,10 @@ def delete_subscription(subscription_id):  # noqa: E501
     :rtype: Subscription
     """
     logging.info(f"delete_subscription(): subscription_id={subscription_id}")
+    if len(subscriptions) == 0:
+        problem = Problem(title="Not Found: No subscriptions in system", status="404")
+        logging.warning(f"delete_subscription(): problem={problem}")
+        return problem, 404
 
     subscription = next((subscription for subscription in subscriptions if subscription.id == subscription_id), None)
     if subscription is not None:
@@ -117,6 +129,11 @@ def search_subscription_by_id(subscription_id):  # noqa: E501
 
     subscription = next((subscription for subscription in subscriptions if subscription.id == subscription_id), None)
     logging.debug(f"search_subscription_by_id(): subscription={subscription}")
+    if subscription is None:
+        problem = Problem(title="Not Found: subscription_id not found", status="404")
+        logging.warning(f"search_subscription_by_id(): problem={problem}")
+        return problem, 404
+
     return subscription
 
 def search_subscriptions(program_id=None, client_name=None, targets=None, objects=None, skip=None, limit=None):  # noqa: E501
@@ -166,37 +183,40 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
         subscriptionBody = Subscription.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"update_subscription(): subscriptionBody={subscriptionBody}")
     if subscriptionBody is None:
-        return []
+        problem = Problem(title="Bad Request: No request body", status="400")
+        logging.warning(f"update_subscription(): problem={problem}")
+        return problem, 400
 
     subscription = next((subscription for subscription in subscriptions if subscription.id == subscription_id), None)
-    if subscription is not None:
-        subscriptions.remove(subscription)
+    if subscription is None:
+        problem = Problem(title="Not Found: subscription_id not found", status="404")
+        logging.warning(f"update_subscription(): problem={problem}")
+        return problem, 404
 
-        # set modification date time
-        now = datetime.now()
-        current_time = now.strftime("%H:%M:%S")
-        subscription.modification_date_time = current_time
+    subscriptions.remove(subscription)
 
-        if subscriptionBody.program_id != subscription.program_id:
-            problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
-            logging.warning(f"update_subscription(): problem={problem}")
-            return problem, 400
-        if subscriptionBody.client_name is not None:
-            subscription.client_name = subscriptionBody.client_name
-        if subscriptionBody.object_operations is not None:
-            subscription.object_operations = subscriptionBody.object_operations
-        if subscriptionBody.targets is not None:
-            subscription.targets = subscriptionBody.targets
+    # set modification date time
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    subscription.modification_date_time = current_time
 
-        subscriptions.append(subscription)
-        logging.debug(f"update_subscription(): subscription={subscription}")
+    if subscriptionBody.program_id != subscription.program_id:
+        problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
+        logging.warning(f"update_subscription(): problem={problem}")
+        return problem, 400
+    if subscriptionBody.client_name is not None:
+        subscription.client_name = subscriptionBody.client_name
+    if subscriptionBody.object_operations is not None:
+        subscription.object_operations = subscriptionBody.object_operations
+    if subscriptionBody.targets is not None:
+        subscription.targets = subscriptionBody.targets
 
-        subscription_callback("SUBSCRIPTION", "PUT", subscription)
+    subscriptions.append(subscription)
+    logging.debug(f"update_subscription(): subscription={subscription}")
 
-        return (subscription)
+    subscription_callback("SUBSCRIPTION", "PUT", subscription)
 
-    return None
-
+    return (subscription)
 
 def subscription_callback(resourceName, operation, object):
     logging.info(f"subscription_callback(): resourceName={resourceName}, operation={operation}, object={object}")

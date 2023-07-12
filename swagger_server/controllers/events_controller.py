@@ -14,7 +14,7 @@ from swagger_server import util
 
 events = []
 eventID = 0
-
+MAX_EVENTS = 3
 
 def create_event(body=None):  # noqa: E501
     """create an event
@@ -28,12 +28,19 @@ def create_event(body=None):  # noqa: E501
     """
     logging.info(f"create_event():")
 
+    if len(events) >= MAX_EVENTS:
+        problem = Problem(title="Insufficient Storage", status="507")
+        logging.warning(f"create_event(): problem={problem}")
+        return problem, 507
+
     eventBody = None
     if connexion.request.is_json:
         eventBody = Event.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"create_event(): eventBody={eventBody}")
-    if eventBody is None:
-        return []
+    # if eventBody is None:
+    #     problem = Problem(title="Bad Request: No request body", status="400")
+    #     logging.warning(f"create_event(): problem={problem}")
+    #     return problem, 400
 
     global eventID
     now = datetime.now()
@@ -43,6 +50,7 @@ def create_event(body=None):  # noqa: E501
         id=str(eventID),
         created_date_time=current_time,
         modification_date_time=None,
+        object_type='EVENT',
         program_id=eventBody.program_id,
         event_name=eventBody.event_name,
         priority=eventBody.priority,
@@ -74,19 +82,23 @@ def delete_event(event_id):  # noqa: E501
     :rtype: Event
     """
     logging.info(f"delete_event():")
+    if len(events) == 0:
+        problem = Problem(title="Not Found: No events in system", status="404")
+        logging.warning(f"delete_event(): problem={problem}")
+        return problem, 404
 
     event = next((event for event in events if event.id == event_id), None)
     if event is not None:
         events.remove(event)
         logging.debug(f"delete_event(): event={event}")
-
         subscription_callback("EVENT", "DELETE", event)
-
         return event
     else:
         problem = Problem(title="Not Found", status="404")
         logging.warning(f"delete_event: problem={problem}")
         return problem, 404
+
+    subscription_callback("EVENT", "DELETE", venResource)
 
 
 def search_all_events(program_id=None, targets=None, skip=None, limit=None):  # noqa: E501
@@ -128,6 +140,10 @@ def search_events_by_id(event_id):  # noqa: E501
     """
     logging.info(f"search_events_by_id(): event_id={event_id}")
     event = next((event for event in events if event.id == event_id), None)
+    if event is None:
+        problem = Problem(title="Not Found: event_id not found", status="404")
+        logging.warning(f"search_events_by_id(): problem={problem}")
+        return problem, 404
     logging.debug(f"search_events_by_id(): event={event}")
 
     return event
@@ -152,38 +168,43 @@ def update_event(event_id, body=None):  # noqa: E501
         eventBody = Event.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"update_event(): eventBody={eventBody}")
     if eventBody is None:
-        return []
+        problem = Problem(title="Bad Request: No request body", status="400")
+        logging.warning(f"update_event(): problem={problem}")
+        return problem, 400
 
     event = next((event for event in events if event.id == event_id), None)
-    if event is not None:
-        events.remove(event)
+    if event is None:
+        problem = Problem(title="Not Found: event_id not found", status="404")
+        logging.warning(f"update_event(): problem={problem}")
+        return problem, 404
 
-        # set modification date time
-        now = datetime.now()
-        current_time = now.strftime("%H:%M:%S")
-        event.modification_date_time = current_time
+    events.remove(event)
 
-        if eventBody.program_id != event.program_id:
-            problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
-            return problem, 400
-        if eventBody.event_name is not None:
-            event.event_name = eventBody.event_name
-        if eventBody.priority is not None:
-            event.priority = eventBody.priority
-        if eventBody.targets is not None:
-            event.targets = eventBody.targets
-        if eventBody.report_descriptors is not None:
-            event.report_requests = eventBody.report_descriptors
-        if eventBody.interval_period is not None:
-            event.interval_period = eventBody.interval_period
-        if eventBody.intervals is not None:
-            event.intervals = eventBody.intervals
+    # set modification date time
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    event.modification_date_time = current_time
 
-        events.append(event)
-        logging.debug(f"update_event(): event={event}")
+    if eventBody.program_id != event.program_id:
+        problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
+        return problem, 400
+    if eventBody.event_name is not None:
+        event.event_name = eventBody.event_name
+    if eventBody.priority is not None:
+        event.priority = eventBody.priority
+    if eventBody.targets is not None:
+        event.targets = eventBody.targets
+    if eventBody.report_descriptors is not None:
+        event.report_requests = eventBody.report_descriptors
+    if eventBody.interval_period is not None:
+        event.interval_period = eventBody.interval_period
+    if eventBody.intervals is not None:
+        event.intervals = eventBody.intervals
 
-        subscription_callback("EVENT", "PUT", event)
+    events.append(event)
+    logging.debug(f"update_event(): event={event}")
 
-        return (event)
+    subscription_callback("EVENT", "PUT", event)
 
-    return None
+    return (event)
+

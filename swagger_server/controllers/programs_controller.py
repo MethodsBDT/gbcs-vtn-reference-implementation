@@ -14,6 +14,7 @@ from swagger_server import util
 
 programs = []
 programID = 0
+MAX_PROGRAMS=3
 
 
 def create_program(body=None):  # noqa: E501
@@ -27,12 +28,20 @@ def create_program(body=None):  # noqa: E501
     :rtype: Program
     """
     logging.info(f"create_program():")
+
+    if len(programs) >= MAX_PROGRAMS:
+        problem = Problem(title="Insufficient Storage", status="507")
+        logging.warning(f"create_program(): problem={problem}")
+        return problem, 507
+
     programBody = None
     if connexion.request.is_json:
         programBody = Program.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"create_program(): programBody={programBody}")
     if programBody is None:
-        return []
+        problem = Problem(title="Bad Request: No request body", status="400")
+        logging.warning(f"create_program(): problem={problem}")
+        return problem, 400
 
     global programID
     now = datetime.now()
@@ -42,6 +51,7 @@ def create_program(body=None):  # noqa: E501
         id=str(programID),
         created_date_time=current_time,
         modification_date_time=None,
+        object_type='PROGRAM',
         program_name=programBody.program_name,
         program_long_name=programBody.program_long_name,
         retailer_name=programBody.retailer_name,
@@ -79,19 +89,21 @@ def delete_program(program_id):  # noqa: E501
     :rtype: Program
     """
     logging.info(f"delete_program(): program_id={program_id}")
+    if len(programs) == 0:
+        problem = Problem(title="Not Found: No programs in system", status="404")
+        logging.warning(f"delete_program(): problem={problem}")
+        return problem, 404
+
     program = next((program for program in programs if program.id == program_id), None)
     if program is not None:
         programs.remove(program)
         logging.debug(f"delete_program(): program={program}")
-
         subscription_callback("PROGRAM", "DELETE", program)
-
         return program
     else:
         problem = Problem(title="Not Found", status="404")
         logging.warning(f"delete_program(): problem={problem}")
         return problem, 404
-
 
 def search_all_programs(targets=None, skip=None, limit=None):  # noqa: E501
     """searches all programs
@@ -124,6 +136,11 @@ def search_program_by_program_id(program_id):  # noqa: E501
     """
     logging.info(f"search_program_by_program_id(): program_id={program_id}")
     program = next((program for program in programs if program.id == program_id), None)
+    if program is None:
+        problem = Problem(title="Not Found: program_id not found", status="404")
+        logging.warning(f"search_program_by_program_id(): problem={problem}")
+        return problem, 404
+
     logging.debug(f"search_program_by_program_id(): program={program}")
     return program
 
@@ -146,51 +163,56 @@ def update_program(program_id, body=None):  # noqa: E501
         programBody = Program.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"update_program(): programBody={programBody}")
     if programBody is None:
-        return None
+        problem = Problem(title="Bad Request: No request body", status="400")
+        logging.warning(f"update_program(): problem={problem}")
+        return problem, 400
 
     program = next((program for program in programs if program.id == program_id), None)
-    if program is not None:
-        programs.remove(program)
+    if program is None:
+        problem = Problem(title="Not Found: program_id not found", status="404")
+        logging.warning(f"update_program(): problem={problem}")
+        return problem, 404
 
-        # set modification date time
-        now = datetime.now()
-        current_time = now.strftime("%H:%M:%S")
-        program.modification_date_time = current_time
+    programs.remove(program)
 
-        if programBody.program_name is not None:
-            program.program_name = programBody.program_name
-        if programBody.program_long_name is not None:
-            program.program_long_name = programBody.program_long_name
-        if programBody.retailer_name is not None:
-            program.retailer_name = programBody.retailer_name
-        if programBody.retailer_long_name is not None:
-            program.retailer_long_name = programBody.retailer_long_name
-        if programBody.program_type is not None:
-            program.program_type = programBody.program_type
-        if programBody.country is not None:
-            program.country = programBody.country
-        if programBody.principal_subdivision is not None:
-            program.principal_subdivision = programBody.principal_subdivision
-        if programBody.time_zone_offset is not None:
-            program.time_zone_offset = programBody.time_zone_offset
-        if programBody.interval_period is not None:
-            program.active_period = programBody.interval_period
-        if programBody.program_descriptions is not None:
-            program.program_descriptions = programBody.program_descriptions
-        if programBody.binding_events is not None:
-            program.binding_events = programBody.binding_events
-        if programBody.local_price is not None:
-            program.local_price = programBody.local_price
-        if programBody.payload_descriptors is not None:
-            program.payload_descriptors = programBody.payload_descriptors
-        if programBody.targets is not None:
-            program.targets = programBody.targets
+    # set modification date time
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    program.modification_date_time = current_time
 
-        programs.append(program)
-        logging.debug(f"update_program: program={program}")
+    if programBody.program_name is not None:
+        program.program_name = programBody.program_name
+    if programBody.program_long_name is not None:
+        program.program_long_name = programBody.program_long_name
+    if programBody.retailer_name is not None:
+        program.retailer_name = programBody.retailer_name
+    if programBody.retailer_long_name is not None:
+        program.retailer_long_name = programBody.retailer_long_name
+    if programBody.program_type is not None:
+        program.program_type = programBody.program_type
+    if programBody.country is not None:
+        program.country = programBody.country
+    if programBody.principal_subdivision is not None:
+        program.principal_subdivision = programBody.principal_subdivision
+    if programBody.time_zone_offset is not None:
+        program.time_zone_offset = programBody.time_zone_offset
+    if programBody.interval_period is not None:
+        program.active_period = programBody.interval_period
+    if programBody.program_descriptions is not None:
+        program.program_descriptions = programBody.program_descriptions
+    if programBody.binding_events is not None:
+        program.binding_events = programBody.binding_events
+    if programBody.local_price is not None:
+        program.local_price = programBody.local_price
+    if programBody.payload_descriptors is not None:
+        program.payload_descriptors = programBody.payload_descriptors
+    if programBody.targets is not None:
+        program.targets = programBody.targets
 
-        subscription_callback("PROGRAM", "PUT", program)
+    programs.append(program)
+    logging.debug(f"update_program: program={program}")
 
-        return program
+    subscription_callback("PROGRAM", "PUT", program)
 
-    return None
+    return program
+

@@ -13,7 +13,7 @@ from swagger_server import util
 
 reports = []
 reportID = 0
-
+MAX_REPORTS=3
 
 def create_report(body=None):  # noqa: E501
     """add a report
@@ -26,13 +26,21 @@ def create_report(body=None):  # noqa: E501
     :rtype: Report
     """
     logging.info(f"create_report():")
+
+    if len(reports) >= MAX_REPORTS:
+        problem = Problem(title="Insufficient Storage", status="507")
+        logging.warning(f"create_report(): problem={problem}")
+        return problem, 507
+
     reportBody = None
     if connexion.request.is_json:
         reportBody = Report.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"create_report(): reportBody={reportBody}")
     if reportBody is None:
-        return []
-
+        problem = Problem(title="Bad Request: No request body", status="400")
+        logging.warning(f"create_report(): problem={problem}")
+        return problem, 400
+    
     global reportID
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
@@ -41,6 +49,7 @@ def create_report(body=None):  # noqa: E501
         id=str(reportID),
         created_date_time=current_time,
         modification_date_time=None,
+        object_type='REPORT',
         program_id=reportBody.program_id,
         event_id=reportBody.event_id,
         client_name=reportBody.client_name,
@@ -63,7 +72,7 @@ def create_report(body=None):  # noqa: E501
 def delete_report(report_id):  # noqa: E501
     """delete a report
 
-    Delete the program specified by the reportID in path. # noqa: E501
+    Delete the repoprt specified by the reportID in path. # noqa: E501
 
     :param report_id: object ID of a report.
     :type report_id: dict | bytes
@@ -71,6 +80,11 @@ def delete_report(report_id):  # noqa: E501
     :rtype: Report
     """
     logging.info(f"delete_report(): report_id={report_id}")
+    if len(reports) == 0:
+        problem = Problem(title="Not Found: No reports in system", status="404")
+        logging.warning(f"delete_report(): problem={problem}")
+        return problem, 404
+
     report = next((report for report in reports if report.id == report_id), None)
     if report is not None:
         reports.remove(report)
@@ -121,6 +135,10 @@ def search_reports_by_report_id(report_id):  # noqa: E501
     logging.info(f"search_reports_by_report_id(): report_id={report_id}")
     report = next((report for report in reports if report.id == report_id), None)
     logging.debug(f"search_reports_by_report_id(): report={report}")
+    if report is None:
+        problem = Problem(title="Not Found: report_id not found", status="404")
+        logging.warning(f"search_reports_by_report_id(): problem={problem}")
+        return problem, 404
     return report
 
 def update_report(report_id, body=None):  # noqa: E501
@@ -141,35 +159,40 @@ def update_report(report_id, body=None):  # noqa: E501
         reportBody = Report.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"update_report(): reportBody={reportBody}")
     if reportBody is None:
-        return []
-
+        problem = Problem(title="Bad Request: No request body", status="400")
+        logging.warning(f"update_ven(): problem={problem}")
+        return problem, 400
+    
     report = next((report for report in reports if report.id == report_id), None)
-    if report is not None:
-        reports.remove(report)
+    if report is None:
+        problem = Problem(title="Not Found: report_id not found", status="404")
+        logging.warning(f"update_report(): problem={problem}")
+        return problem, 404
 
-        # set modification date time
-        now = datetime.now()
-        current_time = now.strftime("%H:%M:%S")
-        report.modification_date_time = current_time
+    reports.remove(report)
 
-        if reportBody.program_id != report.program_id:
-            problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
-            logging.warning(f"update_report(): problem={problem}")
-            return problem, 400
-        if reportBody.event_id is not None:
-            report.event_id = reportBody.event_id
-        if reportBody.client_name is not None:
-            report.client_name = reportBody.client_name
-        if reportBody.report_name is not None:
-            report.report_name = reportBody.report_name
-        if reportBody.resources is not None:
-            report.resources = reportBody.resources
+    # set modification date time
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    report.modification_date_time = current_time
 
-        reports.append(report)
-        logging.debug(f"update_report(): report={report}")
+    if reportBody.program_id != report.program_id:
+        problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
+        logging.warning(f"update_report(): problem={problem}")
+        return problem, 400
+    if reportBody.event_id is not None:
+        report.event_id = reportBody.event_id
+    if reportBody.client_name is not None:
+        report.client_name = reportBody.client_name
+    if reportBody.report_name is not None:
+        report.report_name = reportBody.report_name
+    if reportBody.resources is not None:
+        report.resources = reportBody.resources
 
-        subscription_callback("REPORT", "PUT", report)
+    reports.append(report)
+    logging.debug(f"update_report(): report={report}")
 
-        return (report)
+    subscription_callback("REPORT", "PUT", report)
 
-    return None
+    return (report)
+
