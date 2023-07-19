@@ -8,7 +8,7 @@ import six
 from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.resource import Resource  # noqa: E501
-from swagger_server.models.target import Target  # noqa: E501
+from swagger_server.models.values_map import ValuesMap  # noqa: E501
 from swagger_server.models.ven import Ven  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server import util
@@ -149,6 +149,8 @@ def search_vens(targets=None, skip=None, limit=None):  # noqa: E501
     :rtype: List[Ven]
     """
     logging.info(f"search_vens(): ")
+    if connexion.request.is_json:
+        targets = [ValuesMap.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
 
     return vens
 
@@ -330,6 +332,10 @@ def search_ven_resources(ven_id, targets=None, skip=None, limit=None):  # noqa: 
     :rtype: Resource
     """
     logging.info(f"search_ven_resources(): ven_id={ven_id}")
+    if connexion.request.is_json:
+        ven_id = ObjectID.from_dict(connexion.request.get_json())  # noqa: E501
+    if connexion.request.is_json:
+        targets = [ValuesMap.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
 
     venIndex = _get_ven_index(ven_id)
     if venIndex >= MAX_VENS:

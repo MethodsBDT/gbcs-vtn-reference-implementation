@@ -9,7 +9,7 @@ from swagger_server.models.base_model_ import Model
 from swagger_server.models.model_date_time import ModelDateTime  # noqa: F401,E501
 from swagger_server.models.object_id import ObjectID  # noqa: F401,E501
 from swagger_server.models.subscription_object_operations import SubscriptionObjectOperations  # noqa: F401,E501
-from swagger_server.models.target import Target  # noqa: F401,E501
+from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
 import re  # noqa: F401,E501
 from swagger_server import util
 
@@ -19,7 +19,7 @@ class Subscription(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, client_name: str=None, program_id: ObjectID=None, object_operations: List[SubscriptionObjectOperations]=None, targets: List[Target]=None):  # noqa: E501
+    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, client_name: str=None, program_id: ObjectID=None, object_operations: List[SubscriptionObjectOperations]=None, targets: List[ValuesMap]=None):  # noqa: E501
         """Subscription - a model defined in Swagger
 
         :param id: The id of this Subscription.  # noqa: E501
@@ -37,7 +37,7 @@ class Subscription(Model):
         :param object_operations: The object_operations of this Subscription.  # noqa: E501
         :type object_operations: List[SubscriptionObjectOperations]
         :param targets: The targets of this Subscription.  # noqa: E501
-        :type targets: List[Target]
+        :type targets: List[ValuesMap]
         """
         self.swagger_types = {
             'id': ObjectID,
@@ -47,7 +47,7 @@ class Subscription(Model):
             'client_name': str,
             'program_id': ObjectID,
             'object_operations': List[SubscriptionObjectOperations],
-            'targets': List[Target]
+            'targets': List[ValuesMap]
         }
 
         self.attribute_map = {
@@ -246,24 +246,24 @@ class Subscription(Model):
         self._object_operations = object_operations
 
     @property
-    def targets(self) -> List[Target]:
+    def targets(self) -> List[ValuesMap]:
         """Gets the targets of this Subscription.
 
-        A list of target objects.  # noqa: E501
+        A list of valuesMap objects.  # noqa: E501
 
         :return: The targets of this Subscription.
-        :rtype: List[Target]
+        :rtype: List[ValuesMap]
         """
         return self._targets
 
     @targets.setter
-    def targets(self, targets: List[Target]):
+    def targets(self, targets: List[ValuesMap]):
         """Sets the targets of this Subscription.
 
-        A list of target objects.  # noqa: E501
+        A list of valuesMap objects.  # noqa: E501
 
         :param targets: The targets of this Subscription.
-        :type targets: List[Target]
+        :type targets: List[ValuesMap]
         """
 
         self._targets = targets

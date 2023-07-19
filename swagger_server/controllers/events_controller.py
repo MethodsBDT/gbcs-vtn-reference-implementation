@@ -8,7 +8,7 @@ import six
 from swagger_server.models.event import Event  # noqa: E501
 from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
-from swagger_server.models.target import Target  # noqa: E501
+from swagger_server.models.values_map import ValuesMap  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server import util
 
@@ -118,6 +118,11 @@ def search_all_events(program_id=None, targets=None, skip=None, limit=None):  # 
     :rtype: List[Event]
     """
     logging.info(f"search_all_events(): program_id={program_id}")
+ 
+    if connexion.request.is_json:
+        program_id = ObjectID.from_dict(connexion.request.get_json())  # noqa: E501
+    if connexion.request.is_json:
+        targets = [ValuesMap.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
 
     eventList = events
     if program_id is not None:

@@ -8,7 +8,7 @@ import six
 from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.program import Program  # noqa: E501
-from swagger_server.models.target import Target  # noqa: E501
+from swagger_server.models.values_map import ValuesMap  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server import util
 
@@ -105,7 +105,8 @@ def delete_program(program_id):  # noqa: E501
         logging.warning(f"delete_program(): problem={problem}")
         return problem, 404
 
-def search_all_programs(targets=None, skip=None, limit=None):  # noqa: E501
+def search_all_programs(target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
+
     """searches all programs
 
     List all programs known to the server. Use skip and pagination query params to limit reponse size.  # noqa: E501
@@ -119,8 +120,8 @@ def search_all_programs(targets=None, skip=None, limit=None):  # noqa: E501
 
     :rtype: List[Program]
     """
-    logging.info(f"search_all_programs(): targets={targets}")
-    logging.debug(f"search_all_programs(): programs={programs}")
+    logging.info(f"search_all_programs(): target_type={target_type} target_values={target_values} skip={skip}")
+
     return programs
 
 

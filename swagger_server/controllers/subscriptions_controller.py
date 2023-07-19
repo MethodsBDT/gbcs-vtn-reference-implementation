@@ -10,7 +10,7 @@ from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.object_types import ObjectTypes  # noqa: E501
 from swagger_server.models.subscription import Subscription  # noqa: E501
-from swagger_server.models.target import Target  # noqa: E501
+from swagger_server.models.values_map import ValuesMap  # noqa: E501
 from swagger_server import util
 
 subscriptions = []
@@ -157,6 +157,12 @@ def search_subscriptions(program_id=None, client_name=None, targets=None, object
     :rtype: List[Subscription]
     """
     logging.info(f"search_subscriptions(): program_id={program_id} client_name={client_name} objects{objects}")
+    if connexion.request.is_json:
+        program_id = ObjectID.from_dict(connexion.request.get_json())  # noqa: E501
+    if connexion.request.is_json:
+        targets = [ValuesMap.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
+    if connexion.request.is_json:
+        objects = [ObjectTypes.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
 
     # TBD: implement client_id, objects
     if program_id is not None:

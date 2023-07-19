@@ -43,7 +43,7 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 3.0.0
 servers:
-- url: http://localhost:8080/openadr3/OADR-3.0.0/1.0.0/
+- url: http://localhost:8080/openadr3/OADR-3.0.0/1.0.0
   description: base path
 paths:
   /programs:
@@ -56,16 +56,24 @@ paths:
         Use skip and pagination query params to limit response size.
       operationId: search_all_programs
       parameters:
-      - name: targets
+      - name: targetType
         in: query
-        description: return programs that match requested targets
+        description: "Indicates targeting type, e.g. GROUP"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: targetValues
+        in: query
+        description: "Indicates targeting type, e.g. GROUP"
         required: false
         style: form
         explode: true
         schema:
           type: array
           items:
-            $ref: '#/components/schemas/target'
+            type: string
       - name: skip
         in: query
         description: number of records to skip for pagination.
@@ -620,16 +628,24 @@ paths:
         schema:
           $ref: '#/components/schemas/objectID'
         example: program-999
-      - name: targets
+      - name: targetType
         in: query
-        description: return programs that match requested targets
+        description: "Indicates targeting type, e.g. GROUP"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: targetValues
+        in: query
+        description: "Indicates targeting type, e.g. GROUP"
         required: false
         style: form
         explode: true
         schema:
           type: array
           items:
-            $ref: '#/components/schemas/target'
+            type: string
       - name: skip
         in: query
         description: number of records to skip for pagination.
@@ -915,16 +931,24 @@ paths:
         explode: true
         schema:
           type: string
-      - name: targets
+      - name: targetType
         in: query
-        description: return programs that match requested targets
+        description: "Indicates targeting type, e.g. GROUP"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: targetValues
+        in: query
+        description: "Indicates targeting type, e.g. GROUP"
         required: false
         style: form
         explode: true
         schema:
           type: array
           items:
-            $ref: '#/components/schemas/target'
+            type: string
       - name: objects
         in: query
         description: list of objects to subscribe to.
@@ -1213,16 +1237,24 @@ paths:
         Use skip and pagination query params to limit response size.
       operationId: search_vens
       parameters:
-      - name: targets
+      - name: targetType
         in: query
-        description: return vens that match requested targets
+        description: "Indicates targeting type, e.g. GROUP"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: targetValues
+        in: query
+        description: "Indicates targeting type, e.g. GROUP"
         required: false
         style: form
         explode: true
         schema:
           type: array
           items:
-            $ref: '#/components/schemas/target'
+            type: string
       - name: skip
         in: query
         description: number of records to skip for pagination.
@@ -1491,16 +1523,24 @@ paths:
         explode: false
         schema:
           $ref: '#/components/schemas/objectID'
-      - name: targets
+      - name: targetType
         in: query
-        description: return resources that match requested targets
+        description: "Indicates targeting type, e.g. GROUP"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: targetValues
+        in: query
+        description: "Indicates targeting type, e.g. GROUP"
         required: false
         style: form
         explode: true
         schema:
           type: array
           items:
-            $ref: '#/components/schemas/target'
+            type: string
       - name: skip
         in: query
         description: number of records to skip for pagination.
@@ -1923,10 +1963,10 @@ components:
             - $ref: '#/components/schemas/reportPayloadDescriptor'
         targets:
           type: array
-          description: A list of target objects.
+          description: A list of valuesMap objects.
           nullable: true
           items:
-            $ref: '#/components/schemas/target'
+            $ref: '#/components/schemas/valuesMap'
       description: Provides program specific metadata from VTN to VEN.
       example:
         country: US
@@ -1938,13 +1978,11 @@ components:
         modificationDateTime: null
         targets:
         - values:
-          - RESOURCE-999
-          - RESOURCE-999
-          targetType: VEN_ID
+          - 0.17
+          type: PRICE
         - values:
-          - RESOURCE-999
-          - RESOURCE-999
-          targetType: VEN_ID
+          - 0.17
+          type: PRICE
         objectType: PROGRAM
         payloadDescriptors:
         - ""
@@ -2110,10 +2148,10 @@ components:
           example: 0
         targets:
           type: array
-          description: A list of target objects.
+          description: A list of valuesMap objects.
           nullable: true
           items:
-            $ref: '#/components/schemas/target'
+            $ref: '#/components/schemas/valuesMap'
         reportDescriptors:
           type: array
           description: A list of reportDescriptor objects. Used to request reports
@@ -2196,13 +2234,11 @@ components:
         modificationDateTime: null
         targets:
         - values:
-          - RESOURCE-999
-          - RESOURCE-999
-          targetType: VEN_ID
+          - 0.17
+          type: PRICE
         - values:
-          - RESOURCE-999
-          - RESOURCE-999
-          targetType: VEN_ID
+          - 0.17
+          type: PRICE
         programID: null
         intervalPeriod:
           duration: null
@@ -2242,10 +2278,10 @@ components:
             $ref: '#/components/schemas/subscription_objectOperations'
         targets:
           type: array
-          description: A list of target objects.
+          description: A list of valuesMap objects. Used by server to filter callbacks.
           nullable: true
           items:
-            $ref: '#/components/schemas/target'
+            $ref: '#/components/schemas/valuesMap'
       description: |
         An object created by a client to receive notification of operations on objects.
         Clients may subscribe to be notified when a type of object is created,
@@ -2274,13 +2310,11 @@ components:
         modificationDateTime: null
         targets:
         - values:
-          - RESOURCE-999
-          - RESOURCE-999
-          targetType: VEN_ID
+          - 0.17
+          type: PRICE
         - values:
-          - RESOURCE-999
-          - RESOURCE-999
-          targetType: VEN_ID
+          - 0.17
+          type: PRICE
         programID: null
         objectType: SUBSCRIPTION
     ven:
@@ -2310,15 +2344,11 @@ components:
           description: A list of valuesMap objects describing attributes.
           items:
             $ref: '#/components/schemas/valuesMap'
-        targetValues:
+        targets:
           type: array
-          description: A list of targetValues.
-          nullable: true
+          description: A list of valuesMap objects describing target criteria.
           items:
-            type: string
-            description: A string representing a target identifier.
-            nullable: true
-            example: group1
+            $ref: '#/components/schemas/valuesMap'
         resources:
           type: array
           description: A list of resource objects representing end-devices or systems.
@@ -2328,15 +2358,9 @@ components:
       description: Ven represents a client with the ven role.
       example:
         venName: VEN-999
-        targetValues:
-        - group1
-        - group1
         createdDateTime: 2023-06-15T09:30:00.000Z
         resources:
         - venID: null
-          targetValues:
-          - group1
-          - group1
           createdDateTime: null
           resourceName: RESOURCE-999
           attributes:
@@ -2344,11 +2368,11 @@ components:
           - null
           id: null
           modificationDateTime: null
+          targets:
+          - null
+          - null
           objectType: RESOURCE
         - venID: null
-          targetValues:
-          - group1
-          - group1
           createdDateTime: null
           resourceName: RESOURCE-999
           attributes:
@@ -2356,6 +2380,9 @@ components:
           - null
           id: null
           modificationDateTime: null
+          targets:
+          - null
+          - null
           objectType: RESOURCE
         attributes:
         - values:
@@ -2366,6 +2393,9 @@ components:
           type: PRICE
         id: object-999
         modificationDateTime: null
+        targets:
+        - null
+        - null
         objectType: VEN
     resource:
       required:
@@ -2396,21 +2426,15 @@ components:
           description: A list of valuesMap objects describing attributes.
           items:
             $ref: '#/components/schemas/valuesMap'
-        targetValues:
+        targets:
           type: array
-          description: A list of targetValues.
-          nullable: true
+          description: A list of valuesMap objects describing target criteria.
           items:
-            type: string
-            description: A string representing a target identifier.
-            example: group1
+            $ref: '#/components/schemas/valuesMap'
       description: |
         A resource is an energy device or system subject to control by a VEN.
       example:
         venID: null
-        targetValues:
-        - group1
-        - group1
         createdDateTime: null
         resourceName: RESOURCE-999
         attributes:
@@ -2418,6 +2442,9 @@ components:
         - null
         id: null
         modificationDateTime: null
+        targets:
+        - null
+        - null
         objectType: RESOURCE
     interval:
       required:
@@ -2617,10 +2644,10 @@ components:
           default: DIRECT_READ
         targets:
           type: array
-          description: A list of target objects.
+          description: A list of valuesMap objects.
           nullable: true
           items:
-            $ref: '#/components/schemas/target'
+            $ref: '#/components/schemas/valuesMap'
         aggregate:
           type: boolean
           description: |
@@ -2683,32 +2710,6 @@ components:
         - null
         aggregate: false
         frequency: -1
-    target:
-      required:
-      - targetType
-      - values
-      type: object
-      properties:
-        targetType:
-          type: string
-          description: Enumerated or private string signifying the type of target.
-          example: VEN_ID
-        values:
-          type: array
-          description: A list of values.
-          items:
-            type: string
-            description: |
-              A targeting value.
-              Most often a singular value such as a resourceID,
-              but could be a list of GPS coordinates or other.
-            example: RESOURCE-999
-      description: Indicates a target type and target value.
-      example:
-        values:
-        - RESOURCE-999
-        - RESOURCE-999
-        targetType: VEN_ID
     objectID:
       maxLength: 128
       minLength: 1
@@ -2735,10 +2736,10 @@ components:
           - DELETE
         targets:
           type: array
-          description: A list of target objects.
+          description: A list of valuesMap objects.
           nullable: true
           items:
-            $ref: '#/components/schemas/target'
+            $ref: '#/components/schemas/valuesMap'
         object:
           type: object
           description: the object that is the subject of the notification.

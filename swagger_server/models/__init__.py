@@ -26,6 +26,5 @@ from swagger_server.models.report_resources import ReportResources
 from swagger_server.models.resource import Resource
 from swagger_server.models.subscription import Subscription
 from swagger_server.models.subscription_object_operations import SubscriptionObjectOperations
-from swagger_server.models.target import Target
 from swagger_server.models.values_map import ValuesMap
 from swagger_server.models.ven import Ven
