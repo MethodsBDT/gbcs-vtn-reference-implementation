@@ -18,7 +18,7 @@ class Resource(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, resource_name: str=None, ven_id: ObjectID=None, attributes: List[ValuesMap]=None, target_values: List[str]=None):  # noqa: E501
+    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, resource_name: str=None, ven_id: ObjectID=None, attributes: List[ValuesMap]=None, targets: List[ValuesMap]=None):  # noqa: E501
         """Resource - a model defined in Swagger
 
         :param id: The id of this Resource.  # noqa: E501
@@ -35,8 +35,8 @@ class Resource(Model):
         :type ven_id: ObjectID
         :param attributes: The attributes of this Resource.  # noqa: E501
         :type attributes: List[ValuesMap]
-        :param target_values: The target_values of this Resource.  # noqa: E501
-        :type target_values: List[str]
+        :param targets: The targets of this Resource.  # noqa: E501
+        :type targets: List[ValuesMap]
         """
         self.swagger_types = {
             'id': ObjectID,
@@ -46,7 +46,7 @@ class Resource(Model):
             'resource_name': str,
             'ven_id': ObjectID,
             'attributes': List[ValuesMap],
-            'target_values': List[str]
+            'targets': List[ValuesMap]
         }
 
         self.attribute_map = {
@@ -57,7 +57,7 @@ class Resource(Model):
             'resource_name': 'resourceName',
             'ven_id': 'venID',
             'attributes': 'attributes',
-            'target_values': 'targetValues'
+            'targets': 'targets'
         }
         self._id = id
         self._created_date_time = created_date_time
@@ -66,7 +66,7 @@ class Resource(Model):
         self._resource_name = resource_name
         self._ven_id = ven_id
         self._attributes = attributes
-        self._target_values = target_values
+        self._targets = targets
 
     @classmethod
     def from_dict(cls, dikt) -> 'Resource':
@@ -241,24 +241,24 @@ class Resource(Model):
         self._attributes = attributes
 
     @property
-    def target_values(self) -> List[str]:
-        """Gets the target_values of this Resource.
+    def targets(self) -> List[ValuesMap]:
+        """Gets the targets of this Resource.
 
-        A list of targetValues.  # noqa: E501
+        A list of valuesMap objects describing target criteria.  # noqa: E501
 
-        :return: The target_values of this Resource.
-        :rtype: List[str]
+        :return: The targets of this Resource.
+        :rtype: List[ValuesMap]
         """
-        return self._target_values
+        return self._targets
 
-    @target_values.setter
-    def target_values(self, target_values: List[str]):
-        """Sets the target_values of this Resource.
+    @targets.setter
+    def targets(self, targets: List[ValuesMap]):
+        """Sets the targets of this Resource.
 
-        A list of targetValues.  # noqa: E501
+        A list of valuesMap objects describing target criteria.  # noqa: E501
 
-        :param target_values: The target_values of this Resource.
-        :type target_values: List[str]
+        :param targets: The targets of this Resource.
+        :type targets: List[ValuesMap]
         """
 
-        self._target_values = target_values
+        self._targets = targets

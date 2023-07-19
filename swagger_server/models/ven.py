@@ -19,7 +19,7 @@ class Ven(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, ven_name: str=None, attributes: List[ValuesMap]=None, target_values: List[str]=None, resources: List[Resource]=None):  # noqa: E501
+    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, ven_name: str=None, attributes: List[ValuesMap]=None, targets: List[ValuesMap]=None, resources: List[Resource]=None):  # noqa: E501
         """Ven - a model defined in Swagger
 
         :param id: The id of this Ven.  # noqa: E501
@@ -34,8 +34,8 @@ class Ven(Model):
         :type ven_name: str
         :param attributes: The attributes of this Ven.  # noqa: E501
         :type attributes: List[ValuesMap]
-        :param target_values: The target_values of this Ven.  # noqa: E501
-        :type target_values: List[str]
+        :param targets: The targets of this Ven.  # noqa: E501
+        :type targets: List[ValuesMap]
         :param resources: The resources of this Ven.  # noqa: E501
         :type resources: List[Resource]
         """
@@ -46,7 +46,7 @@ class Ven(Model):
             'object_type': str,
             'ven_name': str,
             'attributes': List[ValuesMap],
-            'target_values': List[str],
+            'targets': List[ValuesMap],
             'resources': List[Resource]
         }
 
@@ -57,7 +57,7 @@ class Ven(Model):
             'object_type': 'objectType',
             'ven_name': 'venName',
             'attributes': 'attributes',
-            'target_values': 'targetValues',
+            'targets': 'targets',
             'resources': 'resources'
         }
         self._id = id
@@ -66,7 +66,7 @@ class Ven(Model):
         self._object_type = object_type
         self._ven_name = ven_name
         self._attributes = attributes
-        self._target_values = target_values
+        self._targets = targets
         self._resources = resources
 
     @classmethod
@@ -221,27 +221,27 @@ class Ven(Model):
         self._attributes = attributes
 
     @property
-    def target_values(self) -> List[str]:
-        """Gets the target_values of this Ven.
+    def targets(self) -> List[ValuesMap]:
+        """Gets the targets of this Ven.
 
-        A list of targetValues.  # noqa: E501
+        A list of valuesMap objects describing target criteria.  # noqa: E501
 
-        :return: The target_values of this Ven.
-        :rtype: List[str]
+        :return: The targets of this Ven.
+        :rtype: List[ValuesMap]
         """
-        return self._target_values
+        return self._targets
 
-    @target_values.setter
-    def target_values(self, target_values: List[str]):
-        """Sets the target_values of this Ven.
+    @targets.setter
+    def targets(self, targets: List[ValuesMap]):
+        """Sets the targets of this Ven.
 
-        A list of targetValues.  # noqa: E501
+        A list of valuesMap objects describing target criteria.  # noqa: E501
 
-        :param target_values: The target_values of this Ven.
-        :type target_values: List[str]
+        :param targets: The targets of this Ven.
+        :type targets: List[ValuesMap]
         """
 
-        self._target_values = target_values
+        self._targets = targets
 
     @property
     def resources(self) -> List[Resource]:
