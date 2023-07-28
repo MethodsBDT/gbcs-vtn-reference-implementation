@@ -101,7 +101,7 @@ def delete_event(event_id):  # noqa: E501
     subscription_callback("EVENT", "DELETE", venResource)
 
 
-def search_all_events(program_id=None, targets=None, skip=None, limit=None):  # noqa: E501
+def search_all_events(program_id=None, target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
     """searches all events
 
     List all events known to the server. May filter results by programID query param. Use skip and pagination query params to limit reponse size.  # noqa: E501
@@ -117,18 +117,29 @@ def search_all_events(program_id=None, targets=None, skip=None, limit=None):  # 
 
     :rtype: List[Event]
     """
-    logging.info(f"search_all_events(): program_id={program_id}")
- 
-    if connexion.request.is_json:
-        program_id = ObjectID.from_dict(connexion.request.get_json())  # noqa: E501
-    if connexion.request.is_json:
-        targets = [ValuesMap.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
+    # TBD: filter by program_id per clients privileges
+    logging.info(f"search_all_events(): program_id={program_id} target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
 
+    logging.debug(f"search_all_events(): events={events}")
     eventList = events
-    if program_id is not None:
-        tempEvents = [event for event in events if event.program_id == program_id]
-        logging.debug(f"search_all_events(): tempEvents={tempEvents}")
-        eventList = tempEvents
+    if program_id != None:
+        # strip leading [' and tailing ']
+        program_id = program_id[2:-2]
+        eventList = [event for event in events if event.program_id == program_id]
+        if len(eventList) == 0:
+            problem = Problem(title="Not Found: program_id not found", status="404")
+            logging.warning(f"search_all_events(): problem={problem}")
+            return problem, 404
+    eventList = util.getTargets(eventList, target_type, target_values)
+    if skip != None:
+        if len(events) < skip:
+            problem = Problem(title="Not Found: skipped records not found", status="404")
+            logging.warning(f"search_all_events(): problem={problem}")
+            return problem, 404
+        eventList = events[skip:]
+    if limit != None:
+        eventList = eventList[:limit]
+    logging.debug(f"search_all_events(): filtered eventList={eventList}")
 
     return eventList
 

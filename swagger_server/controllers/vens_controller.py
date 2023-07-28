@@ -72,7 +72,7 @@ def create_ven(body):  # noqa: E501
         object_type='VEN',
         ven_name=venBody.ven_name,
         attributes=venBody.attributes,
-        target_values=venBody.target_values
+        targets=venBody.targets
     )
 
     if venBody.resources is not None:
@@ -134,7 +134,7 @@ def search_ven_by_id(ven_id):  # noqa: E501
     return ven
 
 
-def search_vens(targets=None, skip=None, limit=None):  # noqa: E501
+def search_vens(target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
     """search vens
 
     List all vens. Use skip and pagination query params to limit response size.  # noqa: E501
@@ -148,11 +148,22 @@ def search_vens(targets=None, skip=None, limit=None):  # noqa: E501
 
     :rtype: List[Ven]
     """
-    logging.info(f"search_vens(): ")
-    if connexion.request.is_json:
-        targets = [ValuesMap.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
+    logging.info(
+        f"search_all_vens(): target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
 
-    return vens
+    logging.debug(f"search_all_vens(): vens={vens}")
+    venList = util.getTargets(vens, target_type, target_values)
+    if skip != None:
+        if len(vens) < skip:
+            problem = Problem(title="Not Found: skipped records not found", status="404")
+            logging.warning(f"search_all_vens(): problem={problem}")
+            return problem, 404
+        venList = vens[skip:]
+    if limit != None:
+        venList = venList[:limit]
+    logging.debug(f"search_all_vens(): venList={venList}")
+
+    return venList
 
 def update_ven(ven_id, body=None):  # noqa: E501
     """update  ven
@@ -192,8 +203,8 @@ def update_ven(ven_id, body=None):  # noqa: E501
 
     if venBody.ven_name is not None:
         ven.ven_name = venBody.ven_name
-    if venBody.target_values is not None:
-        ven.target_values = venBody.target_values
+    if venBody.targets is not None:
+        ven.target = venBody.targets
     if venBody.resources is not None:
         ven.resources = venBody.resources
     if venBody.attributes is not None:
@@ -260,7 +271,7 @@ def create_resource(body, ven_id):  # noqa: E501
         resource_name=resourceBody.resource_name,
         ven_id = venID,
         attributes=resourceBody.attributes,
-        target_values=resourceBody.target_values
+        targets=resourceBody.targets
     )
 
     vens[venIndex].resources.append(venResource)
@@ -315,7 +326,7 @@ def delete_ven_resource(ven_id, resource_id):  # noqa: E501
     subscription_callback("RESOURCE", "DELETE", venResource)
     return venResource
 
-def search_ven_resources(ven_id, targets=None, skip=None, limit=None):  # noqa: E501
+def search_ven_resources(ven_id, target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
     """search ven resources
 
     Return the ven resources specified by venID specified in path. # noqa: E501
@@ -331,11 +342,9 @@ def search_ven_resources(ven_id, targets=None, skip=None, limit=None):  # noqa: 
 
     :rtype: Resource
     """
-    logging.info(f"search_ven_resources(): ven_id={ven_id}")
-    if connexion.request.is_json:
-        ven_id = ObjectID.from_dict(connexion.request.get_json())  # noqa: E501
-    if connexion.request.is_json:
-        targets = [ValuesMap.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
+
+    logging.info(
+        f"search_all_ven_resources(): target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
 
     venIndex = _get_ven_index(ven_id)
     if venIndex >= MAX_VENS:
@@ -346,7 +355,19 @@ def search_ven_resources(ven_id, targets=None, skip=None, limit=None):  # noqa: 
     ven = vens[venIndex]
     logging.debug(f"search_ven_resources(): venIndex={venIndex} ven={ven}")
 
-    return ven.resources
+    logging.debug(f"search_all_ven_resources(): ven.resources={ven.resources}")
+    ven_resourceList = util.getTargets(ven.resources, target_type, target_values)
+    if skip != None:
+        if len(ven_resourceList) < skip:
+            problem = Problem(title="Not Found: skipped records not found", status="404")
+            logging.warning(f"search_all_ven_resources(): problem={problem}")
+            return problem, 404
+        ven_resourceList = ven_resourceList[skip:]
+    if limit != None:
+        ven_resourceList = ven_resourceList[:limit]
+    logging.debug(f"search_all_ven_resources(): ven_resourceList={ven_resourceList}")
+
+    return ven_resourceList
 
 def search_ven_resource_by_id(ven_id, resource_id):  # noqa: E501
     """search ven resources by ID
@@ -440,8 +461,8 @@ def update_ven_resource(ven_id, resource_id, body=None):  # noqa: E501
 
     if resourceBody.resource_name is not None:
         venResource.resource_name = resourceBody.resource_name
-    if resourceBody.target_values is not None:
-        venResource.target_values = resourceBody.target_values
+    if resourceBody.targets is not None:
+        venResource.targets = resourceBody.targets
     if resourceBody.attributes is not None:
         venResource.attributes = resourceBody.attributes,
 

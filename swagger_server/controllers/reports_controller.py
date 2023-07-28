@@ -115,12 +115,38 @@ def search_all_reports(program_id=None, client_name=None, skip=None, limit=None)
 
     :rtype: List[Report]
     """
-    logging.info(f"search_all_reports(): program_id={program_id}")
-    if program_id is not None:
-        tempreports = [report for report in reports if report.program_id == program_id]
-        logging.debug(f"search_all_reports(): tempreports={tempreports}")
-        return tempreports
-    return reports
+    logging.info(f"search_all_reports(): program_id={program_id} client_name={client_name} skip={skip} limit={limit}")
+
+    logging.debug(f"search_all_reports(): reports={reports}")
+    reportList = reports
+    if program_id != None:
+        # strip leading [' and tailing ']
+        program_id = program_id[2:-2]
+        reportList = [report for report in reports if report.program_id == program_id]
+        if len(reportList) == 0:
+            problem = Problem(title="Not Found: program_id not found", status="404")
+            logging.warning(f"search_all_reports(): problem={problem}")
+            return problem, 404
+    if client_name != None:
+        # strip leading [' and tailing ']
+        client_name = client_name[2:-2]
+        reportList = [report for report in reports if report.client_name == client_name]
+        if len(reportList) == 0:
+            problem = Problem(title="Not Found: client_name not found", status="404")
+            logging.warning(f"search_all_reports(): problem={problem}")
+            return problem, 404
+    if skip != None:
+        if len(reports) < skip:
+            problem = Problem(title="Not Found: skipped records not found", status="404")
+            logging.warning(f"search_all_reports(): problem={problem}")
+            return problem, 404
+        reportList = reports[skip:]
+    if limit != None:
+        reportList = reportList[:limit]
+    logging.debug(f"search_all_reports(): reportList={reportList}")
+
+    return reportList
+
 
 def search_reports_by_report_id(report_id):  # noqa: E501
     """searches reports by reportID

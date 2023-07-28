@@ -37,7 +37,6 @@ def create_subscription(body):  # noqa: E501
     subscriptionBody = None
     if connexion.request.is_json:
         subscriptionBody = Subscription.from_dict(connexion.request.get_json())  # noqa: E501
-        logging.debug(f"create_subscription(): subscriptionBody={subscriptionBody}")
     if subscriptionBody is None:
         problem = Problem(title="Bad Request: No request body", status="400")
         logging.warning(f"create_subscription(): problem={problem}")
@@ -61,7 +60,6 @@ def create_subscription(body):  # noqa: E501
     subscriptionID += 1
 
     subscriptions.append(subscription)
-    logging.debug(f"create_subscription(): subscription={subscription}")
     logging.info(f"create_subscription(): subscription={subscription}")
 
     subscription_callback("SUBSCRIPTION", "POST", subscription)
@@ -136,7 +134,7 @@ def search_subscription_by_id(subscription_id):  # noqa: E501
 
     return subscription
 
-def search_subscriptions(program_id=None, client_name=None, targets=None, objects=None, skip=None, limit=None):  # noqa: E501
+def search_subscriptions(program_id=None, client_name=None, target_type=None, target_values=None, objects=None, skip=None, limit=None):  # noqa: E501
     """search subscriptions
 
     List all subscriptions. May filter results by programID and clientID as query params. May filter results by objects as query param. See objectTypes schema. Use skip and pagination query params to limit response size.  # noqa: E501
@@ -156,20 +154,41 @@ def search_subscriptions(program_id=None, client_name=None, targets=None, object
 
     :rtype: List[Subscription]
     """
-    logging.info(f"search_subscriptions(): program_id={program_id} client_name={client_name} objects{objects}")
-    if connexion.request.is_json:
-        program_id = ObjectID.from_dict(connexion.request.get_json())  # noqa: E501
-    if connexion.request.is_json:
-        targets = [ValuesMap.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
-    if connexion.request.is_json:
-        objects = [ObjectTypes.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
+    logging.info(
+        f"search_all_subscriptions(): program_id={program_id} client_name={client_name} target_type={target_type} target_values={target_values} objects={objects} skip={skip} limit={limit}")
 
-    # TBD: implement client_id, objects
-    if program_id is not None:
-        tempSubscriptions = [subscription for subscription in subscriptions if subscription.program_id == program_id]
-        logging.debug(f"search_subscriptions(): tempSubscriptions={tempSubscriptions}")
-        return tempSubscriptions
-    return subscriptions
+    logging.debug(f"search_all_subscriptions(): subscriptions={subscriptions}")
+    subscriptionList = subscriptions
+    if program_id != None:
+        # strip leading [' and tailing ']
+        program_id = program_id[2:-2]
+        subscriptionList = [subscription for subscription in subscriptions if subscription.program_id == program_id]
+        if len(subscriptionList) == 0:
+            problem = Problem(title="Not Found: program_id not found", status="404")
+            logging.warning(f"search_all_subscriptions(): problem={problem}")
+            return problem, 404
+    if client_name != None:
+        # strip leading [' and tailing ']
+        client_name = client_name[2:-2]
+        subscriptionList = [subscription for subscription in subscriptions if subscription.client_name == client_name]
+        if len(subscriptionList) == 0:
+            problem = Problem(title="Not Found: client_name not found", status="404")
+            logging.warning(f"search_all_subscriptions(): problem={problem}")
+            return problem, 404
+    subscriptionList = util.getTargets(subscriptionList, target_type, target_values)
+    subscriptionList = util.getObjects(subscriptionList, objects)
+    if skip != None:
+        if len(subscriptions) < skip:
+            problem = Problem(title="Not Found: skipped records not found", status="404")
+            logging.warning(f"search_all_subscriptions(): problem={problem}")
+            return problem, 404
+        subscriptionList = subscriptions[skip:]
+    if limit != None:
+        subscriptionList = subscriptionList[:limit]
+
+    logging.debug(f"search_all_subscriptions(): subscriptionList={subscriptionList}")
+    return subscriptionList
+
 
 def update_subscription(subscription_id, body=None):  # noqa: E501
     """update  subscription

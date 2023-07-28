@@ -140,3 +140,37 @@ def _deserialize_dict(data, boxed_type):
     """
     return {k: _deserialize(v, boxed_type)
             for k, v in six.iteritems(data)}
+
+def getTargets(objects, target_type, target_values):
+    # logging.info(f"getTargets(): target_type={target_type} target_values={target_values} objects={objects}")
+    if target_type != None:
+        objectList=[]
+        for i in range(0, len(objects)):
+            if objects[i].targets != None:
+                for j in range(0, len(objects[i].targets)):
+                    if objects[i].targets[j].type == target_type:
+                        for k in range(0, len(objects[i].targets[j].values)):
+                            if objects[i].targets[j].values[k] in target_values:
+                                objectList.append(objects[i])
+    else:
+        objectList = objects
+    # logging.info(f"getTargets(): objectList={objectList}")
+
+    return objectList
+
+def getObjects(objects, objectTypes):
+    # logging.info(f"getTargets(): target_type={target_type} target_values={target_values} objects={objects}")
+    if objectTypes != None:
+        objectList=[]
+        for i in range(0, len(objects)):
+            if objects[i].object_operations != None:
+                for j in range(0, len(objects[i].object_operations)):
+                    if objects[i].object_operations[j].objects != None:
+                        for k in range(0, len(objects[i].object_operations[j].objects)):
+                            if objects[i].object_operations[j].objects[k] in objectTypes:
+                                objectList.append(objects[i])
+    else:
+        objectList = objects
+    # logging.info(f"getTargets(): objectList={objectList}")
+
+    return objectList

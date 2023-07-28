@@ -37,7 +37,7 @@ def create_program(body=None):  # noqa: E501
     programBody = None
     if connexion.request.is_json:
         programBody = Program.from_dict(connexion.request.get_json())  # noqa: E501
-        logging.debug(f"create_program(): programBody={programBody}")
+        # logging.debug(f"create_program(): programBody={programBody}")
     if programBody is None:
         problem = Problem(title="Bad Request: No request body", status="400")
         logging.warning(f"create_program(): problem={problem}")
@@ -120,9 +120,21 @@ def search_all_programs(target_type=None, target_values=None, skip=None, limit=N
 
     :rtype: List[Program]
     """
-    logging.info(f"search_all_programs(): target_type={target_type} target_values={target_values} skip={skip}")
+    logging.info(f"search_all_programs(): target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
 
-    return programs
+    logging.debug(f"search_all_programs(): programs={programs}")
+    programList = util.getTargets(programs, target_type, target_values)
+    if skip != None:
+        if len(programs) < skip:
+            problem = Problem(title="Not Found: skipped records not found", status="404")
+            logging.warning(f"search_all_programs(): problem={problem}")
+            return problem, 404
+        programList = programs[skip:]
+    if limit != None:
+        programList = programList[:limit]
+    logging.debug(f"search_all_programs(): programList={programList}")
+
+    return programList
 
 
 def search_program_by_program_id(program_id):  # noqa: E501

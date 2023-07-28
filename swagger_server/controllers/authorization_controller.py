@@ -7,7 +7,7 @@ https://connexion.readthedocs.io/en/latest/security.html
 def check_oAuth2ClientCredentials(token):
     logging.debug(f"check_oAuth2ClientCredentials: token={token}")
     if token == 'ven_token':
-        return {'scopes': ['read_all', 'write_reports', 'write_subscriptions', 'write_vens'], 'uid': 'ALL'}
+        return {'scopes': ['read_all', 'write_reports', 'write_subscriptions', 'write_vens']}
     elif token == 'bl_token':
         return {'scopes': ['read_all', 'write_programs', 'write_events', 'write_subscriptions', 'write_vens']}
     else:
