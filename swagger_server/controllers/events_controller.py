@@ -127,7 +127,7 @@ def search_all_events(program_id=None, target_type=None, target_values=None, ski
         program_id = program_id[2:-2]
         eventList = [event for event in events if event.program_id == program_id]
         if len(eventList) == 0:
-            problem = Problem(title="Not Found: program_id not found", status="404")
+            problem = Problem(title=f"Not Found: program_id {program_id} not found", status="404")
             logging.warning(f"search_all_events(): problem={problem}")
             return problem, 404
     eventList = util.getTargets(eventList, target_type, target_values)
