@@ -143,7 +143,10 @@ def search_all_reports(program_id=None, client_name=None, skip=None, limit=None)
         reportList = reports[skip:]
     if limit != None:
         reportList = reportList[:limit]
+
     logging.debug(f"search_all_reports(): reportList={reportList}")
+
+    subscription_callback("REPORT", "GET", reportList)
 
     return reportList
 
@@ -165,6 +168,9 @@ def search_reports_by_report_id(report_id):  # noqa: E501
         problem = Problem(title="Not Found: report_id not found", status="404")
         logging.warning(f"search_reports_by_report_id(): problem={problem}")
         return problem, 404
+
+    subscription_callback("REPORT", "GET", report)
+
     return report
 
 def update_report(report_id, body=None):  # noqa: E501

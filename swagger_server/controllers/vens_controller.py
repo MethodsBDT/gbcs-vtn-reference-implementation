@@ -131,6 +131,8 @@ def search_ven_by_id(ven_id):  # noqa: E501
         logging.warning(f"search_ven_by_id(): problem={problem}")
         return problem, 404
 
+    subscription_callback("VEN", "GET", ven)
+
     return ven
 
 
@@ -162,6 +164,8 @@ def search_vens(target_type=None, target_values=None, skip=None, limit=None):  #
     if limit != None:
         venList = venList[:limit]
     logging.debug(f"search_all_vens(): venList={venList}")
+
+    subscription_callback("VEN", "GET", venList)
 
     return venList
 
@@ -367,6 +371,8 @@ def search_ven_resources(ven_id, target_type=None, target_values=None, skip=None
         ven_resourceList = ven_resourceList[:limit]
     logging.debug(f"search_all_ven_resources(): ven_resourceList={ven_resourceList}")
 
+    subscription_callback("RESOURCE", "GET", ven_resourceList)
+
     return ven_resourceList
 
 def search_ven_resource_by_id(ven_id, resource_id):  # noqa: E501
@@ -404,6 +410,8 @@ def search_ven_resource_by_id(ven_id, resource_id):  # noqa: E501
         return problem, 404
 
     logging.debug(f"search_ven_resource_by_id(): resource={resource}")
+
+    subscription_callback("RESOURCE", "GET", resource)
 
     return resource
 

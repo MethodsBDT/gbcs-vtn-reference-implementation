@@ -134,6 +134,8 @@ def search_all_programs(target_type=None, target_values=None, skip=None, limit=N
         programList = programList[:limit]
     logging.debug(f"search_all_programs(): programList={programList}")
 
+    subscription_callback("PROGRAM", "GET", programList)
+
     return programList
 
 
@@ -155,6 +157,9 @@ def search_program_by_program_id(program_id):  # noqa: E501
         return problem, 404
 
     logging.debug(f"search_program_by_program_id(): program={program}")
+
+    subscription_callback("PROGRAM", "GET", program)
+
     return program
 
 

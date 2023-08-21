@@ -132,6 +132,8 @@ def search_subscription_by_id(subscription_id):  # noqa: E501
         logging.warning(f"search_subscription_by_id(): problem={problem}")
         return problem, 404
 
+    subscription_callback("SUBSCRIPTION", "GET", subscription)
+
     return subscription
 
 def search_subscriptions(program_id=None, client_name=None, target_type=None, target_values=None, objects=None, skip=None, limit=None):  # noqa: E501
@@ -187,6 +189,8 @@ def search_subscriptions(program_id=None, client_name=None, target_type=None, ta
         subscriptionList = subscriptionList[:limit]
 
     logging.debug(f"search_all_subscriptions(): subscriptionList={subscriptionList}")
+
+    subscription_callback("SUBSCRIPTION", "GET", subscriptionList)
     return subscriptionList
 
 
@@ -245,28 +249,21 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
 
 def subscription_callback(resourceName, operation, object):
     logging.info(f"subscription_callback(): resourceName={resourceName}, operation={operation}, object={object}")
-    # print(f"subscription_callback(): subscriptions={subscriptions}")
 
     for subscription in subscriptions:
-        # print(f"subscription_callback(): subscription={subscription}")
         resource = next((resource for resource in subscription.object_operations if
                          resourceName in resource.objects and operation in resource.operations), None)
         if resource is not None:
-            # print(f"    subscription_callback(): resource={resource}")
-            if object.targets is not None and subscription.targets is not None:
+            if hasattr(object, "targets") and object.targets is not None and hasattr(subscription, "targets") and subscription.targets is not None:
                 for target in object.targets:
-                    # print(f"        subscription_callback(): target={target}")
                     targetObj = next((targetObj for targetObj in subscription.targets if
                                      targetObj.targetType in target.targetType), None)
                     if targetObj is not None:
-                        # print(f"            subscription_callback(): targetObj={targetObj}")
                         if target.values is not None:
                             for value in target.values:
-                                # print(f"subscription_callback(): value={value}")
                                 targetValue = next((targetValue for targetValue in targetObj.values if
                                        value in targetValue), None)
 
-                            # print(f"                subscription_callback(): targetValue={targetValue}")
                             if targetValue is None:
                                 logging.debug(f"subscription_callback: no matching targets")
                                 return None
@@ -274,10 +271,8 @@ def subscription_callback(resourceName, operation, object):
                         logging.debug(f"subscription_callback: no matching targets")
                         return None
 
-
             notification = Notification(object_type=resourceName, operation=operation, targets=None, object=object)
 
-            logging.debug(f"subscription_callback(): notification={notification}")
             logging.info(f"subscription_callback(): notification={notification}")
 
             response = requests.post(resource.callback_url, json=json.dumps(notification.to_dict()))

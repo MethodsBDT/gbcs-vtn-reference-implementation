@@ -101,7 +101,7 @@ class SubscriptionObjectOperations(Model):
         :param operations: The operations of this SubscriptionObjectOperations.
         :type operations: List[str]
         """
-        allowed_values = ["POST", "PUT", "DELETE"]  # noqa: E501
+        allowed_values = ["GET", "POST", "PUT", "DELETE"]  # noqa: E501
         if not set(operations).issubset(set(allowed_values)):
             raise ValueError(
                 "Invalid values for `operations` [{0}], must be a subset of [{1}]"  # noqa: E501

@@ -141,6 +141,8 @@ def search_all_events(program_id=None, target_type=None, target_values=None, ski
         eventList = eventList[:limit]
     logging.debug(f"search_all_events(): filtered eventList={eventList}")
 
+    subscription_callback("EVENT", "GET", eventList)
+
     return eventList
 
 
@@ -162,8 +164,9 @@ def search_events_by_id(event_id):  # noqa: E501
         return problem, 404
     logging.debug(f"search_events_by_id(): event={event}")
 
-    return event
+    subscription_callback("EVENT", "GET", event)
 
+    return event
 
 def update_event(event_id, body=None):  # noqa: E501
     """update an event
