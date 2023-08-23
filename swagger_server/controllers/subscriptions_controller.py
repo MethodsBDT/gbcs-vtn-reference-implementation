@@ -15,7 +15,7 @@ from swagger_server import util
 
 subscriptions = []
 subscriptionID = 0
-MAX_SUBSCRIPTIONS=3
+MAX_SUBSCRIPTIONS=30
 
 def create_subscription(body):  # noqa: E501
     """create subscription
@@ -273,7 +273,7 @@ def subscription_callback(resourceName, operation, object):
 
             notification = Notification(object_type=resourceName, operation=operation, targets=None, object=object)
 
-            logging.info(f"subscription_callback(): notification={notification}")
+            logging.info(f"subscription_callback(): notification={notification} callback_url={resource.callback_url}")
 
             response = requests.post(resource.callback_url, json=json.dumps(notification.to_dict()))
             if response.status_code != 200:

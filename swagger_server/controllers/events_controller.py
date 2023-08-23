@@ -56,6 +56,7 @@ def create_event(body=None):  # noqa: E501
         priority=eventBody.priority,
         targets=eventBody.targets,
         report_descriptors=eventBody.report_descriptors,
+        payload_descriptors=eventBody.payload_descriptors,
         interval_period=eventBody.interval_period,
         intervals=eventBody.intervals
     )
@@ -215,6 +216,8 @@ def update_event(event_id, body=None):  # noqa: E501
         event.targets = eventBody.targets
     if eventBody.report_descriptors is not None:
         event.report_requests = eventBody.report_descriptors
+    if eventBody.payload_descriptors is not None:
+        event.payload_descriptors = eventBody.payload_descriptors
     if eventBody.interval_period is not None:
         event.interval_period = eventBody.interval_period
     if eventBody.intervals is not None:
