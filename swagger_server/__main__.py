@@ -19,12 +19,12 @@ def main():
     if args.loglevel is not None:
         numeric_level = getattr(logging, args.loglevel.upper(), None)
         if not isinstance(numeric_level, int):
-            raise ValueError('Invalid log level: %s' % loglevel)
+            raise ValueError('Invalid log level: %s' % args.loglevel)
 
     if not os.path.exists(LOG_PATH):
         os.mkdir(LOG_PATH)
     logging.basicConfig(filename=LOG_PATH+'/VTN.log', filemode='w', level=numeric_level)
-    print ("VTN: find logs here ./logs/VTN.log")
+    print (f"VTN: find logs here {LOG_PATH}/BL.log")
 
     app = connexion.App(__name__, specification_dir='./swagger/')
     app.app.json_encoder = encoder.JSONEncoder
