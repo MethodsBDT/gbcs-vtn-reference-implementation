@@ -249,6 +249,7 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
 
 def subscription_callback(resourceName, operation, object):
     logging.info(f"subscription_callback(): resourceName={resourceName}, operation={operation}, object={object}")
+    logging.debug(f"subscription_callback(): object={object}")
 
     for subscription in subscriptions:
         resource = next((resource for resource in subscription.object_operations if
