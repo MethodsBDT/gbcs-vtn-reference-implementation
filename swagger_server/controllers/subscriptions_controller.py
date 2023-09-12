@@ -118,12 +118,12 @@ def search_subscription_by_id(subscription_id):  # noqa: E501
     """
     logging.info(f"search_subscription_by_id(): subscription_id={subscription_id}")
 
-    if connexion.request.is_json:
-        program_id = ObjectID.from_dict(connexion.request.get_json())  # noqa: E501
-    if connexion.request.is_json:
-        targets = [Target.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
-    if connexion.request.is_json:
-        objects = [ObjectTypes.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
+    # if connexion.request.is_json:
+    #     program_id = ObjectID.from_dict(connexion.request.get_json())  # noqa: E501
+    # if connexion.request.is_json:
+    #     targets = [Target.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
+    # if connexion.request.is_json:
+    #     objects = [ObjectTypes.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
 
     subscription = next((subscription for subscription in subscriptions if subscription.id == subscription_id), None)
     logging.debug(f"search_subscription_by_id(): subscription={subscription}")
@@ -163,7 +163,7 @@ def search_subscriptions(program_id=None, client_name=None, target_type=None, ta
     subscriptionList = subscriptions
     if program_id != None:
         # strip leading [' and tailing ']
-        program_id = program_id[2:-2]
+        # program_id = program_id[2:-2]
         subscriptionList = [subscription for subscription in subscriptions if subscription.program_id == program_id]
         if len(subscriptionList) == 0:
             problem = Problem(title="Not Found: program_id not found", status="404")
@@ -171,7 +171,7 @@ def search_subscriptions(program_id=None, client_name=None, target_type=None, ta
             return problem, 404
     if client_name != None:
         # strip leading [' and tailing ']
-        client_name = client_name[2:-2]
+        # client_name = client_name[2:-2]
         subscriptionList = [subscription for subscription in subscriptions if subscription.client_name == client_name]
         if len(subscriptionList) == 0:
             problem = Problem(title="Not Found: client_name not found", status="404")
@@ -248,7 +248,7 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
     return (subscription)
 
 def subscription_callback(resourceName, operation, object):
-    logging.info(f"subscription_callback(): resourceName={resourceName}, operation={operation}, object={object}")
+    logging.info(f"subscription_callback(): resourceName={resourceName}, operation={operation}")
     logging.debug(f"subscription_callback(): object={object}")
 
     for subscription in subscriptions:

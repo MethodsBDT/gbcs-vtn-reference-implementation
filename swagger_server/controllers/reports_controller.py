@@ -121,7 +121,7 @@ def search_all_reports(program_id=None, client_name=None, skip=None, limit=None)
     reportList = reports
     if program_id != None:
         # strip leading [' and tailing ']
-        program_id = program_id[2:-2]
+        # program_id = program_id[2:-2]
         reportList = [report for report in reports if report.program_id == program_id]
         if len(reportList) == 0:
             problem = Problem(title="Not Found: program_id not found", status="404")
@@ -129,8 +129,10 @@ def search_all_reports(program_id=None, client_name=None, skip=None, limit=None)
             return problem, 404
     if client_name != None:
         # strip leading [' and tailing ']
-        client_name = client_name[2:-2]
+        # client_name = client_name[2:-2]
+        # logging.debug(f"search_all_reports(): client_name={client_name}")
         reportList = [report for report in reports if report.client_name == client_name]
+        # logging.debug(f"search_all_reports(): reportList={reportList}")
         if len(reportList) == 0:
             problem = Problem(title="Not Found: client_name not found", status="404")
             logging.warning(f"search_all_reports(): problem={problem}")

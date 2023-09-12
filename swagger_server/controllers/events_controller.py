@@ -125,7 +125,7 @@ def search_all_events(program_id=None, target_type=None, target_values=None, ski
     eventList = events
     if program_id != None:
         # strip leading [' and tailing ']
-        program_id = program_id[2:-2]
+        # program_id = program_id[2:-2]
         eventList = [event for event in events if event.program_id == program_id]
         if len(eventList) == 0:
             problem = Problem(title=f"Not Found: program_id {program_id} not found", status="404")
