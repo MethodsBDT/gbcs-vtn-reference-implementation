@@ -10,6 +10,8 @@ from swagger_server.models.resource import Resource  # noqa: E501
 from swagger_server.models.ven import Ven  # noqa: E501
 from swagger_server.test import BaseTestCase
 
+BASE_URL = 'http://localhost:8080/openadr3/OADR-3.0.0/1.0.0/'
+auth_header = {'Authorization': "Bearer ven_token"}
 
 class TestVensController(BaseTestCase):
     """VensController integration test stubs"""
@@ -19,48 +21,53 @@ class TestVensController(BaseTestCase):
 
         create resource
         """
-        body = Resource()
+        body = Resource(resource_name="myResource")
         response = self.client.open(
-            '/francisrsandoval/OpenADR-3.0/1.0.0/vens/{venID}/resources'.format(ven_id=56),
+            BASE_URL+'vens/0/resources',
             method='POST',
             data=json.dumps(body),
-            content_type='application/json')
+            content_type='application/json',
+            headers=auth_header)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_create_ven(self):
+    # Tests run in alphabetical order, so put this first so create resource works on id=0
+    def test_acreate_ven(self):
         """Test case for create_ven
 
         create ven
         """
-        body = Ven()
+        body = Ven(ven_name="myVen")
         response = self.client.open(
-            '/francisrsandoval/OpenADR-3.0/1.0.0/vens',
+            BASE_URL+'vens',
             method='POST',
             data=json.dumps(body),
-            content_type='application/json')
+            content_type='application/json',
+            headers=auth_header)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_delete_ven(self):
+    def test_xxdelete_ven(self):
         """Test case for delete_ven
 
         delete  ven
         """
         response = self.client.open(
-            '/francisrsandoval/OpenADR-3.0/1.0.0/vens/{venID}'.format(ven_id=56),
-            method='DELETE')
+            BASE_URL+'vens/0',
+            method='DELETE',
+            headers=auth_header)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_delete_ven_resource(self):
+    def test_xdelete_ven_resource(self):
         """Test case for delete_ven_resource
 
         delete  ven resource
         """
         response = self.client.open(
-            '/francisrsandoval/OpenADR-3.0/1.0.0/vens/{venID}/resources/{resourceID}'.format(ven_id=56, resource_id=56),
-            method='DELETE')
+            BASE_URL+'vens/0/resources/0',
+            method='DELETE',
+            headers=auth_header)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -70,8 +77,9 @@ class TestVensController(BaseTestCase):
         search vens by ID
         """
         response = self.client.open(
-            '/francisrsandoval/OpenADR-3.0/1.0.0/vens/{venID}'.format(ven_id=56),
-            method='GET')
+            BASE_URL+'vens/0',
+            method='GET',
+            headers=auth_header)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -81,8 +89,9 @@ class TestVensController(BaseTestCase):
         search ven resources by ID
         """
         response = self.client.open(
-            '/francisrsandoval/OpenADR-3.0/1.0.0/vens/{venID}/resources/{resourceID}'.format(ven_id=56, resource_id=56),
-            method='GET')
+            BASE_URL+'vens/0/resources/0',
+            method='GET',
+            headers=auth_header)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -92,8 +101,9 @@ class TestVensController(BaseTestCase):
         search ven resources
         """
         response = self.client.open(
-            '/francisrsandoval/OpenADR-3.0/1.0.0/vens/{venID}/resources'.format(ven_id=56),
-            method='GET')
+            BASE_URL+'vens/0/resources',
+            method='GET',
+            headers=auth_header)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -102,12 +112,10 @@ class TestVensController(BaseTestCase):
 
         search vens
         """
-        query_string = [('skip', 1),
-                        ('limit', 50)]
         response = self.client.open(
-            '/francisrsandoval/OpenADR-3.0/1.0.0/vens',
+            BASE_URL+'vens',
             method='GET',
-            query_string=query_string)
+            headers=auth_header)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -116,9 +124,13 @@ class TestVensController(BaseTestCase):
 
         update  ven
         """
+        body = Ven(ven_name="myVen")
         response = self.client.open(
-            '/francisrsandoval/OpenADR-3.0/1.0.0/vens/{venID}'.format(ven_id=56),
-            method='PUT')
+            BASE_URL+'vens/0',
+            method='PUT',
+            data=json.dumps(body),
+            content_type='application/json',
+            headers=auth_header)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -127,9 +139,13 @@ class TestVensController(BaseTestCase):
 
         update  ven resource
         """
+        body = Resource(resource_name="myResource")
         response = self.client.open(
-            '/francisrsandoval/OpenADR-3.0/1.0.0/vens/{venID}/resources/{resourceID}'.format(ven_id=56, resource_id=56),
-            method='PUT')
+            BASE_URL+'vens/0/resources/0',
+            method='PUT',
+            data=json.dumps(body),
+            content_type='application/json',
+            headers=auth_header)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 

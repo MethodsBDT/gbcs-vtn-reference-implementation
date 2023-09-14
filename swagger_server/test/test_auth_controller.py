@@ -8,6 +8,7 @@ from six import BytesIO
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.test import BaseTestCase
 
+BASE_URL = 'http://localhost:8080/openadr3/OADR-3.0.0/1.0.0/'
 
 class TestAuthController(BaseTestCase):
     """AuthController integration test stubs"""
@@ -17,10 +18,10 @@ class TestAuthController(BaseTestCase):
 
         fetch a token
         """
-        headers = [('client_id', 'client_id_example'),
-                   ('client_secret', 56)]
+        headers = [('clientID', 'ven_client'),
+                   ('clientSecret', 999)]
         response = self.client.open(
-            '/francisrsandoval/OpenADR-3.0/1.0.0/auth/token',
+            BASE_URL+'auth/token',
             method='GET',
             headers=headers)
         self.assert200(response,

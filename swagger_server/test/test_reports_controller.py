@@ -9,6 +9,8 @@ from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.report import Report  # noqa: E501
 from swagger_server.test import BaseTestCase
 
+BASE_URL = 'http://localhost:8080/openadr3/OADR-3.0.0/1.0.0/'
+auth_header = {'Authorization': "Bearer ven_token"}
 
 class TestReportsController(BaseTestCase):
     """ReportsController integration test stubs"""
@@ -18,23 +20,26 @@ class TestReportsController(BaseTestCase):
 
         add a report
         """
-        body = Report()
+        body = Report(client_name="myClient", event_id="0", program_id="0", resources=[])
         response = self.client.open(
-            '/francisrsandoval/OpenADR-3.0/1.0.0/reports',
+            BASE_URL+'reports',
             method='POST',
             data=json.dumps(body),
-            content_type='application/json')
+            content_type='application/json',
+            headers=auth_header)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_delete_report(self):
+    # Tests run in alphabetical order, so put this last so search_by_id and update work on id=0
+    def test_xdelete_report(self):
         """Test case for delete_report
 
         delete a report
         """
         response = self.client.open(
-            '/francisrsandoval/OpenADR-3.0/1.0.0/reports/{reportID}'.format(report_id=56),
-            method='DELETE')
+            BASE_URL+'reports/0',
+            method='DELETE',
+            headers=auth_header)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -43,15 +48,10 @@ class TestReportsController(BaseTestCase):
 
         searches all reports
         """
-        query_string = [('program_id', 56),
-                        ('client_id', 56),
-                        ('no_defaults', true),
-                        ('skip', 1),
-                        ('limit', 50)]
         response = self.client.open(
-            '/francisrsandoval/OpenADR-3.0/1.0.0/reports',
+            BASE_URL+'reports',
             method='GET',
-            query_string=query_string)
+            headers=auth_header)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -60,11 +60,10 @@ class TestReportsController(BaseTestCase):
 
         searches reports by reportID
         """
-        query_string = [('no_defaults', true)]
         response = self.client.open(
-            '/francisrsandoval/OpenADR-3.0/1.0.0/reports/{reportID}'.format(report_id=56),
+            BASE_URL+'reports/0',
             method='GET',
-            query_string=query_string)
+            headers=auth_header)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -73,12 +72,13 @@ class TestReportsController(BaseTestCase):
 
         update a report
         """
-        body = Report()
+        body = Report(client_name="myClient", event_id="0", program_id="0", resources=[])
         response = self.client.open(
-            '/francisrsandoval/OpenADR-3.0/1.0.0/reports/{reportID}'.format(report_id=56),
+            BASE_URL+'reports/0',
             method='PUT',
             data=json.dumps(body),
-            content_type='application/json')
+            content_type='application/json',
+            headers=auth_header)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
