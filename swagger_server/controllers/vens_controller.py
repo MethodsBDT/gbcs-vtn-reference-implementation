@@ -1,40 +1,18 @@
 import connexion
 from datetime import datetime
-import json
 import logging
-import requests
-import six
 
-from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.resource import Resource  # noqa: E501
-from swagger_server.models.values_map import ValuesMap  # noqa: E501
 from swagger_server.models.ven import Ven  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
+from swagger_server.objStore.listStore import objStore
 from swagger_server import util
-
 
 # recall this is just a toy VTN
 MAX_RESOURCES = 3
-MAX_VENS = 3
-
-vens = []
-# always increments
-venID = 0
-# always increments
-resourceIDs = [0] * MAX_RESOURCES
-
-def _get_ven_index(ven_id):
-    logging.info(f"_get_ven_index(): ven_id={ven_id} vens={vens}")
-    venIndex = MAX_VENS
-    for index in range(0, len(vens)):
-        # logging.info(f"_get_ven_index(): vens[venIndex]={vens[venIndex]}")
-        if vens[index].id == ven_id:
-            venIndex = index
-            break
-    logging.info(f"_get_ven_index(): venIndex={venIndex} ")
-
-    return venIndex
+# always incrementing
+resource_id = 0
 
 def create_ven(body):  # noqa: E501
     """create ven
@@ -46,27 +24,16 @@ def create_ven(body):  # noqa: E501
 
     :rtype: Ven
     """
-    global venID
     logging.info(f"create_ven(): ")
-
-    if len(vens) >= MAX_VENS:
-        problem = Problem(title="Insufficient Storage", status="507")
-        logging.warning(f"create_ven(): problem={problem}")
-        return problem, 507
 
     venBody = None
     if connexion.request.is_json:
         venBody = Ven.from_dict(connexion.request.get_json())  # noqa: E501
-    if venBody is None:
-        problem = Problem(title="Bad Request: No request body", status="400")
-        logging.warning(f"create_ven(): problem={problem}")
-        return problem, 400
 
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
 
     ven = Ven(
-        id=str(venID),
         created_date_time=current_time,
         modification_date_time=None,
         object_type='VEN',
@@ -80,11 +47,14 @@ def create_ven(body):  # noqa: E501
     else:
         ven.resources = []
 
-    # bump ven ID
-    venID += 1
-    vens.append(ven)
+    status = objStore.insert(ven)
+    if status != 200:
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"create_ven(): problem={problem}")
+        return problem, status
+
     subscription_callback("VEN", "POST", ven)
-    return ven
+    return ven, 200
 
 def delete_ven(ven_id):  # noqa: E501
     """delete  ven
@@ -98,20 +68,16 @@ def delete_ven(ven_id):  # noqa: E501
     """
 
     logging.info(f"delete_ven(): ven_id={ven_id}")
-    if len(vens) == 0:
-        problem = Problem(title="Not Found: No vens in system", status="404")
+    ven = objStore.remove("VEN", ven_id)
+    if type(ven) is not Ven:
+        status = ven
+        problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"delete_ven(): problem={problem}")
-        return problem, 404
+        return problem, status
 
-    ven = next((ven for ven in vens if ven.id == ven_id), None)
-    if ven is None:
-        problem = Problem(title="Not Found", status="404")
-        logging.warning(f"delete_ven: problem={problem}")
-        return problem, 404
-
-    vens.remove(ven)
     subscription_callback("VEN", "DELETE", ven)
-    return ven
+
+    return ven, 200
 
 
 def search_ven_by_id(ven_id):  # noqa: E501
@@ -125,16 +91,16 @@ def search_ven_by_id(ven_id):  # noqa: E501
     :rtype: Ven
     """
     logging.info(f"search_ven_by_id(): ven_id={ven_id}")
-    ven = next((ven for ven in vens if ven.id == ven_id), None)
-    if ven is None:
-        problem = Problem(title="Not Found: ven_id not found", status="404")
+    ven = objStore.search("VEN", ven_id)
+    if type(ven) is not Ven:
+        status = ven
+        problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"search_ven_by_id(): problem={problem}")
-        return problem, 404
+        return problem, status
 
     subscription_callback("VEN", "GET", ven)
 
-    return ven
-
+    return ven, 200
 
 def search_vens(target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
     """search vens
@@ -153,7 +119,14 @@ def search_vens(target_type=None, target_values=None, skip=None, limit=None):  #
     logging.info(
         f"search_all_vens(): target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
 
+    vens = objStore.search_all("VEN")
     logging.debug(f"search_all_vens(): vens={vens}")
+    if type(vens) is not list:
+        status = vens
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"search_all_vens(): problem={problem}")
+        return problem, status
+
     venList = util.getTargets(vens, target_type, target_values)
     if skip != None:
         if len(vens) < skip:
@@ -192,13 +165,11 @@ def update_ven(ven_id, body=None):  # noqa: E501
         logging.warning(f"update_ven(): problem={problem}")
         return problem, 400
 
-    ven = next((ven for ven in vens if ven.id == ven_id), None)
-    if ven is None:
-        problem = Problem(title="Not Found: ven_id not found", status="404")
+    ven, status = search_ven_by_id(ven_id)
+    if ven is None or status == 404:
+        problem = Problem(title="Not Found: program_id not found", status="404")
         logging.warning(f"update_ven(): problem={problem}")
         return problem, 404
-
-    vens.remove(ven)
 
     # set modification date time
     now = datetime.now()
@@ -214,8 +185,13 @@ def update_ven(ven_id, body=None):  # noqa: E501
     if venBody.attributes is not None:
         ven.attributes = venBody.attributes,
 
-    logging.debug(f"update_ven(): vens={vens}")
-    vens.append(ven)
+    ven = objStore.update("VEN", ven)
+    if type(ven) is not Ven:
+        status = ven
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"update_ven(): problem={problem}")
+        return problem, status
+
     subscription_callback("VEN", "PUT", ven)
     return ven
 
@@ -224,7 +200,7 @@ def create_resource(body, ven_id):  # noqa: E501
 
     Create a new resource. # noqa: E501
 
-    :param body: 
+    :param body:
     :type body: dict | bytes
     :param ven_id: Numeric ID of ven.
     :type ven_id: dict | bytes
@@ -232,59 +208,51 @@ def create_resource(body, ven_id):  # noqa: E501
     :rtype: Resource
      """
     logging.info(f"create_resource(): ven_id={ven_id}")
+    global resource_id
 
-    # find index in vens of ven_id
-    venIndex = _get_ven_index(ven_id)
-    if venIndex >= MAX_VENS:
-        problem = Problem(title="Not Found: ven_id not found", status="404")
+    ven = objStore.search("VEN", ven_id)
+    if type(ven) is not Ven:
+        status = ven
+        problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"create_resource(): problem={problem}")
-        return problem, 404
+        return problem, status
 
-    logging.info(f"create_resource(): venIndex={venIndex}")
-
-    logging.info(f"create_resource(): len ven.resources={len(vens[venIndex].resources)}")
-    if len(vens[venIndex].resources) >= MAX_RESOURCES:
-        problem = Problem(title="Insufficient Storage", status="507")
+    if len(ven.resources) >= MAX_RESOURCES:
+        status = 507
+        problem = Problem(title="Insufficient Storage ", status=str(status))
         logging.warning(f"create_resource(): problem={problem}")
-        return problem, 507
+        return problem, status
 
     resourceBody = None
     if connexion.request.is_json:
         resourceBody = Resource.from_dict(connexion.request.get_json())  # noqa: E501
-    if resourceBody is None:
-        problem = Problem(title="Bad Request: No request body", status="400")
-        logging.warning(f"create_resource(): problem={problem}")
-        return problem, 400
 
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
 
-    # venID expected as element following vens/
-    # Note venId not same as venIndex into vens list
-    base_url = connexion.request.base_url.split('/')
-    ven_index = base_url.index("vens")
-    venID = base_url[ven_index + 1]
-
-    global resourceIDs
-    logging.debug(f"create_resource(): resourceIDs={resourceIDs}")
     venResource = Resource(
-        id=str(resourceIDs[venIndex]),
+        id=str(resource_id),
         created_date_time=current_time,
         modification_date_time=None,
         object_type='RESOURCE',
         resource_name=resourceBody.resource_name,
-        ven_id = venID,
+        ven_id = ven_id,
         attributes=resourceBody.attributes,
         targets=resourceBody.targets
     )
 
-    vens[venIndex].resources.append(venResource)
+    resource_id += 1
+
+    ven.resources.append(venResource)
+    ven = objStore.update("VEN", ven)
+    if type(ven) is not Ven:
+        status = ven
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"update_ven(): problem={problem}")
+        return problem, status
 
     logging.debug(f"create_resource(): venResource={venResource}")
-    logging.debug(f"create_resource(): vens[venIndex].resources={vens[venIndex].resources}")
 
-    # bump resource ID
-    resourceIDs[venIndex] += 1
     subscription_callback("RESOURCE", "POST", venResource)
     return venResource
 
@@ -302,15 +270,14 @@ def delete_ven_resource(ven_id, resource_id):  # noqa: E501
     """
     logging.info(f"delete_ven_resource(): ven_id={ven_id} resource_id={resource_id}")
 
-    # find index in vens of ven_id
-    venIndex = _get_ven_index(ven_id)
-    if venIndex >= MAX_VENS:
-        problem = Problem(title="Not Found: ven_id not found", status="404")
-        logging.warning(f"delete_ven_resource(): problem={problem}")
-        return problem, 404
+    ven = objStore.search("VEN", ven_id)
+    if type(ven) is not Ven:
+        status = ven
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"search_ven_by_id(): problem={problem}")
+        return problem, status
 
-    ven = vens[venIndex]
-    logging.debug(f"delete_ven_resource(): venIndex={venIndex} ven={ven}")
+    logging.debug(f"delete_ven_resource(): ven={ven}")
 
     if len(ven.resources) == 0:
         problem = Problem(title="Not Found: no resources in system", status="404")
@@ -350,14 +317,12 @@ def search_ven_resources(ven_id, target_type=None, target_values=None, skip=None
     logging.info(
         f"search_all_ven_resources(): target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
 
-    venIndex = _get_ven_index(ven_id)
-    if venIndex >= MAX_VENS:
-        problem = Problem(title="Not Found: ven_id not found", status="404")
-        logging.warning(f"search_ven_resources(): problem={problem}")
-        return problem, 404
-
-    ven = vens[venIndex]
-    logging.debug(f"search_ven_resources(): venIndex={venIndex} ven={ven}")
+    ven = objStore.search("VEN", ven_id)
+    if type(ven) is not Ven:
+        status = ven
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"search_ven_by_id(): problem={problem}")
+        return problem, status
 
     logging.debug(f"search_all_ven_resources(): ven.resources={ven.resources}")
     ven_resourceList = util.getTargets(ven.resources, target_type, target_values)
@@ -389,14 +354,15 @@ def search_ven_resource_by_id(ven_id, resource_id):  # noqa: E501
     """
     # find index in vens of ven_id
     logging.info(f"search_ven_resource_by_id(): ven_id={ven_id} resource_id={resource_id}")
-    venIndex = _get_ven_index(ven_id)
-    if venIndex >= MAX_VENS:
-        problem = Problem(title="Not Found: ven_id not found", status="404")
-        logging.warning(f"search_ven_resource_by_id(): problem={problem}")
-        return problem, 404
 
-    ven = vens[venIndex]
-    logging.debug(f"search_ven_resource_by_id(): venIndex={venIndex} ven={ven}")
+    ven = objStore.search("VEN", ven_id)
+    if type(ven) is not Ven:
+        status = ven
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"search_ven_by_id(): problem={problem}")
+        return problem, status
+
+    logging.debug(f"search_ven_resource_by_id(): ven={ven}")
 
     if len(ven.resources) == 0:
         problem = Problem(title="Not Found: no resources in system", status="404")
@@ -430,21 +396,20 @@ def update_ven_resource(ven_id, resource_id, body=None):  # noqa: E501
     :rtype: Resource
     """
     logging.info(f"update_ven_resource(): ven_id={ven_id} resource_id={resource_id}")
+    ven = objStore.search("VEN", ven_id)
+    if type(ven) is not Ven:
+        status = ven
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"search_ven_by_id(): problem={problem}")
+        return problem, status
 
-    venIndex = _get_ven_index(ven_id)
-    if venIndex >= MAX_VENS:
-        problem = Problem(title="Not Found: ven_id not found", status="404")
-        logging.warning(f"update_ven_resource(): problem={problem}")
-        return problem, 404
-
-    ven = vens[venIndex]
-    logging.debug(f"update_ven_resource(): venIndex={venIndex} ven={ven}")
+    logging.debug(f"update_ven_resource(): ven={ven}")
 
     if len(ven.resources) == 0:
         problem = Problem(title="Not Found: no resources in system", status="404")
         logging.warning(f"update_ven_resource(): problem={problem}")
         return problem, 404
-    
+
     resourceBody = None
     if connexion.request.is_json:
         resourceBody = Resource.from_dict(connexion.request.get_json())  # noqa: E501

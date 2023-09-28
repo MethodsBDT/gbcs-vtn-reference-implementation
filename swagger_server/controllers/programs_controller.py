@@ -1,21 +1,12 @@
 import connexion
 from datetime import datetime
-import json
 import logging
-import requests
-import six
 
-from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.program import Program  # noqa: E501
-from swagger_server.models.values_map import ValuesMap  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
+from swagger_server.objStore.listStore import objStore
 from swagger_server import util
-
-programs = []
-programID = 0
-MAX_PROGRAMS=3
-
 
 def create_program(body=None):  # noqa: E501
     """create a program
@@ -29,26 +20,20 @@ def create_program(body=None):  # noqa: E501
     """
     logging.info(f"create_program():")
 
-    if len(programs) >= MAX_PROGRAMS:
-        problem = Problem(title="Insufficient Storage", status="507")
-        logging.warning(f"create_program(): problem={problem}")
-        return problem, 507
-
     programBody = None
     if connexion.request.is_json:
         programBody = Program.from_dict(connexion.request.get_json())  # noqa: E501
         # logging.debug(f"create_program(): programBody={programBody}")
-    if programBody is None:
-        problem = Problem(title="Bad Request: No request body", status="400")
-        logging.warning(f"create_program(): problem={problem}")
-        return problem, 400
+    # TBD: is this necessary or handled by framework?
+    # if programBody is None:
+    #     problem = Problem(title="Bad Request: No request body", status="400")
+    #     logging.warning(f"create_program(): problem={problem}")
+    #     return problem, 400
 
-    global programID
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
 
     program = Program(
-        id=str(programID),
         created_date_time=current_time,
         modification_date_time=None,
         object_type='PROGRAM',
@@ -68,15 +53,17 @@ def create_program(body=None):  # noqa: E501
         targets = programBody.targets
     )
 
-    # bump program ID
-    programID += 1
+    status = objStore.insert(program)
+    if status != 200:
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"create_program(): problem={problem}")
+        return problem, status
 
-    programs.append(program)
     logging.debug(f"create_program(): program={program}")
 
     subscription_callback("PROGRAM", "POST", program)
 
-    return program
+    return program, status
 
 def delete_program(program_id):  # noqa: E501
     """delete a program
@@ -89,21 +76,18 @@ def delete_program(program_id):  # noqa: E501
     :rtype: Program
     """
     logging.info(f"delete_program(): program_id={program_id}")
-    if len(programs) == 0:
-        problem = Problem(title="Not Found: No programs in system", status="404")
-        logging.warning(f"delete_program(): problem={problem}")
-        return problem, 404
 
-    program = next((program for program in programs if program.id == program_id), None)
-    if program is not None:
-        programs.remove(program)
-        logging.debug(f"delete_program(): program={program}")
-        subscription_callback("PROGRAM", "DELETE", program)
-        return program
-    else:
-        problem = Problem(title="Not Found", status="404")
+    program = objStore.remove("PROGRAM", program_id)
+    if type(program) is not Program:
+        status = program
+        problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"delete_program(): problem={problem}")
-        return problem, 404
+        return problem, status
+
+    # TBD: need to test if this is not present
+    subscription_callback("PROGRAM", "DELETE", program)
+
+    return program, 200
 
 def search_all_programs(target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
 
@@ -122,6 +106,13 @@ def search_all_programs(target_type=None, target_values=None, skip=None, limit=N
     """
     logging.info(f"search_all_programs(): target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
 
+    programs = objStore.search_all("PROGRAM")
+    if type(programs) is not list:
+        status = programs
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"search_all_programs(): problem={problem}")
+        return problem, status
+    
     logging.debug(f"search_all_programs(): programs={programs}")
     programList = util.getTargets(programs, target_type, target_values)
     if skip != None:
@@ -136,7 +127,7 @@ def search_all_programs(target_type=None, target_values=None, skip=None, limit=N
 
     subscription_callback("PROGRAM", "GET", programList)
 
-    return programList
+    return programList, 200
 
 
 def search_program_by_program_id(program_id):  # noqa: E501
@@ -150,18 +141,19 @@ def search_program_by_program_id(program_id):  # noqa: E501
     :rtype: Program
     """
     logging.info(f"search_program_by_program_id(): program_id={program_id}")
-    program = next((program for program in programs if program.id == program_id), None)
-    if program is None:
-        problem = Problem(title="Not Found: program_id not found", status="404")
+
+    program = objStore.search("PROGRAM", program_id)
+    if type(program) is not Program:
+        status = program
+        problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"search_program_by_program_id(): problem={problem}")
-        return problem, 404
+        return problem, status
 
     logging.debug(f"search_program_by_program_id(): program={program}")
 
     subscription_callback("PROGRAM", "GET", program)
 
-    return program
-
+    return program, 200
 
 def update_program(program_id, body=None):  # noqa: E501
     """update a program
@@ -180,18 +172,16 @@ def update_program(program_id, body=None):  # noqa: E501
     if connexion.request.is_json:
         programBody = Program.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"update_program(): programBody={programBody}")
-    if programBody is None:
-        problem = Problem(title="Bad Request: No request body", status="400")
-        logging.warning(f"update_program(): problem={problem}")
-        return problem, 400
+    # if programBody is None:
+    #     problem = Problem(title="Bad Request: No request body", status="400")
+    #     logging.warning(f"update_program(): problem={problem}")
+    #     return problem, 400
 
-    program = next((program for program in programs if program.id == program_id), None)
-    if program is None:
+    program, status = search_program_by_program_id(program_id)
+    if program is None or status == 404:
         problem = Problem(title="Not Found: program_id not found", status="404")
         logging.warning(f"update_program(): problem={problem}")
         return problem, 404
-
-    programs.remove(program)
 
     # set modification date time
     now = datetime.now()
@@ -227,10 +217,16 @@ def update_program(program_id, body=None):  # noqa: E501
     if programBody.targets is not None:
         program.targets = programBody.targets
 
-    programs.append(program)
+    program = objStore.update("PROGRAM", program)
+    if type(program) is not Program:
+        status = program
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"update_program(): problem={problem}")
+        return problem, status
+
     logging.debug(f"update_program: program={program}")
 
     subscription_callback("PROGRAM", "PUT", program)
 
-    return program
+    return program, 200
 

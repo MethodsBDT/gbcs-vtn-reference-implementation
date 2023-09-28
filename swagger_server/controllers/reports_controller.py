@@ -9,11 +9,7 @@ from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.report import Report  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
-from swagger_server import util
-
-reports = []
-reportID = 0
-MAX_REPORTS=3
+from swagger_server.objStore.listStore import objStore
 
 def create_report(body=None):  # noqa: E501
     """add a report
@@ -27,26 +23,19 @@ def create_report(body=None):  # noqa: E501
     """
     logging.info(f"create_report():")
 
-    if len(reports) >= MAX_REPORTS:
-        problem = Problem(title="Insufficient Storage", status="507")
-        logging.warning(f"create_report(): problem={problem}")
-        return problem, 507
-
     reportBody = None
     if connexion.request.is_json:
         reportBody = Report.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"create_report(): reportBody={reportBody}")
-    if reportBody is None:
-        problem = Problem(title="Bad Request: No request body", status="400")
-        logging.warning(f"create_report(): problem={problem}")
-        return problem, 400
+    # if reportBody is None:
+    #     problem = Problem(title="Bad Request: No request body", status="400")
+    #     logging.warning(f"create_report(): problem={problem}")
+    #     return problem, 400
     
-    global reportID
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
 
     report = Report(
-        id=str(reportID),
         created_date_time=current_time,
         modification_date_time=None,
         object_type='REPORT',
@@ -58,16 +47,16 @@ def create_report(body=None):  # noqa: E501
         resources=reportBody.resources
     )
 
-    # bump report ID
-    reportID += 1
-
-    reports.append(report)
+    status = objStore.insert(report)
+    if status != 200:
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"create_report(): problem={problem}")
+        return problem, status
     logging.debug(f"create_report(): report={report}")
 
     subscription_callback("REPORT", "POST", report)
 
-    return report
-
+    return report, status
 
 def delete_report(report_id):  # noqa: E501
     """delete a report
@@ -79,24 +68,17 @@ def delete_report(report_id):  # noqa: E501
 
     :rtype: Report
     """
-    logging.info(f"delete_report(): report_id={report_id}")
-    if len(reports) == 0:
-        problem = Problem(title="Not Found: No reports in system", status="404")
+    report = objStore.remove("REPORT", report_id)
+    if type(report) is not Report:
+        status = report
+        problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"delete_report(): problem={problem}")
-        return problem, 404
+        return problem, status
 
-    report = next((report for report in reports if report.id == report_id), None)
-    if report is not None:
-        reports.remove(report)
-        logging.debug(f"delete_report(): report={report}")
+    # TBD: need to test if this is not present
+    subscription_callback("REPORT", "DELETE", report)
 
-        subscription_callback("REPORT", "DELETE", report)
-
-        return report
-    else:
-        problem = Problem(title="Not Found", status="404")
-        logging.warning(f"delete_report(): problem={problem}")
-        return problem, 404
+    return report, 200
 
 
 def search_all_reports(program_id=None, client_name=None, skip=None, limit=None):  # noqa: E501
@@ -117,23 +99,22 @@ def search_all_reports(program_id=None, client_name=None, skip=None, limit=None)
     """
     logging.info(f"search_all_reports(): program_id={program_id} client_name={client_name} skip={skip} limit={limit}")
 
-    logging.debug(f"search_all_reports(): reports={reports}")
-    reportList = reports
+    reports = objStore.search_all("REPORT")
+    if type(reports) is not list:
+        status = reports
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"search_all_reports(): problem={problem}")
+        return problem, status
+
     if program_id != None:
-        # strip leading [' and tailing ']
-        # program_id = program_id[2:-2]
-        reportList = [report for report in reports if report.program_id == program_id]
-        if len(reportList) == 0:
+        reports = [report for report in reports if report.program_id == program_id]
+        if len(reports) == 0:
             problem = Problem(title="Not Found: program_id not found", status="404")
             logging.warning(f"search_all_reports(): problem={problem}")
             return problem, 404
     if client_name != None:
-        # strip leading [' and tailing ']
-        # client_name = client_name[2:-2]
-        # logging.debug(f"search_all_reports(): client_name={client_name}")
-        reportList = [report for report in reports if report.client_name == client_name]
-        # logging.debug(f"search_all_reports(): reportList={reportList}")
-        if len(reportList) == 0:
+        reports = [report for report in reports if report.client_name == client_name]
+        if len(reports) == 0:
             problem = Problem(title="Not Found: client_name not found", status="404")
             logging.warning(f"search_all_reports(): problem={problem}")
             return problem, 404
@@ -142,15 +123,15 @@ def search_all_reports(program_id=None, client_name=None, skip=None, limit=None)
             problem = Problem(title="Not Found: skipped records not found", status="404")
             logging.warning(f"search_all_reports(): problem={problem}")
             return problem, 404
-        reportList = reports[skip:]
+        reports = reports[skip:]
     if limit != None:
-        reportList = reportList[:limit]
+        reports = reports[:limit]
 
-    logging.debug(f"search_all_reports(): reportList={reportList}")
+    logging.debug(f"search_all_reports(): reports={reports}")
 
-    subscription_callback("REPORT", "GET", reportList)
+    subscription_callback("REPORT", "GET", reports)
 
-    return reportList
+    return reports, 200
 
 
 def search_reports_by_report_id(report_id):  # noqa: E501
@@ -164,16 +145,18 @@ def search_reports_by_report_id(report_id):  # noqa: E501
     :rtype: Report
     """
     logging.info(f"search_reports_by_report_id(): report_id={report_id}")
-    report = next((report for report in reports if report.id == report_id), None)
-    logging.debug(f"search_reports_by_report_id(): report={report}")
-    if report is None:
-        problem = Problem(title="Not Found: report_id not found", status="404")
+    report = objStore.search("REPORT", report_id)
+    if type(report) is not Report:
+        status = report
+        problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"search_reports_by_report_id(): problem={problem}")
-        return problem, 404
+        return problem, status
+
+    logging.debug(f"search_reports_by_report_id(): report={report}")
 
     subscription_callback("REPORT", "GET", report)
 
-    return report
+    return report, 200
 
 def update_report(report_id, body=None):  # noqa: E501
     """update a report
@@ -192,18 +175,16 @@ def update_report(report_id, body=None):  # noqa: E501
     if connexion.request.is_json:
         reportBody = Report.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"update_report(): reportBody={reportBody}")
-    if reportBody is None:
-        problem = Problem(title="Bad Request: No request body", status="400")
-        logging.warning(f"update_ven(): problem={problem}")
-        return problem, 400
+    # if reportBody is None:
+    #     problem = Problem(title="Bad Request: No request body", status="400")
+    #     logging.warning(f"update_ven(): problem={problem}")
+    #     return problem, 400
     
-    report = next((report for report in reports if report.id == report_id), None)
-    if report is None:
+    report, status = search_reports_by_report_id(report_id)
+    if report is None or status == 404:
         problem = Problem(title="Not Found: report_id not found", status="404")
         logging.warning(f"update_report(): problem={problem}")
         return problem, 404
-
-    reports.remove(report)
 
     # set modification date time
     now = datetime.now()
@@ -223,10 +204,16 @@ def update_report(report_id, body=None):  # noqa: E501
     if reportBody.resources is not None:
         report.resources = reportBody.resources
 
-    reports.append(report)
-    logging.debug(f"update_report(): report={report}")
+    report = objStore.update("REPORT", report)
+    if type(report) is not Report:
+        status = report
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"update_report(): problem={problem}")
+        return problem, status
+
+    logging.debug(f"update_report: report={report}")
 
     subscription_callback("REPORT", "PUT", report)
 
-    return (report)
+    return report, 200
 

@@ -1,20 +1,12 @@
 import connexion
 from datetime import datetime
-import json
 import logging
-import requests
-import six
 
 from swagger_server.models.event import Event  # noqa: E501
-from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
-from swagger_server.models.values_map import ValuesMap  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
+from swagger_server.objStore.listStore import objStore
 from swagger_server import util
-
-events = []
-eventID = 0
-MAX_EVENTS = 3
 
 def create_event(body=None):  # noqa: E501
     """create an event
@@ -28,11 +20,6 @@ def create_event(body=None):  # noqa: E501
     """
     logging.info(f"create_event():")
 
-    if len(events) >= MAX_EVENTS:
-        problem = Problem(title="Insufficient Storage", status="507")
-        logging.warning(f"create_event(): problem={problem}")
-        return problem, 507
-
     eventBody = None
     if connexion.request.is_json:
         eventBody = Event.from_dict(connexion.request.get_json())  # noqa: E501
@@ -42,12 +29,10 @@ def create_event(body=None):  # noqa: E501
     #     logging.warning(f"create_event(): problem={problem}")
     #     return problem, 400
 
-    global eventID
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
 
     event = Event(
-        id=str(eventID),
         created_date_time=current_time,
         modification_date_time=None,
         object_type='EVENT',
@@ -61,15 +46,15 @@ def create_event(body=None):  # noqa: E501
         intervals=eventBody.intervals
     )
 
-    # bump event ID
-    eventID += 1
-
-    events.append(event)
-    logging.debug(f"create_event(): event={event}")
+    status = objStore.insert(event)
+    if status != 200:
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"create_event(): problem={problem}")
+        return problem, status
 
     subscription_callback("EVENT", "POST", event)
 
-    return event
+    return event, status
 
 
 def delete_event(event_id):  # noqa: E501
@@ -83,24 +68,17 @@ def delete_event(event_id):  # noqa: E501
     :rtype: Event
     """
     logging.info(f"delete_event():")
-    if len(events) == 0:
-        problem = Problem(title="Not Found: No events in system", status="404")
+
+    event = objStore.remove("EVENT", event_id)
+    if type(event) is not Event:
+        status = event
+        problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"delete_event(): problem={problem}")
-        return problem, 404
+        return problem, status
 
-    event = next((event for event in events if event.id == event_id), None)
-    if event is not None:
-        events.remove(event)
-        logging.debug(f"delete_event(): event={event}")
-        subscription_callback("EVENT", "DELETE", event)
-        return event
-    else:
-        problem = Problem(title="Not Found", status="404")
-        logging.warning(f"delete_event: problem={problem}")
-        return problem, 404
+    subscription_callback("EVENT", "DELETE", event)
 
-    subscription_callback("EVENT", "DELETE", venResource)
-
+    return event, 200
 
 def search_all_events(program_id=None, target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
     """searches all events
@@ -121,6 +99,17 @@ def search_all_events(program_id=None, target_type=None, target_values=None, ski
     # TBD: filter by program_id per clients privileges
     logging.info(f"search_all_events(): program_id={program_id} target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
 
+    events = objStore.search_all("EVENT")
+    logging.debug(f"search_all_events(): events={events}")
+    if type(events) is not list:
+        status = events
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"search_all_events(): problem={problem}")
+        return problem, status
+
+    logging.info(
+        f"search_all_events(): program_id={program_id} target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
+
     logging.debug(f"search_all_events(): events={events}")
     eventList = events
     if program_id != None:
@@ -140,7 +129,6 @@ def search_all_events(program_id=None, target_type=None, target_values=None, ski
         eventList = events[skip:]
     if limit != None:
         eventList = eventList[:limit]
-    logging.debug(f"search_all_events(): filtered eventList={eventList}")
 
     subscription_callback("EVENT", "GET", eventList)
 
@@ -158,16 +146,17 @@ def search_events_by_id(event_id):  # noqa: E501
     :rtype: List[Event]
     """
     logging.info(f"search_events_by_id(): event_id={event_id}")
-    event = next((event for event in events if event.id == event_id), None)
-    if event is None:
-        problem = Problem(title="Not Found: event_id not found", status="404")
+    event = objStore.search("EVENT", event_id)
+    if type(event) is not Event:
+        status = event
+        problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"search_events_by_id(): problem={problem}")
-        return problem, 404
+        return problem, status
     logging.debug(f"search_events_by_id(): event={event}")
 
     subscription_callback("EVENT", "GET", event)
 
-    return event
+    return event, 200
 
 def update_event(event_id, body=None):  # noqa: E501
     """update an event
@@ -192,13 +181,11 @@ def update_event(event_id, body=None):  # noqa: E501
         logging.warning(f"update_event(): problem={problem}")
         return problem, 400
 
-    event = next((event for event in events if event.id == event_id), None)
-    if event is None:
-        problem = Problem(title="Not Found: event_id not found", status="404")
+    event, status = search_events_by_id(event_id)
+    if event is None or status == 404:
+        problem = Problem(title="Not Found: program_id not found", status="404")
         logging.warning(f"update_event(): problem={problem}")
         return problem, 404
-
-    events.remove(event)
 
     # set modification date time
     now = datetime.now()
@@ -223,10 +210,15 @@ def update_event(event_id, body=None):  # noqa: E501
     if eventBody.intervals is not None:
         event.intervals = eventBody.intervals
 
-    events.append(event)
+    event = objStore.update("EVENT", event)
+    if type(event) is not Event:
+        status = event
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"update_event(): problem={problem}")
+        return problem, status
     logging.debug(f"update_event(): event={event}")
 
     subscription_callback("EVENT", "PUT", event)
 
-    return (event)
+    return event, 200
 

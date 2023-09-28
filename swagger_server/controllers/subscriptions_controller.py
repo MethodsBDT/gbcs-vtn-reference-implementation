@@ -3,19 +3,12 @@ from datetime import datetime
 import json
 import logging
 import requests
-import six
 
 from swagger_server.models.notification import Notification  # noqa: E501
-from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
-from swagger_server.models.object_types import ObjectTypes  # noqa: E501
 from swagger_server.models.subscription import Subscription  # noqa: E501
-from swagger_server.models.values_map import ValuesMap  # noqa: E501
+from swagger_server.objStore.listStore import objStore
 from swagger_server import util
-
-subscriptions = []
-subscriptionID = 0
-MAX_SUBSCRIPTIONS=30
 
 def create_subscription(body):  # noqa: E501
     """create subscription
@@ -29,25 +22,14 @@ def create_subscription(body):  # noqa: E501
     """
     logging.info(f"create_subscription():")
 
-    if len(subscriptions) >= MAX_SUBSCRIPTIONS:
-        problem = Problem(title="Insufficient Storage", status="507")
-        logging.warning(f"create_subscription(): problem={problem}")
-        return problem, 507
-
     subscriptionBody = None
     if connexion.request.is_json:
         subscriptionBody = Subscription.from_dict(connexion.request.get_json())  # noqa: E501
-    if subscriptionBody is None:
-        problem = Problem(title="Bad Request: No request body", status="400")
-        logging.warning(f"create_subscription(): problem={problem}")
-        return problem, 400
 
-    global subscriptionID
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
 
     subscription = Subscription(
-        id=str(subscriptionID),
         created_date_time=current_time,
         object_type='SUBSCRIPTION',
         client_name=subscriptionBody.client_name,
@@ -56,15 +38,15 @@ def create_subscription(body):  # noqa: E501
         targets = subscriptionBody.targets
     )
 
-    # bump Subscription ID
-    subscriptionID += 1
-
-    subscriptions.append(subscription)
-    logging.info(f"create_subscription(): subscription={subscription}")
+    status = objStore.insert(subscription)
+    if status != 200:
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"create_subscription(): problem={problem}")
+        return problem, status
 
     subscription_callback("SUBSCRIPTION", "POST", subscription)
 
-    return subscription
+    return subscription, 200
 
 
 def delete_subscription(subscription_id):  # noqa: E501
@@ -78,23 +60,17 @@ def delete_subscription(subscription_id):  # noqa: E501
     :rtype: Subscription
     """
     logging.info(f"delete_subscription(): subscription_id={subscription_id}")
-    if len(subscriptions) == 0:
-        problem = Problem(title="Not Found: No subscriptions in system", status="404")
+
+    subscription = objStore.remove("SUBSCRIPTION", subscription_id)
+    if type(subscription) is not Subscription:
+        status = subscription
+        problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"delete_subscription(): problem={problem}")
-        return problem, 404
+        return problem, status
 
-    subscription = next((subscription for subscription in subscriptions if subscription.id == subscription_id), None)
-    if subscription is not None:
-        subscriptions.remove(subscription)
-        logging.debug(f"delete_subscription(): subscription={subscription}")
+    subscription_callback("SUBSCRIPTION", "DELETE", subscription)
 
-        subscription_callback("SUBSCRIPTION", "DELETE", subscription)
-
-        return subscription
-    else:
-        problem = Problem(title="Not Found", status="404")
-        logging.warning(f"delete_subscription(): logging={logging}")
-        return problem, 404
+    return subscription, 200
 
 def search_subscription_by_id(subscription_id):  # noqa: E501
     """search subscriptions by ID
@@ -118,23 +94,17 @@ def search_subscription_by_id(subscription_id):  # noqa: E501
     """
     logging.info(f"search_subscription_by_id(): subscription_id={subscription_id}")
 
-    # if connexion.request.is_json:
-    #     program_id = ObjectID.from_dict(connexion.request.get_json())  # noqa: E501
-    # if connexion.request.is_json:
-    #     targets = [Target.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
-    # if connexion.request.is_json:
-    #     objects = [ObjectTypes.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
-
-    subscription = next((subscription for subscription in subscriptions if subscription.id == subscription_id), None)
-    logging.debug(f"search_subscription_by_id(): subscription={subscription}")
-    if subscription is None:
-        problem = Problem(title="Not Found: subscription_id not found", status="404")
-        logging.warning(f"search_subscription_by_id(): problem={problem}")
-        return problem, 404
+    subscription = objStore.search("SUBSCRIPTION", subscription_id)
+    logging.debug(f"search_all_subscriptions(): subscription={subscription}")
+    if type(subscription) is not Subscription:
+        status = subscription
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"search_all_subscriptions(): problem={problem}")
+        return problem, status
 
     subscription_callback("SUBSCRIPTION", "GET", subscription)
 
-    return subscription
+    return subscription, 200
 
 def search_subscriptions(program_id=None, client_name=None, target_type=None, target_values=None, objects=None, skip=None, limit=None):  # noqa: E501
     """search subscriptions
@@ -159,39 +129,45 @@ def search_subscriptions(program_id=None, client_name=None, target_type=None, ta
     logging.info(
         f"search_all_subscriptions(): program_id={program_id} client_name={client_name} target_type={target_type} target_values={target_values} objects={objects} skip={skip} limit={limit}")
 
+    subscriptions = objStore.search_all("SUBSCRIPTION")
     logging.debug(f"search_all_subscriptions(): subscriptions={subscriptions}")
-    subscriptionList = subscriptions
+    if type(subscriptions) is not list:
+        status = subscriptions
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"search_all_subscriptions(): problem={problem}")
+        return problem, status
+
     if program_id != None:
         # strip leading [' and tailing ']
         # program_id = program_id[2:-2]
-        subscriptionList = [subscription for subscription in subscriptions if subscription.program_id == program_id]
-        if len(subscriptionList) == 0:
+        subscriptions = [subscription for subscription in subscriptions if subscription.program_id == program_id]
+        if len(subscriptions) == 0:
             problem = Problem(title="Not Found: program_id not found", status="404")
             logging.warning(f"search_all_subscriptions(): problem={problem}")
             return problem, 404
     if client_name != None:
         # strip leading [' and tailing ']
         # client_name = client_name[2:-2]
-        subscriptionList = [subscription for subscription in subscriptions if subscription.client_name == client_name]
-        if len(subscriptionList) == 0:
+        subscriptions = [subscription for subscription in subscriptions if subscription.client_name == client_name]
+        if len(subscriptions) == 0:
             problem = Problem(title="Not Found: client_name not found", status="404")
             logging.warning(f"search_all_subscriptions(): problem={problem}")
             return problem, 404
-    subscriptionList = util.getTargets(subscriptionList, target_type, target_values)
-    subscriptionList = util.getObjects(subscriptionList, objects)
+    subscriptions = util.getTargets(subscriptions, target_type, target_values)
+    subscriptions = util.getObjects(subscriptions, objects)
     if skip != None:
         if len(subscriptions) < skip:
             problem = Problem(title="Not Found: skipped records not found", status="404")
             logging.warning(f"search_all_subscriptions(): problem={problem}")
             return problem, 404
-        subscriptionList = subscriptions[skip:]
+        subscriptions = subscriptions[skip:]
     if limit != None:
-        subscriptionList = subscriptionList[:limit]
+        subscriptions = subscriptions[:limit]
 
-    logging.debug(f"search_all_subscriptions(): subscriptionList={subscriptionList}")
+    logging.debug(f"search_all_subscriptions(): subscriptions={subscriptions}")
 
-    subscription_callback("SUBSCRIPTION", "GET", subscriptionList)
-    return subscriptionList
+    subscription_callback("SUBSCRIPTION", "GET", subscriptions)
+    return subscriptions
 
 
 def update_subscription(subscription_id, body=None):  # noqa: E501
@@ -216,13 +192,11 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
         logging.warning(f"update_subscription(): problem={problem}")
         return problem, 400
 
-    subscription = next((subscription for subscription in subscriptions if subscription.id == subscription_id), None)
-    if subscription is None:
-        problem = Problem(title="Not Found: subscription_id not found", status="404")
+    subscription, status = search_subscription_by_id(subscription_id)
+    if subscription is None or status == 404:
+        problem = Problem(title="Not Found: program_id not found", status="404")
         logging.warning(f"update_subscription(): problem={problem}")
         return problem, 404
-
-    subscriptions.remove(subscription)
 
     # set modification date time
     now = datetime.now()
@@ -240,7 +214,13 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
     if subscriptionBody.targets is not None:
         subscription.targets = subscriptionBody.targets
 
-    subscriptions.append(subscription)
+    subscription = objStore.update("SUBSCRIPTION", subscription)
+    if type(subscription) is not Subscription:
+        status = subscription
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"update_subscription(): problem={problem}")
+        return problem, status
+
     logging.debug(f"update_subscription(): subscription={subscription}")
 
     subscription_callback("SUBSCRIPTION", "PUT", subscription)
@@ -250,6 +230,14 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
 def subscription_callback(resourceName, operation, object):
     logging.info(f"subscription_callback(): resourceName={resourceName}, operation={operation}")
     logging.debug(f"subscription_callback(): object={object}")
+
+    subscriptions = objStore.search_all("SUBSCRIPTION")
+    logging.debug(f"subscription_callback(): subscriptions={subscriptions}")
+    if type(subscriptions) is not list:
+        status = subscriptions
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"subscription_callback(): problem={problem}")
+        return problem, status
 
     for subscription in subscriptions:
         resource = next((resource for resource in subscription.object_operations if
