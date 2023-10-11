@@ -1,0 +1,15 @@
+name: Test CI run
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Write Hello World
+        run: echo "Hello World!!"
