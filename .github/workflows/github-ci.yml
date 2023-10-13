@@ -31,4 +31,4 @@ jobs:
       - name: Build docker image
         run: docker build . -t oadr-ri:$(git rev-parse --short HEAD)
       - name: Push image
-        run: docker push $ECR_REGISTRY/$ECR_REPOSITORY/$IMAGE_NAME:$IMAGE_VERSION
+        run: docker image push $ECR_REGISTRY/$ECR_REPOSITORY/$IMAGE_NAME:$IMAGE_VERSION
