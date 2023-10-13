@@ -2,8 +2,8 @@ name: Build image in ECR
 
 on:
   push:
-    branches:
-      - "main"
+    # branches:
+    #   - "main"
   workflow_dispatch:
 
 jobs:
@@ -21,11 +21,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
       - name: Set ECR_REGISTRY
-        run: echo -e "ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}" >> $GITHUB_ENV
+        run: export ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
       - name: Set ECR_REPOSITORY
-        run: echo $(oadr-ri) >> $ECR_REPOSITORY
+        run: export ECR_REPOSITORY=oadr-ri
       - name: Set IMAGE_TAG
-        run: echo $(git rev-parse --short HEAD) >> $IMAGE_TAG
+        run: export IMAGE_TAG=$(git rev-parse --short HEAD)
       - name: Build docker image
         run: docker build . -t $IMAGE_TAG
       - name: Push image
