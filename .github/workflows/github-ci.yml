@@ -23,9 +23,9 @@ jobs:
       - name: Set ECR_REGISTRY
         run: echo -e "ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}" >> $GITHUB_ENV
       - name: Set ECR_REPOSITORY
-        run: oadr-ri >> $ECR_REPOSITORY
+        run: echo $(oadr-ri) >> $ECR_REPOSITORY
       - name: Set IMAGE_TAG
-        run: git rev-parse --short HEAD >> $IMAGE_TAG
+        run: echo $(git rev-parse --short HEAD) >> $IMAGE_TAG
       - name: Build docker image
         run: docker build . -t $IMAGE_TAG
       - name: Push image
