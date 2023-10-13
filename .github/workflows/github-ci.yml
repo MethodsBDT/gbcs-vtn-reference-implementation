@@ -22,9 +22,15 @@ jobs:
         run: export ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
       - name: Set ECR_REPOSITORY
         run: export ECR_REPOSITORY=oadr-ri
-      - name: echo git commit id
+      - name: Set IMAGE_NAME
+        run: export IMAGE_NAME=oadr-ri
+      - name: Get version
         run: echo "$(git rev-parse --short HEAD)"
+      - name: Set IMAGE_VERSION
+        run: export IMAGE_VERSION=$(git rev-parse --short HEAD)
+      - name: Set FULL_IMAGE_TAG
+        run: export FULL_IMAGE_TAG=$IMAGE_NAME:$IMAGE_VERSION
       - name: Build docker image
-        run: docker build . -t $(git rev-parse --short HEAD)
+        run: docker build . -t $FULL_IMAGE_TAG
       - name: Push image
-        run: docker push $ECR_REGISTRY/$ECR_REPOSITORY:$(git rev-parse --short HEAD)
+        run: docker push $ECR_REGISTRY/$ECR_REPOSITORY/$FULL_IMAGE_TAG
