@@ -22,6 +22,8 @@ jobs:
         run: export ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
       - name: Set ECR_REPOSITORY
         run: export ECR_REPOSITORY=oadr-ri
+      - name: echo git commit id
+        run: echo "$(git rev-parse --short HEAD)"
       - name: Set IMAGE_TAG
         run: export IMAGE_TAG=$(git rev-parse --short HEAD)
       - name: Print IMAGE_TAG
