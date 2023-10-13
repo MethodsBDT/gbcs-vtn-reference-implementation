@@ -24,11 +24,7 @@ jobs:
         run: export ECR_REPOSITORY=oadr-ri
       - name: echo git commit id
         run: echo "$(git rev-parse --short HEAD)"
-      - name: Set IMAGE_TAG
-        run: export IMAGE_TAG="$(git rev-parse --short HEAD)"
-      - name: Print IMAGE_TAG
-        run: echo $IMAGE_TAG
       - name: Build docker image
-        run: docker build . -t $IMAGE_TAG
+        run: docker build . -t $(git rev-parse --short HEAD)
       - name: Push image
-        run: docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        run: docker push $ECR_REGISTRY/$ECR_REPOSITORY:$(git rev-parse --short HEAD)
