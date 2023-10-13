@@ -28,9 +28,7 @@ jobs:
         run: echo "$(git rev-parse --short HEAD)"
       - name: Set IMAGE_VERSION
         run: export IMAGE_VERSION=$(git rev-parse --short HEAD)
-      - name: Set FULL_IMAGE_TAG
-        run: export FULL_IMAGE_TAG=$IMAGE_NAME:$IMAGE_VERSION
       - name: Build docker image
-        run: docker build . -t $FULL_IMAGE_TAG
+        run: docker build . -t $IMAGE_NAME:$IMAGE_VERSION
       - name: Push image
-        run: docker push $ECR_REGISTRY/$ECR_REPOSITORY/$FULL_IMAGE_TAG
+        run: docker push $ECR_REGISTRY/$ECR_REPOSITORY/$IMAGE_NAME:$IMAGE_VERSION
