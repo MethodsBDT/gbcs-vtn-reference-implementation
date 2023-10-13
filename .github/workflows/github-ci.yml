@@ -30,5 +30,7 @@ jobs:
         run: echo "IMAGE_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
       - name: Build docker image
         run: docker build . -t oadr-ri:$(git rev-parse --short HEAD)
+      - name: Tag image
+        run: docker image tag $IMAGE_NAME:$IMAGE_VERSION $ECR_REGISTRY/$ECR_REPOSITORY/$IMAGE_NAME:$IMAGE_VERSION
       - name: Push image
         run: docker image push $ECR_REGISTRY/$ECR_REPOSITORY/$IMAGE_NAME:$IMAGE_VERSION
