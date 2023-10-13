@@ -1,0 +1,32 @@
+name: Build image in ECR
+
+on:
+  push:
+    branches:
+      - "main"
+  workflow_dispatch:
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+      - name: Set ECR_REGISTRY
+        run: echo -e "ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}" >> $GITHUB_ENV
+      - name: Set ECR_REPOSITORY
+        run: oadr-ri >> $ECR_REPOSITORY
+      - name: Set IMAGE_TAG
+        run: git rev-parse --short HEAD >> $IMAGE_TAG
+      - name: Build docker image
+        run: docker build . -t $IMAGE_TAG
+      - name: Push image
+        run: docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
