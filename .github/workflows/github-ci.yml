@@ -2,8 +2,8 @@ name: Build image in ECR
 
 on:
   push:
-    branches:
-      - "main"
+     branches:
+       - "main"
   workflow_dispatch:
 
 jobs:
@@ -12,21 +12,26 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ${{ secrets.AWS_REGION }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
       - name: Set ECR_REGISTRY
-        run: echo -e "ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}" >> $GITHUB_ENV
+        run: echo "ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}" >> $GITHUB_ENV
       - name: Set ECR_REPOSITORY
-        run: echo $(oadr-ri) >> $ECR_REPOSITORY
-      - name: Set IMAGE_TAG
-        run: echo $(git rev-parse --short HEAD) >> $IMAGE_TAG
+        run: echo "ECR_REPOSITORY=oadr-ri" >> $GITHUB_ENV
+      - name: Get version
+        run: echo "$(git rev-parse --short HEAD)"
+      - name: Set IMAGE_VERSION
+        run: echo "IMAGE_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
       - name: Build docker image
-        run: docker build . -t $IMAGE_TAG
+        run: docker build . -t $ECR_REPOSITORY:$IMAGE_VERSION
+      - name: Tag image
+        run: docker image tag $ECR_REPOSITORY:$IMAGE_VERSION $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_VERSION
       - name: Push image
-        run: docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        run: docker image push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_VERSION
