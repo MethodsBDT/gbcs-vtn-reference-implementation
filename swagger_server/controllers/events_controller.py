@@ -1,12 +1,14 @@
-import connexion
-from datetime import datetime
 import logging
+from datetime import datetime
 
+import connexion
+
+from swagger_server import util
+from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server.models.event import Event  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
-from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server.objStore.listStore import objStore
-from swagger_server import util
+
 
 def create_event(body=None):  # noqa: E501
     """create an event
@@ -80,6 +82,7 @@ def delete_event(event_id):  # noqa: E501
 
     return event, 200
 
+
 def search_all_events(program_id=None, target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
     """searches all events
 
@@ -97,7 +100,8 @@ def search_all_events(program_id=None, target_type=None, target_values=None, ski
     :rtype: List[Event]
     """
     # TBD: filter by program_id per clients privileges
-    logging.info(f"search_all_events(): program_id={program_id} target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
+    logging.info(
+        f"search_all_events(): program_id={program_id} target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
 
     events = objStore.search_all("EVENT")
     logging.debug(f"search_all_events(): events={events}")
@@ -157,6 +161,7 @@ def search_events_by_id(event_id):  # noqa: E501
     subscription_callback("EVENT", "GET", event)
 
     return event, 200
+
 
 def update_event(event_id, body=None):  # noqa: E501
     """update an event
@@ -221,4 +226,3 @@ def update_event(event_id, body=None):  # noqa: E501
     subscription_callback("EVENT", "PUT", event)
 
     return event, 200
-
