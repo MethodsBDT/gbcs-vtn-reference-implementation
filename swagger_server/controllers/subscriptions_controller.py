@@ -263,7 +263,8 @@ def subscription_callback(resourceName, operation, object):
             notification = Notification(object_type=resourceName, operation=operation, targets=None, object=object)
 
             logging.info(f"subscription_callback(): notification={notification} callback_url={resource.callback_url}")
+            headers = { "Authorization": f"Bearer {resource.bearer_token}"}
 
-            response = requests.post(resource.callback_url, json=json.dumps(notification.to_dict()))
+            response = requests.post(resource.callback_url, json=json.dumps(notification.to_dict()), headers=headers)
             if response.status_code != 200:
                 logging.warning(f"subscription_callback: callback response.status_code={response.status_code}")
