@@ -33,11 +33,7 @@ class MockAuthProvider:
         return False
 
     def get_scope(self, token: str) -> list[str]:
-        if token == 'ven_token':
-            return ['test-tool/TEST_VEN']
-        elif token == 'bl_token':
-            return ['test-tool/TEST_BL']
-        elif token == 'admin_token':
-            return ['test-tool/TEST_VEN', 'test-tool/TEST_BL']
-        else:
-            return []
+        for authority in self.allowed_authorities:
+            if token == authority.token:
+                return authority.scope
+        return []
