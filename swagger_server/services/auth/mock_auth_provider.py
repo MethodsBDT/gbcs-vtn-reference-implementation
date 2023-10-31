@@ -1,8 +1,10 @@
 import logging
 
+from swagger_server.services.auth.AuthException import AuthException
+
 
 class AuthorityModel:
-    def __init__(self, client_id: str, client_secret: str, scope: list[str], token: str, ):
+    def __init__(self, client_id: str, client_secret: str, scope: list[str], token: str):
         self.client_id = client_id
         self.client_secret = client_secret
         self.scope = scope
@@ -24,7 +26,7 @@ class MockAuthProvider:
                 logging.debug(
                     f"fetch_token: {authority.token} client_id={authority.client_id} client_secret={authority.client_secret}")
                 return authority.token
-        return 'bad_token'  # TODO: I am not sure if in oauth2 you can generate something like bad token, replace with 403
+        raise AuthException('Provided credentials are invalid')
 
     def validate_token(self, token: str) -> bool:
         for authority in self.allowed_authorities:

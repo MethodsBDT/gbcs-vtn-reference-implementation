@@ -12,7 +12,7 @@ BL_SCOPES = ['read_all', 'write_programs', 'write_events', 'write_subscriptions'
 
 
 def check_oAuth2ClientCredentials(token):
-    logging.debug(f"check_oAuth2ClientCredentials: token={token}")
+    logging.debug(f'check_oAuth2ClientCredentials: token={token}')
 
     external_token_scope = auth_provider.get_scopes(token)
 
@@ -26,11 +26,10 @@ def check_oAuth2ClientCredentials(token):
 
 def validate_scope_oAuth2ClientCredentials(required_scopes, token_scopes):
     logging.debug(
-        f"validate_scope_oAuth2ClientCredentials: required_scopes={required_scopes} token_scopes={token_scopes}")
+        f'validate_scope_oAuth2ClientCredentials: required_scopes={required_scopes} token_scopes={token_scopes}')
     return set(required_scopes).issubset(set(token_scopes))
 
 
 def check_bearerAuth(token):
-    logging.debug(f"check_bearerAuth: token={token}")
+    logging.debug(f'check_bearerAuth: token={token}')
     return {}
-    # return {'test_key': 'test_value'}
