@@ -7,8 +7,10 @@ https://connexion.readthedocs.io/en/latest/security.html
 """
 
 auth_provider = AuthServiceProvider()
-VEN_SCOPES = ['read_all', 'write_reports', 'write_subscriptions', 'write_vens']
-BL_SCOPES = ['read_all', 'write_programs', 'write_events', 'write_subscriptions', 'write_vens']
+scopes = {
+ 'test-tool/TEST_VEN': ['read_all', 'write_reports', 'write_subscriptions', 'write_vens'],
+ 'test-tool/TEST_BL': ['read_all', 'write_programs', 'write_events', 'write_subscriptions', 'write_vens']
+}
 
 
 def check_oAuth2ClientCredentials(token):
@@ -17,10 +19,9 @@ def check_oAuth2ClientCredentials(token):
     external_token_scope = auth_provider.get_scopes(token)
 
     allowed_scopes = {'scopes': []}
-    if 'test-tool/TEST_VEN' in external_token_scope:
-        allowed_scopes['scopes'].extend(VEN_SCOPES)
-    if 'test-tool/TEST_BL' in external_token_scope:
-        allowed_scopes['scopes'].extend(BL_SCOPES)
+    for scope in scopes:
+        if scope in external_token_scope:
+            allowed_scopes['scopes'].extend(scopes[scope])
     return allowed_scopes
 
 
