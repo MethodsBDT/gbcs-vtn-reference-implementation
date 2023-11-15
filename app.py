@@ -25,10 +25,9 @@ def hello2():
 def handler(event, context):
     logging.info(event)
     print(event)
-    event['httpMethod'] = event['http']['method']
-    print(event['http']['method'])
+    event['httpMethod'] = event['requestContext']['http']['method']
     print(event['httpMethod'])
-    event['path'] = event['http']['path']
+    event['path'] = event['requestContext']['http']['path']
     print(event['path'])
     event['queryStringParameters'] = event['rawQueryString']
     print(event['queryStringParameters'])
