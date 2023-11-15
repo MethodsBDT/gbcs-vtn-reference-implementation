@@ -25,4 +25,11 @@ def hello2():
 def handler(event, context):
     logging.info(event)
     print(event)
+    event['httpMethod'] = event['http']['method']
+    print(event['http']['method'])
+    print(event['httpMethod'])
+    event['path'] = event['http']['path']
+    print(event['path'])
+    event['queryStringParameters'] = event['rawQueryString']
+    print(event['queryStringParameters'])
     return awsgi.response(app, event, context)
