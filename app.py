@@ -1,3 +1,5 @@
+import logging
+
 import awsgi
 from flask import Flask
 # import connexion
@@ -19,4 +21,5 @@ def hello2():
 
 
 def handler(event, context):
+    logging.debug(event)
     return awsgi.response(app, event, context)
