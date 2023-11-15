@@ -1,7 +1,8 @@
-FROM python:3.9-alpine
+FROM public.ecr.aws/lambda/python:3.9
+
+#COPY requirements.txt ${LAMBDA_TASK_ROOT}
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
-COPY . /usr/src/app
-RUN pip3 install --no-cache-dir -r requirements.txt
-EXPOSE 8080
-ENTRYPOINT [ "python3", "-m", "swagger_server" ]
+COPY * /usr/src/app
+RUN pip install -r requirements.txt
+CMD [ "app.handler" ]
