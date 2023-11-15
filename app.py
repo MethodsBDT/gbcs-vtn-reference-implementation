@@ -24,4 +24,5 @@ def hello2():
 
 def handler(event, context):
     logging.info(event)
+    print(event)
     return awsgi.response(app, event, context)
