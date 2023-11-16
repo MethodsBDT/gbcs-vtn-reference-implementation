@@ -39,9 +39,9 @@ jobs:
         run: |
           docker image tag $ECR_REPOSITORY:$IMAGE_VERSION $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_VERSION
           docker image tag $ECR_REPOSITORY:$IMAGE_VERSION_LAMBDA $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_VERSION_LAMBDA
-          docker image tag $ECR_REPOSITORY:$IMAGE_VERSION_LAMBDA $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker image tag $ECR_REPOSITORY:$IMAGE_VERSION_LAMBDA $ECR_REGISTRY/$ECR_REPOSITORY:lambda-latest
       - name: Push images
         run: |
           docker image push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_VERSION
           docker image push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_VERSION_LAMBDA
-          docker image push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker image push $ECR_REGISTRY/$ECR_REPOSITORY:lambda-latest
