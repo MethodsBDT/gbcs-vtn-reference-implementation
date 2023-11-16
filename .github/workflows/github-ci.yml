@@ -11,7 +11,6 @@ jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
     env:
-      ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
       ECR_REPOSITORY: oadr-ri
     steps:
       - name: Checkout repository
@@ -25,10 +24,8 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-#      - name: Set ECR_REGISTRY
-#        run: echo "ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}" >> $GITHUB_ENV
-#      - name: Set ECR_REPOSITORY
-#        run: echo "ECR_REPOSITORY=oadr-ri" >> $GITHUB_ENV
+      - name: Set ECR_REGISTRY
+        run: echo "ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}" >> $GITHUB_ENV
       - name: Get version
         run: |
           echo "$(git rev-parse --short HEAD)"
