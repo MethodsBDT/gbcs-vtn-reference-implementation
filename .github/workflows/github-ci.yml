@@ -31,7 +31,7 @@ jobs:
       - name: Set IMAGE_VERSION
         run: echo "IMAGE_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
       - name: Build docker image
-        run: docker build . -t $ECR_REPOSITORY:$IMAGE_VERSION
+        run: docker build --no-cache --progress=plain -t $ECR_REPOSITORY:$IMAGE_VERSION .
       - name: Tag image
         run: docker image tag $ECR_REPOSITORY:$IMAGE_VERSION $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_VERSION
       - name: Push image
