@@ -1,16 +1,13 @@
 import logging
-import sys
 
 import awsgi
-from flask import Flask
-# import connexion
-# from swagger_server import encoder
+import connexion
+from swagger_server import encoder
 
-# app = connexion.App(__name__, specification_dir='swagger_server/swagger/')
-# app.app.json_encoder = encoder.JSONEncoder
-# app.add_api('swagger.yaml', arguments={'title': 'OpenADR REST Demand Response API'}, pythonic_params=True)
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-app = Flask(__name__)
+app = connexion.App(__name__, specification_dir='swagger_server/swagger/')
+app.app.json_encoder = encoder.JSONEncoder
+app.add_api('swagger.yaml', arguments={'title': 'OpenADR REST Demand Response API'}, pythonic_params=True)
+
 
 @app.route("/")
 def hello():
@@ -26,9 +23,8 @@ def handler(event, context):
     logging.info(event)
     print(event)
     event['httpMethod'] = event['requestContext']['http']['method']
-    print(event['httpMethod'])
     event['path'] = event['requestContext']['http']['path']
-    print(event['path'])
     event['queryStringParameters'] = event['rawQueryString']
-    print(event['queryStringParameters'])
+    print(
+        f"httpMethod: {event['httpMethod']}, path: {event['path']}, queryStringParameters: {event['queryStringParameters']}")
     return awsgi.response(app, event, context)
