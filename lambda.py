@@ -9,16 +9,6 @@ app.app.json_encoder = encoder.JSONEncoder
 app.add_api('swagger.yaml', arguments={'title': 'OpenADR REST Demand Response API'}, pythonic_params=True)
 
 
-@app.route("/")
-def hello():
-    return "Hello, World!"
-
-
-@app.route("/world")
-def hello2():
-    return "Hello, test different route!"
-
-
 def handler(event, context):
     logging.info(event)
     print(event)
