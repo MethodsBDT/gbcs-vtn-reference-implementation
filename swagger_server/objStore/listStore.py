@@ -1,31 +1,31 @@
-
 import logging
 from swagger_server.objStore.objStore import ObjStore
 
 programs = []
 programID = 0
-MAX_PROGRAMS=3
+MAX_PROGRAMS = 3
 
 events = []
 eventID = 0
-MAX_EVENTS=3
+MAX_EVENTS = 3
 
 reports = []
 reportID = 0
-MAX_REPORTS=3
+MAX_REPORTS = 3
 
 subscriptions = []
 subscriptionID = 0
-MAX_SUBSCRIPTIONS=3
+MAX_SUBSCRIPTIONS = 3
 
 vens = []
 venID = 0
-MAX_VENS=3
+MAX_VENS = 3
 
-MAX_RESOURCES=3
+MAX_RESOURCES = 3
 resourceIDs = [0] * MAX_RESOURCES
 # TBD remove as resources are stored in body of ven
 resources = []
+
 
 class ListStore(ObjStore):
     """
@@ -138,7 +138,6 @@ class ListStore(ObjStore):
         else:
             logging.warning(f"ListStore.update(): unknown obj.object_type={object_type}")
             return 400
-
 
         object = next((object for object in list if str(object.id) == str(obj.id)), None)
         if object is not None:

@@ -7,7 +7,7 @@ from swagger_server import util
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server.models.event import Event  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
-from swagger_server.objStore.listStore import objStore
+from swagger_server.objStore.storageInterface import objStore
 
 
 def create_event(body=None):  # noqa: E501

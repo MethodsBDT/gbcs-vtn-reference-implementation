@@ -7,7 +7,7 @@ import requests
 from swagger_server.models.notification import Notification  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.subscription import Subscription  # noqa: E501
-from swagger_server.objStore.listStore import objStore
+from swagger_server.objStore.storageInterface import objStore
 from swagger_server import util
 
 def create_subscription(body):  # noqa: E501
