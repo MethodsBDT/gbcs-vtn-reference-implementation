@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import connexion
 
 from swagger_server import encoder
