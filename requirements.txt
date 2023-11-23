@@ -8,4 +8,5 @@ setuptools >= 21.0.0
 swagger-ui-bundle >= 0.0.2
 PyJWT==2.8.0
 cryptography==41.0.5
+gevent==23.9.1
 aws-wsgi==0.2.7
