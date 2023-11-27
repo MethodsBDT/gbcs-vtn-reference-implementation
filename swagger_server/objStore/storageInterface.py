@@ -8,24 +8,25 @@ class StorageInterface(ObjStore):
 
     def __init__(self):
         self.storage = {
-            'IN_MEMORY': ListStore(),
-            'IN_FILE_TMP': FileStore(),
-        }[STORAGE_IMPLEMENTATION]
+            # use lambda to not initialize all repositories
+            'IN_MEMORY': lambda x: ListStore(),
+            'IN_FILE': lambda x: FileStore(file_path='./tmp/fileStorage.json'),
+        }.get(STORAGE_IMPLEMENTATION, 'IN_MEMORY')('')
 
     def insert(self, obj):
-        self.storage.insert(obj)
+        return self.storage.insert(obj)
 
     def remove(self, object_type, id):
-        self.storage.remove(object_type, id)
+        return self.storage.remove(object_type, id)
 
     def update(self, object_type, obj):
-        self.storage.update(object_type, obj)
+        return self.storage.update(object_type, obj)
 
     def search_all(self, object_type):
-        self.storage.search_all(object_type)
+        return self.storage.search_all(object_type)
 
     def search(self, object_type, id):
-        self.storage.search_all(object_type, id)
+        return self.storage.search(object_type, id)
 
 
 objStore = StorageInterface()

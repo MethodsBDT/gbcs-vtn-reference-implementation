@@ -188,6 +188,3 @@ class ListStore(ObjStore):
 
         logging.debug(f"ListStore.search(): list={list}")
         return next((obj for obj in list if str(obj.id) == str(id)), 404)
-
-
-objStore = ListStore()

@@ -12,5 +12,6 @@ def main():
     http_server = WSGIServer(('0.0.0.0', SERVER_PORT), app)
     http_server.serve_forever()
 
+
 if __name__ == '__main__':
     main()

@@ -12,17 +12,17 @@ class ObjStore(ABC):
         pass
 
     @abstractmethod
-    def remove(self, objType, id):
+    def remove(self, object_type, id):
         pass
 
     @abstractmethod
-    def update(self, objType, obj):
+    def update(self, object_type, obj):
         pass
 
     @abstractmethod
-    def search_all(self, objType):
+    def search_all(self, object_type):
         pass
 
     @abstractmethod
-    def search(self, objType, id):
+    def search(self, object_type, id):
         pass
