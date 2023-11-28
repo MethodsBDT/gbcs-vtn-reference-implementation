@@ -1,4 +1,4 @@
-from config import STORAGE_IMPLEMENTATION
+from config import STORAGE_IMPLEMENTATION, STORAGE_FILE_PATH
 from swagger_server.objStore.listStore import ListStore
 from swagger_server.objStore.fileStore import FileStore
 from swagger_server.objStore.objStore import ObjStore
@@ -10,7 +10,7 @@ class StorageInterface(ObjStore):
         self.storage = {
             # use lambda to not initialize all repositories
             'IN_MEMORY': lambda x: ListStore(),
-            'IN_FILE': lambda x: FileStore(file_path='./tmp/fileStorage.json'),
+            'IN_FILE': lambda x: FileStore(file_path=STORAGE_FILE_PATH),
         }.get(STORAGE_IMPLEMENTATION, 'IN_MEMORY')('')
 
     def insert(self, obj):
