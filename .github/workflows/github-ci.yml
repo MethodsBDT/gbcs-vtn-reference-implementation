@@ -4,6 +4,7 @@ on:
   push:
      branches:
        - "main"
+       - "feature/OPENADR-102"
   workflow_dispatch:
 
 jobs:
