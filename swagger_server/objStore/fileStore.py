@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import json
 import os
@@ -99,6 +101,7 @@ class FileStore(ObjStore):
         logging.info(f"FileStore.search_all(): object_type={object_type}")
         saved_data = self.__read_file()
         return __get_type__(object_type, saved_data)
+
 
     def search(self, object_type, id) -> Subscription | Report | Program | Event | Ven | Resource | int:
         logging.info(f"FileStore.search(): object_type={object_type}, id={id}")
