@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 import json
 import os
@@ -11,20 +9,61 @@ from swagger_server.objStore.objStore import ObjStore
 from dataclasses import dataclass
 
 
+def from_dict(dict_data):
+    programs = []
+    events = []
+    reports = []
+    subscriptions = []
+    vens = []
+    resources = []
+
+    for program in dict_data['programs']:
+        programs.append(Program.from_dict(program))
+    for event in dict_data['events']:
+        events.append(Event.from_dict(event))
+    for report in dict_data['reports']:
+        reports.append(Report.from_dict(report))
+    for subscription in dict_data['subscriptions']:
+        subscriptions.append(Subscription.from_dict(subscription))
+    for ven in dict_data['vens']:
+        vens.append(Ven.from_dict(ven))
+    for resource in dict_data['resources']:
+        resources.append(Resource.from_dict(resource))
+    return DataModel(programs, events, reports, subscriptions, vens, resources)
+
+
 @dataclass
 class DataModel:
     """Model for data"""
-    programs: list[Program]
-    events: list[Event]
-    reports: list[Report]
-    subscriptions: list[Subscription]
-    vens: list[Ven]
-    resources: list[Resource]
+
+    def __init__(self, programs, events, reports, subscriptions, vens, resources):
+        self.programs = programs
+        self.events = events
+        self.reports = reports
+        self.subscriptions = subscriptions
+        self.vens = vens
+        self.resources = resources
 
     def to_json(self):
-        json_data = jsonpickle.encode(self)
-        logging.info(json_data)
-        return json_data
+        # Event(**jsonpickle.decode(jsonpickle.encode(jsonpickle.decode(read).events[0].to_dict())))
+
+        # json_data = jsonpickle.encode(self)
+        # logging.info(json_data)
+
+        return jsonpickle.encode({
+            'programs': self.to_dict(self.programs),
+            'events': self.to_dict(self.events),
+            'reports': self.to_dict(self.reports),
+            'subscriptions': self.to_dict(self.subscriptions),
+            'vens': self.to_dict(self.vens),
+            'resources': self.to_dict(self.resources)
+        })
+
+    def to_dict(self, list: list):
+        result = []
+        for item in list:
+            result.append(item.to_dict())
+        return result
 
 
 class FileStore(ObjStore):
@@ -42,15 +81,14 @@ class FileStore(ObjStore):
 
     def __read_file(self) -> DataModel:
         with open(self.file_path, "r+") as f:
-            data = jsonpickle.decode(f.read())
-            print(f'Read: {data}')
+            read = f.read()
+            data = from_dict(jsonpickle.decode(read))
             return data
 
     def __write_file(self, data: DataModel):
         with open(self.file_path, "w+") as f:
-            data = data.to_json()
-            print(f'Write: {data}')
-            f.write(data)
+            json_data = data.to_json()
+            f.write(json_data)
 
     def insert(self, obj):
         object_type = obj.object_type
@@ -96,14 +134,12 @@ class FileStore(ObjStore):
         else:
             return 404
 
-    def search_all(self, object_type) -> list[Subscription] | list[Report] | list[Program] | list[Event] | \
-                                         list[Ven] | list[Resource] | int:
+    def search_all(self, object_type) -> list:
         logging.info(f"FileStore.search_all(): object_type={object_type}")
         saved_data = self.__read_file()
         return __get_type__(object_type, saved_data)
 
-
-    def search(self, object_type, id) -> Subscription | Report | Program | Event | Ven | Resource | int:
+    def search(self, object_type, id):
         logging.info(f"FileStore.search(): object_type={object_type}, id={id}")
         saved_data = self.__read_file()
         _list = __get_type__(object_type, saved_data)
@@ -111,8 +147,7 @@ class FileStore(ObjStore):
         return next((obj for obj in _list if str(obj.id) == str(id)), 404)
 
 
-def __get_type__(object_type, data_model: DataModel) -> list[Subscription] | list[Report] | list[Program] | list[
-    Event] | list[Ven] | list[Resource] | int:
+def __get_type__(object_type, data_model: DataModel) -> list:
     return {
         'PROGRAM': data_model.programs,
         'EVENT': data_model.events,
