@@ -82,12 +82,14 @@ class FileStore(ObjStore):
     def __read_file(self) -> DataModel:
         with open(self.file_path, "r+") as f:
             read = f.read()
+            print(f'Read: {read}')
             data = from_dict(jsonpickle.decode(read))
             return data
 
     def __write_file(self, data: DataModel):
         with open(self.file_path, "w+") as f:
             json_data = data.to_json()
+            print(f'Write: {json_data}')
             f.write(json_data)
 
     def insert(self, obj):
