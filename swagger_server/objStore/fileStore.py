@@ -1,5 +1,4 @@
 import logging
-import json
 import os
 
 import jsonpickle
@@ -20,22 +19,16 @@ def from_dict(dict_data):
 
     for program in dict_data['programs']:
         programs.append(Program.from_dict(program))
-        # programs.append(Program(**program))
     for event in dict_data['events']:
         events.append(Event.from_dict(event))
-        # events.append(Event(**event))
     for report in dict_data['reports']:
         reports.append(Report.from_dict(report))
-        # reports.append(Report(**report))
     for subscription in dict_data['subscriptions']:
         subscriptions.append(Subscription.from_dict(subscription))
-        # subscriptions.append(Subscription(**subscription))
     for ven in dict_data['vens']:
         vens.append(Ven.from_dict(ven))
-        # vens.append(Ven(**ven))
     for resource in dict_data['resources']:
         resources.append(Resource.from_dict(resource))
-        # resources.append(Resource(**resource))
     return DataModel(programs, events, reports, subscriptions, vens, resources)
 
 
@@ -52,11 +45,6 @@ class DataModel:
         self.resources = resources
 
     def to_json(self):
-        # Event(**jsonpickle.decode(jsonpickle.encode(jsonpickle.decode(read).events[0].to_dict())))
-
-        # json_data = jsonpickle.encode(self)
-        # logging.info(json_data)
-
         return jsonpickle.encode({
             'programs': self.to_dict(self.programs),
             'events': self.to_dict(self.events),
@@ -66,10 +54,10 @@ class DataModel:
             'resources': self.to_dict(self.resources)
         })
 
-    def to_dict(self, list: list):
+    def to_dict(self, items: list):
         result = []
-        for item in list:
-            result.append(item.to_dict())
+        for item in items:
+            result.append(item.to_json_dict())
         return result
 
 
@@ -138,10 +126,8 @@ class FileStore(ObjStore):
         _object = next((object for object in _list if str(object.id) == str(obj.id)), None)
         if _object is not None:
             logging.debug(f"FileStore.update(): original object={_object}")
-
             index = _list.index(_object)
             _list[index] = obj
-
             logging.debug(f"FileStore.update(): list[{index}]={_list[index]}")
             self.__write_file(saved_data)
             logging.info(saved_data)

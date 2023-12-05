@@ -22,6 +22,33 @@ class Model(object):
         """Returns the dict as a model"""
         return util.deserialize_model(dikt, cls)
 
+    def to_json_dict(self):
+        """Returns the model properties as a dict
+
+        :rtype: dict
+        """
+        result = {}
+
+        for attr, json_attr in six.iteritems(self.attribute_map):
+            value = getattr(self, attr)
+            if isinstance(value, list):
+                result[json_attr] = list(map(
+                    lambda x: x.to_dict() if hasattr(x, "to_dict") else x,
+                    value
+                ))
+            elif hasattr(value, "to_dict"):
+                result[json_attr] = value.to_dict()
+            elif isinstance(value, dict):
+                result[json_attr] = dict(map(
+                    lambda item: (item[0], item[1].to_dict())
+                    if hasattr(item[1], "to_dict") else item,
+                    value.items()
+                ))
+            else:
+                result[json_attr] = value
+
+        return result
+
     def to_dict(self):
         """Returns the model properties as a dict
 
