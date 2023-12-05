@@ -3,6 +3,7 @@ import json
 import os
 
 import jsonpickle
+from datetime import datetime
 
 from swagger_server.models import Subscription, Report, Program, Event, Ven, Resource
 from swagger_server.objStore.objStore import ObjStore
@@ -19,16 +20,22 @@ def from_dict(dict_data):
 
     for program in dict_data['programs']:
         programs.append(Program.from_dict(program))
+        # programs.append(Program(**program))
     for event in dict_data['events']:
         events.append(Event.from_dict(event))
+        # events.append(Event(**event))
     for report in dict_data['reports']:
         reports.append(Report.from_dict(report))
+        # reports.append(Report(**report))
     for subscription in dict_data['subscriptions']:
         subscriptions.append(Subscription.from_dict(subscription))
+        # subscriptions.append(Subscription(**subscription))
     for ven in dict_data['vens']:
         vens.append(Ven.from_dict(ven))
+        # vens.append(Ven(**ven))
     for resource in dict_data['resources']:
         resources.append(Resource.from_dict(resource))
+        # resources.append(Resource(**resource))
     return DataModel(programs, events, reports, subscriptions, vens, resources)
 
 
@@ -80,17 +87,21 @@ class FileStore(ObjStore):
         self.id_counter = 0
 
     def __read_file(self) -> DataModel:
+        print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         with open(self.file_path, "r+") as f:
             read = f.read()
             print(f'Read: {read}')
             data = from_dict(jsonpickle.decode(read))
+            print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             return data
 
     def __write_file(self, data: DataModel):
+        print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         with open(self.file_path, "w+") as f:
             json_data = data.to_json()
             print(f'Write: {json_data}')
             f.write(json_data)
+            print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
     def insert(self, obj):
         object_type = obj.object_type
@@ -123,16 +134,18 @@ class FileStore(ObjStore):
         logging.info(f"FileStore.update():: obj={obj}")
         saved_data = self.__read_file()
         _list = __get_type__(object_type, saved_data)
+
         _object = next((object for object in _list if str(object.id) == str(obj.id)), None)
         if _object is not None:
             logging.debug(f"FileStore.update(): original object={_object}")
+
             index = _list.index(_object)
-            _list[index] = _object
+            _list[index] = obj
+
             logging.debug(f"FileStore.update(): list[{index}]={_list[index]}")
-            _list.append(_object)
             self.__write_file(saved_data)
             logging.info(saved_data)
-            return _object
+            return obj
         else:
             return 404
 

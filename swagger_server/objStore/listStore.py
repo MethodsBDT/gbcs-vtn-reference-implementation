@@ -142,8 +142,10 @@ class ListStore(ObjStore):
         object = next((object for object in list if str(object.id) == str(obj.id)), None)
         if object is not None:
             logging.debug(f"ListStore.update(): original object={object}")
+
             index = list.index(object)
             list[index] = object
+
             logging.debug(f"ListStore.update(): list[index]={list[index]}")
             return object
         else:
