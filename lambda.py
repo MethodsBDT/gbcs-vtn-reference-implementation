@@ -14,7 +14,7 @@ def handler(event, context):
     print(event)
     event['httpMethod'] = event['requestContext']['http']['method']
     event['path'] = event['requestContext']['http']['path']
-    event['queryStringParameters'] = event['rawQueryString']
-    print(
-        f"httpMethod: {event['httpMethod']}, path: {event['path']}, queryStringParameters: {event['queryStringParameters']}")
+    event['queryStringParameters'] = event.get('queryStringParameters')
+    print(f"httpMethod: {event['httpMethod']}, path: {event['path']}, "
+          f"queryStringParameters: {event.get('queryStringParameters')}")
     return awsgi.response(app, event, context)

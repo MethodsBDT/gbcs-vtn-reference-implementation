@@ -29,7 +29,7 @@ class OIDCAuthProvider:
 
     def validate_token(self, token: str) -> bool:
         try:
-            public_keys = self.know_issuer_client.get_signing_keys(refresh=True)
+            public_keys = self.know_issuer_client.get_signing_keys(refresh=False)
             token_headers = jwt.get_unverified_header(token)
             for key in public_keys:
                 if key.key_id == token_headers['kid']:

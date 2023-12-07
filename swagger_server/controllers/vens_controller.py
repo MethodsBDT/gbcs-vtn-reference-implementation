@@ -6,7 +6,7 @@ from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.resource import Resource  # noqa: E501
 from swagger_server.models.ven import Ven  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
-from swagger_server.objStore.listStore import objStore
+from swagger_server.objStore.storageInterface import objStore
 from swagger_server import util
 
 # recall this is just a toy VTN

@@ -9,7 +9,7 @@ from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.report import Report  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
-from swagger_server.objStore.listStore import objStore
+from swagger_server.objStore.storageInterface import objStore
 
 def create_report(body=None):  # noqa: E501
     """add a report
