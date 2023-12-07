@@ -23,8 +23,7 @@ class Model(object):
         return util.deserialize_model(dikt, cls)
 
     def to_json_dict(self):
-        """Returns the model properties as a dict
-
+        """Returns the dict which matched json model, dict can be remapped to class using from_dict method
         :rtype: dict
         """
         result = {}

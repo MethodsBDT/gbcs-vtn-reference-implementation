@@ -3,26 +3,20 @@ from swagger_server.objStore.objStore import ObjStore
 
 programs = []
 programID = 0
-MAX_PROGRAMS = 3
 
 events = []
 eventID = 0
-MAX_EVENTS = 3
 
 reports = []
 reportID = 0
-MAX_REPORTS = 3
 
 subscriptions = []
 subscriptionID = 0
-MAX_SUBSCRIPTIONS = 3
 
 vens = []
 venID = 0
-MAX_VENS = 3
 
-MAX_RESOURCES = 3
-resourceIDs = [0] * MAX_RESOURCES
+resourceIDs = [0]
 # TBD remove as resources are stored in body of ven
 resources = []
 
@@ -46,46 +40,37 @@ class ListStore(ObjStore):
             global programID
             id = programID
             programID += 1
-            max = MAX_PROGRAMS
         elif obj.object_type == 'EVENT':
             list = events
             global eventID
             id = eventID
             eventID += 1
-            max = MAX_EVENTS
         elif obj.object_type == 'REPORT':
             list = reports
             global reportID
             id = reportID
             reportID += 1
-            max = MAX_REPORTS
         elif obj.object_type == 'SUBSCRIPTION':
             list = subscriptions
             global subscriptionID
             id = subscriptionID
             subscriptionID += 1
-            max = MAX_SUBSCRIPTIONS
         elif obj.object_type == 'VEN':
             list = vens
             global venID
             id = venID
             venID += 1
-            max = MAX_VENS
         elif obj.object_type == 'RESOURCE':
             list = resources
             global resourceID
             id = resourceID
             resourceID += 1
-            max = MAX_RESOURCES
         else:
             logging.warning(f"ListStore.insert(): unknown obj.object_type={obj.object_type}")
             return 400
 
         # Insufficient storage
         logging.debug(f"ListStore.insert(): list={list}")
-        if len(list) >= max:
-            logging.warning(f"ListStore.insert(): out of storage: obj.object_type={obj.object_type}")
-            return 507
 
         obj.id = str(id)
 
