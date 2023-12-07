@@ -9,7 +9,7 @@ https://connexion.readthedocs.io/en/latest/security.html
 auth_provider = AuthServiceProvider()
 scopes = {
  'test-tool/TEST_VEN': ['read_all', 'write_reports', 'write_subscriptions', 'write_vens'],
- 'test-tool/TEST_VTN': ['read_all', 'write_programs', 'write_events', 'write_subscriptions', 'write_vens']
+ 'test-tool/TEST_BL': ['read_all', 'write_programs', 'write_events', 'write_subscriptions', 'write_vens']
 }
 
 
