@@ -16,9 +16,9 @@ class MockAuthProvider:
     def __init__(self):
         self.allowed_authorities = [
             #// todo: REPLACE TOKEN VALUES
-            AuthorityModel('ven_client', '999', ['test-tool/TEST_VEN'], 'ven_token'),
-            AuthorityModel('bl_client', '1001', ['test-tool/TEST_BL'], 'bl_token'),
-            AuthorityModel('admin_client', '1000', ['test-tool/TEST_VEN', 'test-tool/TEST_BL'], 'admin_token')
+            AuthorityModel('ven_client', '999', ['test/VEN'], 'ven_token'),
+            AuthorityModel('bl_client', '1001', ['test/BL'], 'bl_token'),
+            AuthorityModel('admin_client', '1000', ['test/VEN', 'test/BL'], 'admin_token')
         ]
 
     def get_token(self, client_id: str, client_secret: str) -> str:
