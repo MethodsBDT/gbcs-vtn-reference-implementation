@@ -19,8 +19,7 @@ class Subscription(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, client_name: str=None, program_id: ObjectID=None, object_operations: List[SubscriptionObjectOperations]= None,
-                 targets=None):  # noqa: E501
+    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, client_name: str=None, program_id: ObjectID=None, object_operations: List[SubscriptionObjectOperations]=None, targets: List[ValuesMap]=None):  # noqa: E501
         if targets is None:
             targets = []
         if object_operations is None:
@@ -254,7 +253,7 @@ class Subscription(Model):
     def targets(self) -> List[ValuesMap]:
         """Gets the targets of this Subscription.
 
-        A list of valuesMap objects.  # noqa: E501
+        A list of valuesMap objects. Used by server to filter callbacks.  # noqa: E501
 
         :return: The targets of this Subscription.
         :rtype: List[ValuesMap]
@@ -265,7 +264,7 @@ class Subscription(Model):
     def targets(self, targets: List[ValuesMap]):
         """Sets the targets of this Subscription.
 
-        A list of valuesMap objects.  # noqa: E501
+        A list of valuesMap objects. Used by server to filter callbacks.  # noqa: E501
 
         :param targets: The targets of this Subscription.
         :type targets: List[ValuesMap]

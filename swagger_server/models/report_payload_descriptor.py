@@ -14,7 +14,7 @@ class ReportPayloadDescriptor(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, object_type: str='REPORT_PAYLOAD_DESCRIPTOR', payload_type: str=None, reading_type: str='DIRECT_READ', units: str='KWH', accuracy: float=0, confidence: int=100):  # noqa: E501
+    def __init__(self, object_type: str='REPORT_PAYLOAD_DESCRIPTOR', payload_type: str=None, reading_type: str=None, units: str=None, accuracy: float=None, confidence: int=None):  # noqa: E501
         """ReportPayloadDescriptor - a model defined in Swagger
 
         :param object_type: The object_type of this ReportPayloadDescriptor.  # noqa: E501

@@ -14,7 +14,7 @@ class EventPayloadDescriptor(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, object_type: str='EVENT_PAYLOAD_DESCRIPTOR', payload_type: str=None, units: str='KWH', currency: str='USD'):  # noqa: E501
+    def __init__(self, object_type: str='EVENT_PAYLOAD_DESCRIPTOR', payload_type: str=None, units: str=None, currency: str=None):  # noqa: E501
         """EventPayloadDescriptor - a model defined in Swagger
 
         :param object_type: The object_type of this EventPayloadDescriptor.  # noqa: E501
