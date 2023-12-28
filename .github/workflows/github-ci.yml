@@ -28,19 +28,21 @@ jobs:
       - name: Get version
         run: |
           echo "$(git rev-parse --short HEAD)"
-          echo "IMAGE_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           echo "IMAGE_VERSION_LAMBDA=lambda-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-      - name: Build docker image
+      - name: Set up QEMU for arm64
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build docker image for arm64
         run: |
-          docker build --progress=plain -t $ECR_REPOSITORY:$IMAGE_VERSION -f Dockerfile .
-          docker build --progress=plain -t $ECR_REPOSITORY:$IMAGE_VERSION_LAMBDA -f Dockerfile-lambda .
+          docker buildx build --platform linux/arm64 --load --progress=plain -t $ECR_REPOSITORY:$IMAGE_VERSION_LAMBDA -f Dockerfile-lambda .
       - name: Tag images
         run: |
-          docker image tag $ECR_REPOSITORY:$IMAGE_VERSION $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_VERSION
           docker image tag $ECR_REPOSITORY:$IMAGE_VERSION_LAMBDA $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_VERSION_LAMBDA
           docker image tag $ECR_REPOSITORY:$IMAGE_VERSION_LAMBDA $ECR_REGISTRY/$ECR_REPOSITORY:lambda-latest
       - name: Push images
         run: |
-          docker image push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_VERSION
           docker image push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_VERSION_LAMBDA
           docker image push $ECR_REGISTRY/$ECR_REPOSITORY:lambda-latest
