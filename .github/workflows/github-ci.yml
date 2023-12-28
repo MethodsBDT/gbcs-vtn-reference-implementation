@@ -29,9 +29,7 @@ jobs:
         run: |
           echo "$(git rev-parse --short HEAD)"
           echo "IMAGE_VERSION_LAMBDA=lambda-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-      - # Add support for more platforms with QEMU (optional)
-        # https://github.com/docker/setup-qemu-action
-        name: Set up QEMU for arm64
+      - name: Set up QEMU for arm64
         uses: docker/setup-qemu-action@v3
         with:
           platforms: arm64
