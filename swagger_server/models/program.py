@@ -22,7 +22,7 @@ class Program(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, program_name: str=None, program_long_name: str=None, retailer_name: str=None, retailer_long_name: str=None, program_type: str=None, country: str=None, principal_subdivision: str=None, time_zone_offset: Duration=None, interval_period: IntervalPeriod=None, program_descriptions: List[ProgramProgramDescriptions]=None, binding_events: bool=False, local_price: bool=False, payload_descriptors: List[AnyOfprogramPayloadDescriptorsItems]=None, targets: List[ValuesMap]=None):  # noqa: E501
+    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, program_name: str=None, program_long_name: str=None, retailer_name: str=None, retailer_long_name: str=None, program_type: str=None, country: str=None, principal_subdivision: str=None, time_zone_offset: Duration=None, interval_period: IntervalPeriod=None, program_descriptions: List[ProgramProgramDescriptions]=None, binding_events: bool=None, local_price: bool=None, payload_descriptors: List[AnyOfprogramPayloadDescriptorsItems]=None, targets: List[ValuesMap]=None):  # noqa: E501
         """Program - a model defined in Swagger
 
         :param id: The id of this Program.  # noqa: E501

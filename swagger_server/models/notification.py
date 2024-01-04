@@ -17,17 +17,17 @@ class Notification(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, object_type: ObjectTypes=None, operation: str=None, targets: List[ValuesMap]=None, object: OneOfnotificationObject=None):  # noqa: E501
+    def __init__(self, object_type: ObjectTypes=None, operation: str=None, object: OneOfnotificationObject=None, targets: List[ValuesMap]=None):  # noqa: E501
         """Notification - a model defined in Swagger
 
         :param object_type: The object_type of this Notification.  # noqa: E501
         :type object_type: ObjectTypes
         :param operation: The operation of this Notification.  # noqa: E501
         :type operation: str
-        :param targets: The targets of this Notification.  # noqa: E501
-        :type targets: List[ValuesMap]
         :param object: The object of this Notification.  # noqa: E501
         :type object: OneOfnotificationObject
+        :param targets: The targets of this Notification.  # noqa: E501
+        :type targets: List[ValuesMap]
         """
         self.swagger_types = {
             'object_type': ObjectTypes,
@@ -101,7 +101,7 @@ class Notification(Model):
         :param operation: The operation of this Notification.
         :type operation: str
         """
-        allowed_values = ["POST", "PUT", "DELETE"]  # noqa: E501
+        allowed_values = ["GET", "POST", "PUT", "DELETE"]  # noqa: E501
         if operation not in allowed_values:
             raise ValueError(
                 "Invalid value for `operation` ({0}), must be one of {1}"

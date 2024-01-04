@@ -15,13 +15,15 @@ class ReportDescriptor(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, payload_type: str=None, reading_type: str='DIRECT_READ', targets: List[ValuesMap]=None, aggregate: bool=False, start_interval: int=-1, num_intervals: int=-1, historical: bool=True, frequency: int=-1, repeat: int=1):  # noqa: E501
+    def __init__(self, payload_type: str=None, reading_type: str=None, units: str=None, targets: List[ValuesMap]=None, aggregate: bool=False, start_interval: int=-1, num_intervals: int=-1, historical: bool=True, frequency: int=-1, repeat: int=1):  # noqa: E501
         """ReportDescriptor - a model defined in Swagger
 
         :param payload_type: The payload_type of this ReportDescriptor.  # noqa: E501
         :type payload_type: str
         :param reading_type: The reading_type of this ReportDescriptor.  # noqa: E501
         :type reading_type: str
+        :param units: The units of this ReportDescriptor.  # noqa: E501
+        :type units: str
         :param targets: The targets of this ReportDescriptor.  # noqa: E501
         :type targets: List[ValuesMap]
         :param aggregate: The aggregate of this ReportDescriptor.  # noqa: E501
@@ -40,6 +42,7 @@ class ReportDescriptor(Model):
         self.swagger_types = {
             'payload_type': str,
             'reading_type': str,
+            'units': str,
             'targets': List[ValuesMap],
             'aggregate': bool,
             'start_interval': int,
@@ -52,6 +55,7 @@ class ReportDescriptor(Model):
         self.attribute_map = {
             'payload_type': 'payloadType',
             'reading_type': 'readingType',
+            'units': 'units',
             'targets': 'targets',
             'aggregate': 'aggregate',
             'start_interval': 'startInterval',
@@ -62,6 +66,7 @@ class ReportDescriptor(Model):
         }
         self._payload_type = payload_type
         self._reading_type = reading_type
+        self._units = units
         self._targets = targets
         self._aggregate = aggregate
         self._start_interval = start_interval
@@ -128,6 +133,29 @@ class ReportDescriptor(Model):
         """
 
         self._reading_type = reading_type
+
+    @property
+    def units(self) -> str:
+        """Gets the units of this ReportDescriptor.
+
+        Units of measure.  # noqa: E501
+
+        :return: The units of this ReportDescriptor.
+        :rtype: str
+        """
+        return self._units
+
+    @units.setter
+    def units(self, units: str):
+        """Sets the units of this ReportDescriptor.
+
+        Units of measure.  # noqa: E501
+
+        :param units: The units of this ReportDescriptor.
+        :type units: str
+        """
+
+        self._units = units
 
     @property
     def targets(self) -> List[ValuesMap]:

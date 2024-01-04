@@ -93,10 +93,12 @@ def search_all_programs(target_type=None, target_values=None, skip=None, limit=N
 
     """searches all programs
 
-    List all programs known to the server. Use skip and pagination query params to limit reponse size.  # noqa: E501
+    List all programs known to the server. Use skip and pagination query params to limit response size.  # noqa: E501
 
-    :param targets: return programs that match requested targets
-    :type targets: list | bytes
+    :param target_type: Indicates targeting type, e.g. GROUP
+    :type target_type: str
+    :param target_values: List of target values, e.g. group names
+    :type target_values: List[str]
     :param skip: number of records to skip for pagination.
     :type skip: int
     :param limit: maximum number of records to return.
@@ -133,7 +135,7 @@ def search_all_programs(target_type=None, target_values=None, skip=None, limit=N
 def search_program_by_program_id(program_id):  # noqa: E501
     """searches programs by program ID
 
-    Fetch the program specified by the programID in path. # noqa: E501
+    Fetch the program specified by the programID in path.  # noqa: E501
 
     :param program_id: Object ID of the program object.
     :type program_id: dict | bytes

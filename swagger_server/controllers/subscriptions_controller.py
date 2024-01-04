@@ -75,22 +75,12 @@ def delete_subscription(subscription_id):  # noqa: E501
 def search_subscription_by_id(subscription_id):  # noqa: E501
     """search subscriptions by ID
 
-    List all subscriptions. May filter results by programID and clientID as query params. May filter results by objects as query param. See objectTypes schema. Use skip and pagination query params to limit response size.  # noqa: E501
+    Return the subscription specified by subscriptionID specified in path. # noqa: E501
 
-    :param program_id: filter results to subscriptions with programID.
-    :type program_id: dict | bytes
-    :param client_name: filter results to subscriptions with clientName.
-    :type client_name: str
-    :param targets: return programs that match requested targets
-    :type targets: list | bytes
-    :param objects: list of objects to subscribe to.
-    :type objects: list | bytes
-    :param skip: number of records to skip for pagination.
-    :type skip: int
-    :param limit: maximum number of records to return.
-    :type limit: int
+    :param subscription_id: object ID of the associated subscription.
+    :type subscription_id: dict | bytes
 
-    :rtype: List[Subscription]
+    :rtype: Subscription
     """
     logging.info(f"search_subscription_by_id(): subscription_id={subscription_id}")
 
@@ -110,16 +100,18 @@ def search_subscriptions(program_id=None, client_name=None, target_type=None, ta
     """search subscriptions
 
     List all subscriptions. May filter results by programID and clientID as query params. May filter results by objects as query param. See objectTypes schema. Use skip and pagination query params to limit response size.  # noqa: E501
-    
+
     :param program_id: filter results to subscriptions with programID.
     :type program_id: dict | bytes
-    :param client_name: filter results to subscriptions with clientIdentifier.
+    :param client_name: filter results to subscriptions with clientName.
     :type client_name: str
-    :param targets: return programs that match requested targets
-    :type targets: list | bytes
+    :param target_type: Indicates targeting type, e.g. GROUP
+    :type target_type: str
+    :param target_values: List of target values, e.g. group names
+    :type target_values: List[str]
     :param objects: list of objects to subscribe to.
     :type objects: list | bytes
-     :param skip: number of records to skip for pagination.
+    :param skip: number of records to skip for pagination.
     :type skip: int
     :param limit: maximum number of records to return.
     :type limit: int
