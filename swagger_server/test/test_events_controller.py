@@ -3,14 +3,13 @@
 from __future__ import absolute_import
 
 from flask import json
-from six import BytesIO
 
 from swagger_server.models.event import Event  # noqa: E501
-from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.test import BaseTestCase
 
-BASE_URL = 'http://localhost:8080/openadr3/OADR-3.0.0/1.0.0/'
-auth_header = {'Authorization': "Bearer bl_token"}
+BASE_URL = 'http://localhost:8080/openadr3/3.0.1'
+auth_header = {'Authorization': 'Bearer bl_token'}
+
 
 class TestEventsController(BaseTestCase):
     """EventsController integration test stubs"""
@@ -22,7 +21,7 @@ class TestEventsController(BaseTestCase):
         """
         body = Event(program_id="0", intervals=[])
         response = self.client.open(
-            BASE_URL+'events',
+            BASE_URL + 'events',
             method='POST',
             data=json.dumps(body),
             content_type='application/json',
@@ -37,7 +36,7 @@ class TestEventsController(BaseTestCase):
         delete an event
         """
         response = self.client.open(
-            BASE_URL+'events/0',
+            BASE_URL + 'events/0',
             method='DELETE',
             headers=auth_header)
         self.assert200(response,
@@ -49,7 +48,7 @@ class TestEventsController(BaseTestCase):
         searches all events
         """
         response = self.client.open(
-            BASE_URL+'events',
+            BASE_URL + 'events',
             method='GET',
             headers=auth_header)
         self.assert200(response,
@@ -61,7 +60,7 @@ class TestEventsController(BaseTestCase):
         search events by ID
         """
         response = self.client.open(
-            BASE_URL+'events/0',
+            BASE_URL + 'events/0',
             method='GET',
             headers=auth_header)
         self.assert200(response,
@@ -74,7 +73,7 @@ class TestEventsController(BaseTestCase):
         """
         body = Event(program_id="0", intervals=[])
         response = self.client.open(
-            BASE_URL+'events/0',
+            BASE_URL + 'events/0',
             method='PUT',
             data=json.dumps(body),
             content_type='application/json',
@@ -85,4 +84,5 @@ class TestEventsController(BaseTestCase):
 
 if __name__ == '__main__':
     import unittest
+
     unittest.main()

@@ -3,14 +3,13 @@
 from __future__ import absolute_import
 
 from flask import json
-from six import BytesIO
 
-from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.program import Program  # noqa: E501
 from swagger_server.test import BaseTestCase
 
-BASE_URL = 'http://localhost:8080/openadr3/OADR-3.0.0/1.0.0/'
-auth_header = {'Authorization': "Bearer bl_token"}
+BASE_URL = 'http://localhost:8080/openadr3/3.0.1'
+auth_header = {'Authorization': 'Bearer bl_token'}
+
 
 class TestProgramsController(BaseTestCase):
     """ProgramsController integration test stubs"""
@@ -20,9 +19,9 @@ class TestProgramsController(BaseTestCase):
 
         create a program
         """
-        body = Program(program_name="myProgram")
+        body = Program(program_name='myProgram')
         response = self.client.open(
-            BASE_URL+'programs',
+            BASE_URL + 'programs',
             method='POST',
             data=json.dumps(body),
             content_type='application/json',
@@ -36,7 +35,7 @@ class TestProgramsController(BaseTestCase):
         searches all programs
         """
         response = self.client.get(
-            BASE_URL+'programs',
+            BASE_URL + 'programs',
             headers=auth_header)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -47,7 +46,7 @@ class TestProgramsController(BaseTestCase):
         searches programs by program ID
         """
         response = self.client.open(
-            BASE_URL+'programs/0',
+            BASE_URL + 'programs/0',
             method='GET',
             headers=auth_header)
         self.assert200(response,
@@ -60,7 +59,7 @@ class TestProgramsController(BaseTestCase):
         """
         body = Program(program_name="myProgram")
         response = self.client.open(
-            BASE_URL+'programs/0',
+            BASE_URL + 'programs/0',
             method='PUT',
             data=json.dumps(body),
             content_type='application/json',
@@ -75,12 +74,14 @@ class TestProgramsController(BaseTestCase):
         delete a program
         """
         response = self.client.open(
-            BASE_URL+'programs/0',
+            BASE_URL + 'programs/0',
             method='DELETE',
             headers=auth_header)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+
 if __name__ == '__main__':
     import unittest
+
     unittest.main()

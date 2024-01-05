@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: OpenADR 3 API
   description: |
-    The OpenADR 3.0.0 API supports energy retailer to energy customer Demand Response programs.
+    The OpenADR 3.0.1 API supports energy retailer to energy customer Demand Response programs.
     The API includes the following capabilities and operations:
 
     __Manage programs:__

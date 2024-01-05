@@ -3,14 +3,13 @@
 from __future__ import absolute_import
 
 from flask import json
-from six import BytesIO
 
-from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.report import Report  # noqa: E501
 from swagger_server.test import BaseTestCase
 
-BASE_URL = 'http://localhost:8080/openadr3/OADR-3.0.0/1.0.0/'
-auth_header = {'Authorization': "Bearer ven_token"}
+BASE_URL = 'http://localhost:8080/openadr3/3.0.1'
+auth_header = {'Authorization': 'Bearer ven_token'}
+
 
 class TestReportsController(BaseTestCase):
     """ReportsController integration test stubs"""
@@ -22,7 +21,7 @@ class TestReportsController(BaseTestCase):
         """
         body = Report(client_name="myClient", event_id="0", program_id="0", resources=[])
         response = self.client.open(
-            BASE_URL+'reports',
+            BASE_URL + 'reports',
             method='POST',
             data=json.dumps(body),
             content_type='application/json',
@@ -37,7 +36,7 @@ class TestReportsController(BaseTestCase):
         delete a report
         """
         response = self.client.open(
-            BASE_URL+'reports/0',
+            BASE_URL + 'reports/0',
             method='DELETE',
             headers=auth_header)
         self.assert200(response,
@@ -49,7 +48,7 @@ class TestReportsController(BaseTestCase):
         searches all reports
         """
         response = self.client.open(
-            BASE_URL+'reports',
+            BASE_URL + 'reports',
             method='GET',
             headers=auth_header)
         self.assert200(response,
@@ -61,7 +60,7 @@ class TestReportsController(BaseTestCase):
         searches reports by reportID
         """
         response = self.client.open(
-            BASE_URL+'reports/0',
+            BASE_URL + 'reports/0',
             method='GET',
             headers=auth_header)
         self.assert200(response,
@@ -74,7 +73,7 @@ class TestReportsController(BaseTestCase):
         """
         body = Report(client_name="myClient", event_id="0", program_id="0", resources=[])
         response = self.client.open(
-            BASE_URL+'reports/0',
+            BASE_URL + 'reports/0',
             method='PUT',
             data=json.dumps(body),
             content_type='application/json',
@@ -85,4 +84,5 @@ class TestReportsController(BaseTestCase):
 
 if __name__ == '__main__':
     import unittest
+
     unittest.main()
