@@ -3,15 +3,14 @@
 from __future__ import absolute_import
 
 from flask import json
-from six import BytesIO
 
-from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.resource import Resource  # noqa: E501
 from swagger_server.models.ven import Ven  # noqa: E501
 from swagger_server.test import BaseTestCase
 
-BASE_URL = 'http://localhost:8080/openadr3/OADR-3.0.0/1.0.0/'
-auth_header = {'Authorization': "Bearer ven_token"}
+BASE_URL = 'http://localhost:8080/openadr3/3.0.1'
+auth_header = {'Authorization': 'Bearer ven_token'}
+
 
 class TestVensController(BaseTestCase):
     """VensController integration test stubs"""
@@ -23,7 +22,7 @@ class TestVensController(BaseTestCase):
         """
         body = Resource(resource_name="myResource")
         response = self.client.open(
-            BASE_URL+'vens/0/resources',
+            BASE_URL + 'vens/0/resources',
             method='POST',
             data=json.dumps(body),
             content_type='application/json',
@@ -39,7 +38,7 @@ class TestVensController(BaseTestCase):
         """
         body = Ven(ven_name="myVen")
         response = self.client.open(
-            BASE_URL+'vens',
+            BASE_URL + 'vens',
             method='POST',
             data=json.dumps(body),
             content_type='application/json',
@@ -53,7 +52,7 @@ class TestVensController(BaseTestCase):
         delete  ven
         """
         response = self.client.open(
-            BASE_URL+'vens/0',
+            BASE_URL + 'vens/0',
             method='DELETE',
             headers=auth_header)
         self.assert200(response,
@@ -65,7 +64,7 @@ class TestVensController(BaseTestCase):
         delete  ven resource
         """
         response = self.client.open(
-            BASE_URL+'vens/0/resources/0',
+            BASE_URL + 'vens/0/resources/0',
             method='DELETE',
             headers=auth_header)
         self.assert200(response,
@@ -77,7 +76,7 @@ class TestVensController(BaseTestCase):
         search vens by ID
         """
         response = self.client.open(
-            BASE_URL+'vens/0',
+            BASE_URL + 'vens/0',
             method='GET',
             headers=auth_header)
         self.assert200(response,
@@ -89,7 +88,7 @@ class TestVensController(BaseTestCase):
         search ven resources by ID
         """
         response = self.client.open(
-            BASE_URL+'vens/0/resources/0',
+            BASE_URL + 'vens/0/resources/0',
             method='GET',
             headers=auth_header)
         self.assert200(response,
@@ -101,7 +100,7 @@ class TestVensController(BaseTestCase):
         search ven resources
         """
         response = self.client.open(
-            BASE_URL+'vens/0/resources',
+            BASE_URL + 'vens/0/resources',
             method='GET',
             headers=auth_header)
         self.assert200(response,
@@ -113,7 +112,7 @@ class TestVensController(BaseTestCase):
         search vens
         """
         response = self.client.open(
-            BASE_URL+'vens',
+            BASE_URL + 'vens',
             method='GET',
             headers=auth_header)
         self.assert200(response,
@@ -126,7 +125,7 @@ class TestVensController(BaseTestCase):
         """
         body = Ven(ven_name="myVen")
         response = self.client.open(
-            BASE_URL+'vens/0',
+            BASE_URL + 'vens/0',
             method='PUT',
             data=json.dumps(body),
             content_type='application/json',
@@ -141,7 +140,7 @@ class TestVensController(BaseTestCase):
         """
         body = Resource(resource_name="myResource")
         response = self.client.open(
-            BASE_URL+'vens/0/resources/0',
+            BASE_URL + 'vens/0/resources/0',
             method='PUT',
             data=json.dumps(body),
             content_type='application/json',
@@ -152,4 +151,5 @@ class TestVensController(BaseTestCase):
 
 if __name__ == '__main__':
     import unittest
+
     unittest.main()
