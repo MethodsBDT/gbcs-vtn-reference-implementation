@@ -1,5 +1,6 @@
 import connexion
 from datetime import datetime
+from http import HTTPStatus
 import logging
 
 from swagger_server.models.problem import Problem  # noqa: E501
@@ -54,7 +55,7 @@ def create_program(body=None):  # noqa: E501
     )
 
     status = objStore.insert(program)
-    if status != 200:
+    if status != HTTPStatus.CREATED:
         problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"create_program(): problem={problem}")
         return problem, status
@@ -87,7 +88,7 @@ def delete_program(program_id):  # noqa: E501
     # TBD: need to test if this is not present
     subscription_callback("PROGRAM", "DELETE", program)
 
-    return program, 200
+    return program, HTTPStatus.OK
 
 def search_all_programs(target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
 
@@ -121,7 +122,7 @@ def search_all_programs(target_type=None, target_values=None, skip=None, limit=N
         if len(programs) < skip:
             problem = Problem(title="Not Found: skipped records not found", status="404")
             logging.warning(f"search_all_programs(): problem={problem}")
-            return problem, 404
+            return problem, HTTPStatus.NOT_FOUND
         programList = programs[skip:]
     if limit != None:
         programList = programList[:limit]
@@ -129,7 +130,7 @@ def search_all_programs(target_type=None, target_values=None, skip=None, limit=N
 
     subscription_callback("PROGRAM", "GET", programList)
 
-    return programList, 200
+    return programList, HTTPStatus.OK
 
 
 def search_program_by_program_id(program_id):  # noqa: E501
@@ -155,7 +156,7 @@ def search_program_by_program_id(program_id):  # noqa: E501
 
     subscription_callback("PROGRAM", "GET", program)
 
-    return program, 200
+    return program, HTTPStatus.OK
 
 def update_program(program_id, body=None):  # noqa: E501
     """update a program
@@ -180,10 +181,10 @@ def update_program(program_id, body=None):  # noqa: E501
     #     return problem, 400
 
     program, status = search_program_by_program_id(program_id)
-    if program is None or status == 404:
+    if program is None or status == HTTPStatus.NOT_FOUND:
         problem = Problem(title="Not Found: program_id not found", status="404")
         logging.warning(f"update_program(): problem={problem}")
-        return problem, 404
+        return problem, HTTPStatus.NOT_FOUND
 
     # set modification date time
     now = datetime.now()
@@ -230,5 +231,5 @@ def update_program(program_id, body=None):  # noqa: E501
 
     subscription_callback("PROGRAM", "PUT", program)
 
-    return program, 200
+    return program, HTTPStatus.OK
 

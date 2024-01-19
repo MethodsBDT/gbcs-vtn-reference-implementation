@@ -1,9 +1,7 @@
 import connexion
 from datetime import datetime
-import json
+from http import HTTPStatus
 import logging
-import requests
-import six
 
 from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
@@ -48,7 +46,7 @@ def create_report(body=None):  # noqa: E501
     )
 
     status = objStore.insert(report)
-    if status != 200:
+    if status != HTTPStatus.CREATED:
         problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"create_report(): problem={problem}")
         return problem, status
@@ -78,7 +76,7 @@ def delete_report(report_id):  # noqa: E501
     # TBD: need to test if this is not present
     subscription_callback("REPORT", "DELETE", report)
 
-    return report, 200
+    return report, HTTPStatus.OK
 
 
 def search_all_reports(program_id=None, client_name=None, skip=None, limit=None):  # noqa: E501
@@ -111,18 +109,18 @@ def search_all_reports(program_id=None, client_name=None, skip=None, limit=None)
         if len(reports) == 0:
             problem = Problem(title="Not Found: program_id not found", status="404")
             logging.warning(f"search_all_reports(): problem={problem}")
-            return problem, 404
+            return problem, HTTPStatus.NOT_FOUND
     if client_name != None:
         reports = [report for report in reports if report.client_name == client_name]
         if len(reports) == 0:
             problem = Problem(title="Not Found: client_name not found", status="404")
             logging.warning(f"search_all_reports(): problem={problem}")
-            return problem, 404
+            return problem, HTTPStatus.NOT_FOUND
     if skip != None:
         if len(reports) < skip:
             problem = Problem(title="Not Found: skipped records not found", status="404")
             logging.warning(f"search_all_reports(): problem={problem}")
-            return problem, 404
+            return problem, HTTPStatus.NOT_FOUND
         reports = reports[skip:]
     if limit != None:
         reports = reports[:limit]
@@ -131,7 +129,7 @@ def search_all_reports(program_id=None, client_name=None, skip=None, limit=None)
 
     subscription_callback("REPORT", "GET", reports)
 
-    return reports, 200
+    return reports, HTTPStatus.OK
 
 
 def search_reports_by_report_id(report_id):  # noqa: E501
@@ -156,7 +154,7 @@ def search_reports_by_report_id(report_id):  # noqa: E501
 
     subscription_callback("REPORT", "GET", report)
 
-    return report, 200
+    return report, HTTPStatus.OK
 
 def update_report(report_id, body=None):  # noqa: E501
     """update a report
@@ -181,10 +179,10 @@ def update_report(report_id, body=None):  # noqa: E501
     #     return problem, 400
     
     report, status = search_reports_by_report_id(report_id)
-    if report is None or status == 404:
+    if report is None or status == HTTPStatus.NOT_FOUND:
         problem = Problem(title="Not Found: report_id not found", status="404")
         logging.warning(f"update_report(): problem={problem}")
-        return problem, 404
+        return problem, HTTPStatus.NOT_FOUND
 
     # set modification date time
     now = datetime.now()
@@ -194,7 +192,7 @@ def update_report(report_id, body=None):  # noqa: E501
     if reportBody.program_id != report.program_id:
         problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
         logging.warning(f"update_report(): problem={problem}")
-        return problem, 400
+        return problem, HTTPStatus.BAD_REQUEST
     if reportBody.event_id is not None:
         report.event_id = reportBody.event_id
     if reportBody.client_name is not None:
@@ -215,5 +213,5 @@ def update_report(report_id, body=None):  # noqa: E501
 
     subscription_callback("REPORT", "PUT", report)
 
-    return report, 200
+    return report, HTTPStatus.OK
 
