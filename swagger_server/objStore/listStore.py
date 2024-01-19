@@ -1,3 +1,4 @@
+from http import HTTPStatus
 import logging
 from swagger_server.objStore.objStore import ObjStore
 
@@ -67,7 +68,7 @@ class ListStore(ObjStore):
             resourceID += 1
         else:
             logging.warning(f"ListStore.insert(): unknown obj.object_type={obj.object_type}")
-            return 400
+            return HTTPStatus.BAD_REQUEST
 
         # Insufficient storage
         logging.debug(f"ListStore.insert(): list={list}")
@@ -76,7 +77,7 @@ class ListStore(ObjStore):
 
         list.append(obj)
 
-        return 200
+        return HTTPStatus.CREATED
 
     def remove(self, object_type, id):
         logging.info(f"ListStore.remove(): object_type={object_type} id={id}")
@@ -95,7 +96,7 @@ class ListStore(ObjStore):
             list = resources
         else:
             logging.warning(f"ListStore.remove(): unknown obj.object_type={object_type}")
-            return 400
+            return HTTPStatus.BAD_REQUEST
 
         object = next((obj for obj in list if str(obj.id) == str(id)), None)
 
@@ -104,7 +105,7 @@ class ListStore(ObjStore):
             logging.debug(f"ListStore.remove(): object={object}")
             return object
         else:
-            return 404
+            return HTTPStatus.NOT_FOUND
 
     def update(self, object_type, obj):
         logging.info(f"ListStore.update():: obj={obj}")
@@ -122,7 +123,7 @@ class ListStore(ObjStore):
             list = resources
         else:
             logging.warning(f"ListStore.update(): unknown obj.object_type={object_type}")
-            return 400
+            return HTTPStatus.BAD_REQUEST
 
         object = next((object for object in list if str(object.id) == str(obj.id)), None)
         if object is not None:
@@ -134,7 +135,7 @@ class ListStore(ObjStore):
             logging.debug(f"ListStore.update(): list[index]={list[index]}")
             return object
         else:
-            return 404
+            return HTTPStatus.NOT_FOUND
 
     def search_all(self, object_type):
         logging.info(f"ListStore.search_all(): object_type={object_type}")
@@ -152,7 +153,7 @@ class ListStore(ObjStore):
             return resources
         else:
             logging.warning(f"ListStore.search_all(): unknown object_type={object_type}")
-            return 400
+            return HTTPStatus.BAD_REQUEST
 
     def search(self, object_type, id):
         logging.info(f"ListStore.search(): object_type={object_type}, id={id}")
@@ -171,7 +172,7 @@ class ListStore(ObjStore):
             list = resources
         else:
             logging.warning(f"ListStore.remove(): unknown obj.object_type={object_type}")
-            return 400
+            return HTTPStatus.BAD_REQUEST
 
         logging.debug(f"ListStore.search(): list={list}")
         return next((obj for obj in list if str(obj.id) == str(id)), 404)

@@ -1,7 +1,7 @@
-import logging
-from datetime import datetime
-
 import connexion
+from datetime import datetime
+from http import HTTPStatus
+import logging
 
 from swagger_server import util
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
@@ -49,7 +49,7 @@ def create_event(body=None):  # noqa: E501
     )
 
     status = objStore.insert(event)
-    if status != 200:
+    if status != HTTPStatus.CREATED:
         problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"create_event(): problem={problem}")
         return problem, status
@@ -80,7 +80,7 @@ def delete_event(event_id):  # noqa: E501
 
     subscription_callback("EVENT", "DELETE", event)
 
-    return event, 200
+    return event, HTTPStatus.OK
 
 
 def search_all_events(program_id=None, target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
@@ -123,13 +123,13 @@ def search_all_events(program_id=None, target_type=None, target_values=None, ski
         if len(eventList) == 0:
             problem = Problem(title=f"Not Found: program_id {program_id} not found", status="404")
             logging.warning(f"search_all_events(): problem={problem}")
-            return problem, 404
+            return problem, HTTPStatus.NOT_FOUND
     eventList = util.getTargets(eventList, target_type, target_values)
     if skip != None:
         if len(events) < skip:
             problem = Problem(title="Not Found: skipped records not found", status="404")
             logging.warning(f"search_all_events(): problem={problem}")
-            return problem, 404
+            return problem, HTTPStatus.NOT_FOUND
         eventList = events[skip:]
     if limit != None:
         eventList = eventList[:limit]
@@ -160,7 +160,7 @@ def search_events_by_id(event_id):  # noqa: E501
 
     subscription_callback("EVENT", "GET", event)
 
-    return event, 200
+    return event, HTTPStatus.OK
 
 
 def update_event(event_id, body=None):  # noqa: E501
@@ -184,13 +184,13 @@ def update_event(event_id, body=None):  # noqa: E501
     if eventBody is None:
         problem = Problem(title="Bad Request: No request body", status="400")
         logging.warning(f"update_event(): problem={problem}")
-        return problem, 400
+        return problem, HTTPStatus.BAD_REQUEST
 
     event, status = search_events_by_id(event_id)
-    if event is None or status == 404:
+    if event is None or status == HTTPStatus.NOT_FOUND:
         problem = Problem(title="Not Found: program_id not found", status="404")
         logging.warning(f"update_event(): problem={problem}")
-        return problem, 404
+        return problem, HTTPStatus.NOT_FOUND
 
     # set modification date time
     now = datetime.now()
@@ -199,7 +199,7 @@ def update_event(event_id, body=None):  # noqa: E501
 
     if eventBody.program_id != event.program_id:
         problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
-        return problem, 400
+        return problem, HTTPStatus.BAD_REQUEST
     if eventBody.event_name is not None:
         event.event_name = eventBody.event_name
     if eventBody.priority is not None:
@@ -225,4 +225,4 @@ def update_event(event_id, body=None):  # noqa: E501
 
     subscription_callback("EVENT", "PUT", event)
 
-    return event, 200
+    return event, HTTPStatus.OK

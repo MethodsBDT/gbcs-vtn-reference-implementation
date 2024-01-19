@@ -1,5 +1,6 @@
 import connexion
 from datetime import datetime
+from http import HTTPStatus
 import logging
 
 from swagger_server.models.problem import Problem  # noqa: E501
@@ -48,13 +49,13 @@ def create_ven(body):  # noqa: E501
         ven.resources = []
 
     status = objStore.insert(ven)
-    if status != 200:
+    if status != HTTPStatus.CREATED:
         problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"create_ven(): problem={problem}")
         return problem, status
 
     subscription_callback("VEN", "POST", ven)
-    return ven, 200
+    return ven, HTTPStatus.CREATED
 
 def delete_ven(ven_id):  # noqa: E501
     """delete  ven
@@ -77,7 +78,7 @@ def delete_ven(ven_id):  # noqa: E501
 
     subscription_callback("VEN", "DELETE", ven)
 
-    return ven, 200
+    return ven, HTTPStatus.OK
 
 
 def search_ven_by_id(ven_id):  # noqa: E501
@@ -100,7 +101,7 @@ def search_ven_by_id(ven_id):  # noqa: E501
 
     subscription_callback("VEN", "GET", ven)
 
-    return ven, 200
+    return ven, HTTPStatus.OK
 
 def search_vens(target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
     """search vens
@@ -132,7 +133,7 @@ def search_vens(target_type=None, target_values=None, skip=None, limit=None):  #
         if len(vens) < skip:
             problem = Problem(title="Not Found: skipped records not found", status="404")
             logging.warning(f"search_all_vens(): problem={problem}")
-            return problem, 404
+            return problem, HTTPStatus.NOT_FOUND
         venList = vens[skip:]
     if limit != None:
         venList = venList[:limit]
@@ -163,13 +164,13 @@ def update_ven(ven_id, body=None):  # noqa: E501
     if venBody is None:
         problem = Problem(title="Bad Request: No request body", status="400")
         logging.warning(f"update_ven(): problem={problem}")
-        return problem, 400
+        return problem, HTTPStatus.BAD_REQUEST
 
     ven, status = search_ven_by_id(ven_id)
-    if ven is None or status == 404:
+    if ven is None or status == HTTPStatus.NOT_FOUND:
         problem = Problem(title="Not Found: program_id not found", status="404")
         logging.warning(f"update_ven(): problem={problem}")
-        return problem, 404
+        return problem, HTTPStatus.NOT_FOUND
 
     # set modification date time
     now = datetime.now()
@@ -218,7 +219,7 @@ def create_resource(body, ven_id):  # noqa: E501
         return problem, status
 
     if len(ven.resources) >= MAX_RESOURCES:
-        status = 507
+        status = HTTPStatus.INSUFFICIENT_STORAGE
         problem = Problem(title="Insufficient Storage ", status=str(status))
         logging.warning(f"create_resource(): problem={problem}")
         return problem, status
@@ -254,7 +255,7 @@ def create_resource(body, ven_id):  # noqa: E501
     logging.debug(f"create_resource(): venResource={venResource}")
 
     subscription_callback("RESOURCE", "POST", venResource)
-    return venResource
+    return venResource, HTTPStatus.CREATED
 
 def delete_ven_resource(ven_id, resource_id):  # noqa: E501
     """delete  ven resource
@@ -282,13 +283,13 @@ def delete_ven_resource(ven_id, resource_id):  # noqa: E501
     if len(ven.resources) == 0:
         problem = Problem(title="Not Found: no resources in system", status="404")
         logging.warning(f"delete_ven_resource(): problem={problem}")
-        return problem, 404
+        return problem, HTTPStatus.NOT_FOUND
 
     venResource = next((venResource for venResource in ven.resources if venResource.id == resource_id), None)
     if venResource is None:
         problem = Problem(title="Not Found: resource_id not found", status="404")
         logging.warning(f"delete_ven_resource: problem={problem}")
-        return problem, 404
+        return problem, HTTPStatus.NOT_FOUND
 
     logging.debug(f"delete_ven_resource(): venResource={venResource}")
     logging.debug(f"delete_ven_resource(): ven.resources={ven.resources}")
@@ -330,7 +331,7 @@ def search_ven_resources(ven_id, target_type=None, target_values=None, skip=None
         if len(ven_resourceList) < skip:
             problem = Problem(title="Not Found: skipped records not found", status="404")
             logging.warning(f"search_all_ven_resources(): problem={problem}")
-            return problem, 404
+            return problem, HTTPStatus.NOT_FOUND
         ven_resourceList = ven_resourceList[skip:]
     if limit != None:
         ven_resourceList = ven_resourceList[:limit]
@@ -367,13 +368,13 @@ def search_ven_resource_by_id(ven_id, resource_id):  # noqa: E501
     if len(ven.resources) == 0:
         problem = Problem(title="Not Found: no resources in system", status="404")
         logging.warning(f"search_ven_resource_by_id(): problem={problem}")
-        return problem, 404
+        return problem, HTTPStatus.NOT_FOUND
 
     resource = next((resource for resource in ven.resources if resource.id == resource_id), None)
     if resource is None:
         problem = Problem(title="Not Found: resource_id not found", status="404")
         logging.warning(f"search_ven_resource_by_id(): problem={problem}")
-        return problem, 404
+        return problem, HTTPStatus.NOT_FOUND
 
     logging.debug(f"search_ven_resource_by_id(): resource={resource}")
 
@@ -408,7 +409,7 @@ def update_ven_resource(ven_id, resource_id, body=None):  # noqa: E501
     if len(ven.resources) == 0:
         problem = Problem(title="Not Found: no resources in system", status="404")
         logging.warning(f"update_ven_resource(): problem={problem}")
-        return problem, 404
+        return problem, HTTPStatus.NOT_FOUND
 
     resourceBody = None
     if connexion.request.is_json:
@@ -417,13 +418,13 @@ def update_ven_resource(ven_id, resource_id, body=None):  # noqa: E501
     if resourceBody is None:
         problem = Problem(title="Bad Request: No request body", status="400")
         logging.warning(f"update_ven_resource(): problem={problem}")
-        return problem, 400
+        return problem, HTTPStatus.BAD_REQUEST
 
     venResource = next((venResource for venResource in ven.resources if venResource.id == resource_id), None)
     if venResource is None:
         problem = Problem(title="Not Found: resource_id not found", status="404")
         logging.warning(f"update_ven_resource(): problem={problem}")
-        return problem, 404
+        return problem, HTTPStatus.NOT_FOUND
 
     ven.resources.remove(venResource)
 

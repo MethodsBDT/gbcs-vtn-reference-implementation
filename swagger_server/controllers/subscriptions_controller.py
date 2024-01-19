@@ -1,5 +1,6 @@
 import connexion
 from datetime import datetime
+from http import HTTPStatus
 import json
 import logging
 import requests
@@ -39,14 +40,14 @@ def create_subscription(body):  # noqa: E501
     )
 
     status = objStore.insert(subscription)
-    if status != 200:
+    if status != HTTPStatus.CREATED:
         problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"create_subscription(): problem={problem}")
         return problem, status
 
     subscription_callback("SUBSCRIPTION", "POST", subscription)
 
-    return subscription, 200
+    return subscription, HTTPStatus.CREATED
 
 
 def delete_subscription(subscription_id):  # noqa: E501
@@ -70,7 +71,7 @@ def delete_subscription(subscription_id):  # noqa: E501
 
     subscription_callback("SUBSCRIPTION", "DELETE", subscription)
 
-    return subscription, 200
+    return subscription, HTTPStatus.OK
 
 def search_subscription_by_id(subscription_id):  # noqa: E501
     """search subscriptions by ID
@@ -94,7 +95,7 @@ def search_subscription_by_id(subscription_id):  # noqa: E501
 
     subscription_callback("SUBSCRIPTION", "GET", subscription)
 
-    return subscription, 200
+    return subscription, HTTPStatus.OK
 
 def search_subscriptions(program_id=None, client_name=None, target_type=None, target_values=None, objects=None, skip=None, limit=None):  # noqa: E501
     """search subscriptions
@@ -136,7 +137,7 @@ def search_subscriptions(program_id=None, client_name=None, target_type=None, ta
         if len(subscriptions) == 0:
             problem = Problem(title="Not Found: program_id not found", status="404")
             logging.warning(f"search_all_subscriptions(): problem={problem}")
-            return problem, 404
+            return problem, HTTPStatus.NOT_FOUND
     if client_name != None:
         # strip leading [' and tailing ']
         # client_name = client_name[2:-2]
@@ -144,14 +145,14 @@ def search_subscriptions(program_id=None, client_name=None, target_type=None, ta
         if len(subscriptions) == 0:
             problem = Problem(title="Not Found: client_name not found", status="404")
             logging.warning(f"search_all_subscriptions(): problem={problem}")
-            return problem, 404
+            return problem, HTTPStatus.NOT_FOUND
     subscriptions = util.getTargets(subscriptions, target_type, target_values)
     subscriptions = util.getObjects(subscriptions, objects)
     if skip != None:
         if len(subscriptions) < skip:
             problem = Problem(title="Not Found: skipped records not found", status="404")
             logging.warning(f"search_all_subscriptions(): problem={problem}")
-            return problem, 404
+            return problem, HTTPStatus.NOT_FOUND
         subscriptions = subscriptions[skip:]
     if limit != None:
         subscriptions = subscriptions[:limit]
@@ -182,13 +183,13 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
     if subscriptionBody is None:
         problem = Problem(title="Bad Request: No request body", status="400")
         logging.warning(f"update_subscription(): problem={problem}")
-        return problem, 400
+        return problem, HTTPStatus.BAD_REQUEST
 
     subscription, status = search_subscription_by_id(subscription_id)
-    if subscription is None or status == 404:
+    if subscription is None or status == HTTPStatus.NOT_FOUND:
         problem = Problem(title="Not Found: program_id not found", status="404")
         logging.warning(f"update_subscription(): problem={problem}")
-        return problem, 404
+        return problem, HTTPStatus.NOT_FOUND
 
     # set modification date time
     now = datetime.now()
@@ -198,7 +199,7 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
     if subscriptionBody.program_id != subscription.program_id:
         problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
         logging.warning(f"update_subscription(): problem={problem}")
-        return problem, 400
+        return problem, HTTPStatus.BAD_REQUEST
     if subscriptionBody.client_name is not None:
         subscription.client_name = subscriptionBody.client_name
     if subscriptionBody.object_operations is not None:
@@ -258,5 +259,5 @@ def subscription_callback(resourceName, operation, object):
             headers = { "Authorization": f"Bearer {resource.bearer_token}"}
 
             response = requests.post(resource.callback_url, json=json.dumps(notification.to_dict()), headers=headers)
-            if response.status_code != 200:
+            if response.status_code != HTTPStatus.OK:
                 logging.warning(f"subscription_callback: callback response.status_code={response.status_code}")

@@ -1,3 +1,4 @@
+from http import HTTPStatus
 import logging
 import os
 
@@ -103,7 +104,7 @@ class FileStore(ObjStore):
         obj.id = str(counter)
         _list.append(obj)
         self.__write_file(saved_data)
-        return 200
+        return HTTPStatus.CREATED
 
     def remove(self, object_type, id):
         logging.info(f"FileStore.remove(): object_type={object_type} id={id}")
@@ -116,7 +117,7 @@ class FileStore(ObjStore):
             self.__write_file(saved_data)
             return _object
         else:
-            return 404
+            return HTTPStatus.NOT_FOUND
 
     def update(self, object_type, obj):
         logging.info(f"FileStore.update():: obj={obj}")
@@ -133,7 +134,7 @@ class FileStore(ObjStore):
             logging.info(saved_data)
             return obj
         else:
-            return 404
+            return HTTPStatus.NOT_FOUND
 
     def search_all(self, object_type) -> list:
         logging.info(f"FileStore.search_all(): object_type={object_type}")
@@ -145,7 +146,7 @@ class FileStore(ObjStore):
         saved_data = self.__read_file()
         _list = __get_type__(object_type, saved_data)
         logging.debug(f"FileStore.search(): list={_list}")
-        return next((obj for obj in _list if str(obj.id) == str(id)), 404)
+        return next((obj for obj in _list if str(obj.id) == str(id)), HTTPStatus.FORBIDDEN)
 
 
 def __get_type__(object_type, data_model: DataModel) -> list:
@@ -156,4 +157,4 @@ def __get_type__(object_type, data_model: DataModel) -> list:
         'SUBSCRIPTION': data_model.subscriptions,
         'VEN': data_model.vens,
         'RESOURCE': data_model.resources,
-    }.get(object_type, 400)
+    }.get(object_type, HTTPStatus.BAD_REQUEST)
