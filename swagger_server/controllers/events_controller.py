@@ -99,7 +99,6 @@ def search_all_events(program_id=None, target_type=None, target_values=None, ski
 
     :rtype: List[Event]
     """
-    # TBD: filter by program_id per clients privileges
     logging.info(
         f"search_all_events(): program_id={program_id} target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
 
@@ -111,9 +110,6 @@ def search_all_events(program_id=None, target_type=None, target_values=None, ski
         logging.warning(f"search_all_events(): problem={problem}")
         return problem, status
 
-    logging.info(
-        f"search_all_events(): program_id={program_id} target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
-
     logging.debug(f"search_all_events(): events={events}")
     eventList = events
     if program_id != None:
@@ -121,9 +117,7 @@ def search_all_events(program_id=None, target_type=None, target_values=None, ski
         # program_id = program_id[2:-2]
         eventList = [event for event in events if event.program_id == program_id]
         if len(eventList) == 0:
-            problem = Problem(title=f"Not Found: program_id {program_id} not found", status="404")
-            logging.warning(f"search_all_events(): problem={problem}")
-            return problem, HTTPStatus.NOT_FOUND
+            return eventList, HTTPStatus.OK
     eventList = util.getTargets(eventList, target_type, target_values)
     if skip != None:
         if len(events) < skip:

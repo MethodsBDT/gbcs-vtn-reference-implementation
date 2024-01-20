@@ -135,17 +135,13 @@ def search_subscriptions(program_id=None, client_name=None, target_type=None, ta
         # program_id = program_id[2:-2]
         subscriptions = [subscription for subscription in subscriptions if subscription.program_id == program_id]
         if len(subscriptions) == 0:
-            problem = Problem(title="Not Found: program_id not found", status="404")
-            logging.warning(f"search_all_subscriptions(): problem={problem}")
-            return problem, HTTPStatus.NOT_FOUND
+            return subscriptions, HTTPStatus.OK
     if client_name != None:
         # strip leading [' and tailing ']
         # client_name = client_name[2:-2]
         subscriptions = [subscription for subscription in subscriptions if subscription.client_name == client_name]
         if len(subscriptions) == 0:
-            problem = Problem(title="Not Found: client_name not found", status="404")
-            logging.warning(f"search_all_subscriptions(): problem={problem}")
-            return problem, HTTPStatus.NOT_FOUND
+            return subscriptions, HTTPStatus.OK
     subscriptions = util.getTargets(subscriptions, target_type, target_values)
     subscriptions = util.getObjects(subscriptions, objects)
     if skip != None:

@@ -107,15 +107,11 @@ def search_all_reports(program_id=None, client_name=None, skip=None, limit=None)
     if program_id != None:
         reports = [report for report in reports if report.program_id == program_id]
         if len(reports) == 0:
-            problem = Problem(title="Not Found: program_id not found", status="404")
-            logging.warning(f"search_all_reports(): problem={problem}")
-            return problem, HTTPStatus.NOT_FOUND
+            return reports, HTTPStatus.OK
     if client_name != None:
         reports = [report for report in reports if report.client_name == client_name]
         if len(reports) == 0:
-            problem = Problem(title="Not Found: client_name not found", status="404")
-            logging.warning(f"search_all_reports(): problem={problem}")
-            return problem, HTTPStatus.NOT_FOUND
+            return reports, HTTPStatus.OK
     if skip != None:
         if len(reports) < skip:
             problem = Problem(title="Not Found: skipped records not found", status="404")
