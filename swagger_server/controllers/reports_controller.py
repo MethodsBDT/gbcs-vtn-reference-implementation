@@ -79,13 +79,15 @@ def delete_report(report_id):  # noqa: E501
     return report, HTTPStatus.OK
 
 
-def search_all_reports(program_id=None, client_name=None, skip=None, limit=None):  # noqa: E501
+def search_all_reports(program_id=None, event_id=None, client_name=None, skip=None, limit=None):  # noqa: E501
     """searches all reports
 
     List all reports known to the server. May filter results by programID and clientName as query param. Use skip and pagination query params to limit response size.  # noqa: E501
 
     :param program_id: filter results to reports with programID.
     :type program_id: dict | bytes
+    :param event_id: filter results to reports with eventID.
+    :type event_id: dict | bytes
     :param client_name: filter results to reports with clientName.
     :type client_name: str
     :param skip: number of records to skip for pagination.
@@ -106,6 +108,10 @@ def search_all_reports(program_id=None, client_name=None, skip=None, limit=None)
 
     if program_id != None:
         reports = [report for report in reports if report.program_id == program_id]
+        if len(reports) == 0:
+            return reports, HTTPStatus.OK
+    if event_id != None:
+        reports = [report for report in reports if report.event_id == event_id]
         if len(reports) == 0:
             return reports, HTTPStatus.OK
     if client_name != None:

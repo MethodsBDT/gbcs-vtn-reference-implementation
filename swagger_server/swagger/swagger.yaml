@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: OpenADR 3 API
   description: |
-    The OpenADR 3.0.1 API supports energy retailer to energy customer Demand Response programs.
+    The OpenADR 3 API supports energy retailer to energy customer Demand Response programs.
     The API includes the following capabilities and operations:
 
     __Manage programs:__
@@ -365,6 +365,15 @@ paths:
         schema:
           $ref: '#/components/schemas/objectID'
         example: program-999
+      - name: eventID
+        in: query
+        description: filter results to reports with eventID.
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/objectID'
+        example: event-999
       - name: clientName
         in: query
         description: filter results to reports with clientName.
