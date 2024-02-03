@@ -131,9 +131,7 @@ def search_vens(target_type=None, target_values=None, skip=None, limit=None):  #
     venList = util.getTargets(vens, target_type, target_values)
     if skip != None:
         if len(vens) < skip:
-            problem = Problem(title="Not Found: skipped records not found", status="404")
-            logging.warning(f"search_all_vens(): problem={problem}")
-            return problem, HTTPStatus.NOT_FOUND
+            return [], HTTPStatus.OK
         venList = vens[skip:]
     if limit != None:
         venList = venList[:limit]
@@ -329,9 +327,7 @@ def search_ven_resources(ven_id, target_type=None, target_values=None, skip=None
     ven_resourceList = util.getTargets(ven.resources, target_type, target_values)
     if skip != None:
         if len(ven_resourceList) < skip:
-            problem = Problem(title="Not Found: skipped records not found", status="404")
-            logging.warning(f"search_all_ven_resources(): problem={problem}")
-            return problem, HTTPStatus.NOT_FOUND
+            return [], HTTPStatus.OK
         ven_resourceList = ven_resourceList[skip:]
     if limit != None:
         ven_resourceList = ven_resourceList[:limit]
