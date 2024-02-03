@@ -120,9 +120,7 @@ def search_all_programs(target_type=None, target_values=None, skip=None, limit=N
     programList = util.getTargets(programs, target_type, target_values)
     if skip != None:
         if len(programs) < skip:
-            problem = Problem(title="Not Found: skipped records not found", status="404")
-            logging.warning(f"search_all_programs(): problem={problem}")
-            return problem, HTTPStatus.NOT_FOUND
+            return [], HTTPStatus.OK
         programList = programs[skip:]
     if limit != None:
         programList = programList[:limit]

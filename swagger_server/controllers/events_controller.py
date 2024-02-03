@@ -120,10 +120,8 @@ def search_all_events(program_id=None, target_type=None, target_values=None, ski
             return eventList, HTTPStatus.OK
     eventList = util.getTargets(eventList, target_type, target_values)
     if skip != None:
-        if len(events) < skip:
-            problem = Problem(title="Not Found: skipped records not found", status="404")
-            logging.warning(f"search_all_events(): problem={problem}")
-            return problem, HTTPStatus.NOT_FOUND
+        if len(eventList) < skip:
+            return [], HTTPStatus.OK
         eventList = events[skip:]
     if limit != None:
         eventList = eventList[:limit]

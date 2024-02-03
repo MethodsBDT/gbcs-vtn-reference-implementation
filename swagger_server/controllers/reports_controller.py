@@ -120,9 +120,7 @@ def search_all_reports(program_id=None, event_id=None, client_name=None, skip=No
             return reports, HTTPStatus.OK
     if skip != None:
         if len(reports) < skip:
-            problem = Problem(title="Not Found: skipped records not found", status="404")
-            logging.warning(f"search_all_reports(): problem={problem}")
-            return problem, HTTPStatus.NOT_FOUND
+            return [], HTTPStatus.OK
         reports = reports[skip:]
     if limit != None:
         reports = reports[:limit]

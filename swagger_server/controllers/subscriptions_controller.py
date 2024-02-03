@@ -146,9 +146,7 @@ def search_subscriptions(program_id=None, client_name=None, target_type=None, ta
     subscriptions = util.getObjects(subscriptions, objects)
     if skip != None:
         if len(subscriptions) < skip:
-            problem = Problem(title="Not Found: skipped records not found", status="404")
-            logging.warning(f"search_all_subscriptions(): problem={problem}")
-            return problem, HTTPStatus.NOT_FOUND
+            return [], HTTPStatus.OK
         subscriptions = subscriptions[skip:]
     if limit != None:
         subscriptions = subscriptions[:limit]
