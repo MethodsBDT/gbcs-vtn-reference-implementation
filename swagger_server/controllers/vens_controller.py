@@ -31,6 +31,12 @@ def create_ven(body):  # noqa: E501
     if connexion.request.is_json:
         venBody = Ven.from_dict(connexion.request.get_json())  # noqa: E501
 
+    # object must have unique name
+    vens = objStore.search_all("VEN")
+    vensList = [v for v in vens if v.ven_name == venBody.ven_name]
+    if len(vensList) > 0:
+        return [], HTTPStatus.CONFLICT
+
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
 
@@ -216,15 +222,30 @@ def create_resource(body, ven_id):  # noqa: E501
         logging.warning(f"create_resource(): problem={problem}")
         return problem, status
 
-    if len(ven.resources) >= MAX_RESOURCES:
-        status = HTTPStatus.INSUFFICIENT_STORAGE
-        problem = Problem(title="Insufficient Storage ", status=str(status))
-        logging.warning(f"create_resource(): problem={problem}")
-        return problem, status
+    # if len(ven.resources) >= MAX_RESOURCES:
+    #     status = HTTPStatus.INSUFFICIENT_STORAGE
+    #     problem = Problem(title="Insufficient Storage ", status=str(status))
+    #     logging.warning(f"create_resource(): problem={problem}")
+    #     return problem, status
 
     resourceBody = None
     if connexion.request.is_json:
         resourceBody = Resource.from_dict(connexion.request.get_json())  # noqa: E501
+
+    # object must have unique name
+    ven = objStore.search("VEN", ven_id)
+    if type(ven) is not Ven:
+        status = ven
+        problem = Problem(title="object Storage issue", status=str(status))
+        logging.warning(f"create_resource(): problem={problem}")
+        return problem, status
+
+    logging.debug(f"search_all_ven_resources(): ven.resources={ven.resources}")
+
+    resources = ven.resources
+    resourceList = [r for r in resources if r.resource_name == resourceBody.resource_name]
+    if len(resourceList) > 0:
+        return [], HTTPStatus.CONFLICT
 
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
@@ -314,13 +335,13 @@ def search_ven_resources(ven_id, target_type=None, target_values=None, skip=None
     """
 
     logging.info(
-        f"search_all_ven_resources(): target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
+        f"search_ven_resources(): target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
 
     ven = objStore.search("VEN", ven_id)
     if type(ven) is not Ven:
         status = ven
         problem = Problem(title="object Storage issue", status=str(status))
-        logging.warning(f"search_ven_by_id(): problem={problem}")
+        logging.warning(f"search_ven_resources(): problem={problem}")
         return problem, status
 
     logging.debug(f"search_all_ven_resources(): ven.resources={ven.resources}")

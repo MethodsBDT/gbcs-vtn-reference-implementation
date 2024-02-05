@@ -25,10 +25,12 @@ def create_report(body=None):  # noqa: E501
     if connexion.request.is_json:
         reportBody = Report.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"create_report(): reportBody={reportBody}")
-    # if reportBody is None:
-    #     problem = Problem(title="Bad Request: No request body", status="400")
-    #     logging.warning(f"create_report(): problem={problem}")
-    #     return problem, 400
+
+    # object must have unique name
+    reports = objStore.search_all("REPORT")
+    reportList = [r for r in reports if r.report_name == reportBody.report_name]
+    if len(reportList) > 0:
+        return [], HTTPStatus.CONFLICT
     
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")

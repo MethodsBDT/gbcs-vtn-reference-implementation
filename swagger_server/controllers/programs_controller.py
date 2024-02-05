@@ -24,12 +24,13 @@ def create_program(body=None):  # noqa: E501
     programBody = None
     if connexion.request.is_json:
         programBody = Program.from_dict(connexion.request.get_json())  # noqa: E501
-        # logging.debug(f"create_program(): programBody={programBody}")
-    # TBD: is this necessary or handled by framework?
-    # if programBody is None:
-    #     problem = Problem(title="Bad Request: No request body", status="400")
-    #     logging.warning(f"create_program(): problem={problem}")
-    #     return problem, 400
+        logging.debug(f"create_program(): programBody={programBody}")
+
+    # object must have unique name
+    programs = objStore.search_all("PROGRAM")
+    programList = [p for p in programs if p.program_name == programBody.program_name]
+    if len(programList) > 0:
+        return [], HTTPStatus.CONFLICT
 
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")

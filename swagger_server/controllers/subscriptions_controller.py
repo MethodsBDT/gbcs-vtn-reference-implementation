@@ -27,6 +27,8 @@ def create_subscription(body):  # noqa: E501
     if connexion.request.is_json:
         subscriptionBody = Subscription.from_dict(connexion.request.get_json())  # noqa: E501
 
+    # Note: there is currently no concept of a duplicated subscription
+
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
 
