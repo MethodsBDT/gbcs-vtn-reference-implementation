@@ -26,10 +26,12 @@ def create_event(body=None):  # noqa: E501
     if connexion.request.is_json:
         eventBody = Event.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"create_event(): eventBody={eventBody}")
-    # if eventBody is None:
-    #     problem = Problem(title="Bad Request: No request body", status="400")
-    #     logging.warning(f"create_event(): problem={problem}")
-    #     return problem, 400
+
+    # object must have unique name
+    events = objStore.search_all("EVENT")
+    eventList = [e for e in events if e.event_name == eventBody.event_name]
+    if len(eventList) > 0:
+        return [], HTTPStatus.CONFLICT
 
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
@@ -189,9 +191,12 @@ def update_event(event_id, body=None):  # noqa: E501
     current_time = now.strftime("%H:%M:%S")
     event.modification_date_time = current_time
 
-    if eventBody.program_id != event.program_id:
-        problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
-        return problem, HTTPStatus.BAD_REQUEST
+    # Allow event to be assigned to other program
+    if eventBody.program_id is not None:
+        event.program_id = eventBody.program_id
+    # if eventBody.program_id != event.program_id:
+    #     problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
+    #     return problem, HTTPStatus.BAD_REQUEST
     if eventBody.event_name is not None:
         event.event_name = eventBody.event_name
     if eventBody.priority is not None:
