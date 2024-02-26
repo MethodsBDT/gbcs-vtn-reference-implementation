@@ -31,7 +31,19 @@ def create_report(body=None):  # noqa: E501
     reportList = [r for r in reports if r.report_name == reportBody.report_name]
     if len(reportList) > 0:
         return [], HTTPStatus.CONFLICT
-    
+
+    # object must refer to an existing program
+    programs = objStore.search_all("PROGRAM")
+    programList = [p for p in programs if p.id == reportBody.program_id]
+    if len(programList) == 0:
+        return [], HTTPStatus.BAD_REQUEST
+
+    # object must refer to an existing event
+    events = objStore.search_all("EVENT")
+    eventList = [p for p in events if p.id == reportBody.event_id]
+    if len(eventList) == 0:
+        return [], HTTPStatus.BAD_REQUEST
+
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
 
