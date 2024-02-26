@@ -25,13 +25,19 @@ def create_event(body=None):  # noqa: E501
     eventBody = None
     if connexion.request.is_json:
         eventBody = Event.from_dict(connexion.request.get_json())  # noqa: E501
-        logging.debug(f"create_event(): eventBody={eventBody}")
+        logging.info(f"create_event(): eventBody={eventBody}")
 
     # object must have unique name
     events = objStore.search_all("EVENT")
     eventList = [e for e in events if e.event_name == eventBody.event_name]
     if len(eventList) > 0:
         return [], HTTPStatus.CONFLICT
+
+    # object must refer to an existing program
+    programs = objStore.search_all("PROGRAM")
+    programList = [p for p in programs if p.id == eventBody.program_id]
+    if len(programList) == 0:
+        return [], HTTPStatus.BAD_REQUEST
 
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
