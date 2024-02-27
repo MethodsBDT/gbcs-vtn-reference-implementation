@@ -30,7 +30,9 @@ def create_program(body=None):  # noqa: E501
     programs = objStore.search_all("PROGRAM")
     programList = [p for p in programs if p.program_name == programBody.program_name]
     if len(programList) > 0:
-        return [], HTTPStatus.CONFLICT
+        problem = Problem(title="program with same name exists", status=HTTPStatus.CONFLICT)
+        logging.warning(f"create_subscription(): problem={problem}")
+        return problem, HTTPStatus.CONFLICT
 
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")

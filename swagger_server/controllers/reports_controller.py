@@ -30,19 +30,25 @@ def create_report(body=None):  # noqa: E501
     reports = objStore.search_all("REPORT")
     reportList = [r for r in reports if r.report_name == reportBody.report_name]
     if len(reportList) > 0:
-        return [], HTTPStatus.CONFLICT
+        problem = Problem(title="report with same name exists", status=HTTPStatus.CONFLICT)
+        logging.warning(f"create_subscription(): problem={problem}")
+        return problem, HTTPStatus.CONFLICT
 
     # object must refer to an existing program
     programs = objStore.search_all("PROGRAM")
     programList = [p for p in programs if p.id == reportBody.program_id]
     if len(programList) == 0:
-        return [], HTTPStatus.BAD_REQUEST
+        problem = Problem(title="program_id does not refer to an existing program", status=HTTPStatus.BAD_REQUEST)
+        logging.warning(f"create_subscription(): problem={problem}")
+        return problem, HTTPStatus.BAD_REQUEST
 
     # object must refer to an existing event
     events = objStore.search_all("EVENT")
     eventList = [p for p in events if p.id == reportBody.event_id]
     if len(eventList) == 0:
-        return [], HTTPStatus.BAD_REQUEST
+        problem = Problem(title="event_id does not refer to an existing event", status=HTTPStatus.BAD_REQUEST)
+        logging.warning(f"create_subscription(): problem={problem}")
+        return problem, HTTPStatus.BAD_REQUEST
 
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
