@@ -27,6 +27,14 @@ def create_subscription(body):  # noqa: E501
     if connexion.request.is_json:
         subscriptionBody = Subscription.from_dict(connexion.request.get_json())  # noqa: E501
 
+    # object must refer to an existing program
+    programs = objStore.search_all("PROGRAM")
+    programList = [p for p in programs if p.id == subscriptionBody.program_id]
+    if len(programList) == 0:
+        problem = Problem(title="program_id does not refer to an existing program", status=HTTPStatus.BAD_REQUEST)
+        logging.warning(f"create_subscription(): problem={problem}")
+        return problem, HTTPStatus.BAD_REQUEST
+
     # Note: there is currently no concept of a duplicated subscription
 
     now = datetime.now()

@@ -31,13 +31,17 @@ def create_event(body=None):  # noqa: E501
     events = objStore.search_all("EVENT")
     eventList = [e for e in events if e.event_name == eventBody.event_name]
     if len(eventList) > 0:
-        return [], HTTPStatus.CONFLICT
+        problem = Problem(title="event with same name exists", status=HTTPStatus.CONFLICT)
+        logging.warning(f"create_subscription(): problem={problem}")
+        return problem, HTTPStatus.CONFLICT
 
     # object must refer to an existing program
     programs = objStore.search_all("PROGRAM")
     programList = [p for p in programs if p.id == eventBody.program_id]
     if len(programList) == 0:
-        return [], HTTPStatus.BAD_REQUEST
+        problem = Problem(title="program_id does not refer to an existing program", status=HTTPStatus.BAD_REQUEST)
+        logging.warning(f"create_subscription(): problem={problem}")
+        return problem, HTTPStatus.BAD_REQUEST
 
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
