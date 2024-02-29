@@ -193,12 +193,10 @@ def update_event(event_id, body=None):  # noqa: E501
     current_time = now.strftime("%H:%M:%S")
     event.modification_date_time = current_time
 
-    # Allow event to be assigned to other program
-    if eventBody.program_id is not None:
-        event.program_id = eventBody.program_id
-    # if eventBody.program_id != event.program_id:
-    #     problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
-    #     return problem, HTTPStatus.BAD_REQUEST
+    # Do not llow event to be assigned to other program
+    if eventBody.program_id != event.program_id:
+        problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
+        return problem, HTTPStatus.BAD_REQUEST
     if eventBody.event_name is not None:
         event.event_name = eventBody.event_name
     if eventBody.priority is not None:
