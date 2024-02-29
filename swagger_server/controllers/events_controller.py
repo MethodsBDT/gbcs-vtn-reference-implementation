@@ -27,14 +27,6 @@ def create_event(body=None):  # noqa: E501
         eventBody = Event.from_dict(connexion.request.get_json())  # noqa: E501
         logging.info(f"create_event(): eventBody={eventBody}")
 
-    # object must have unique name
-    events = objStore.search_all("EVENT")
-    eventList = [e for e in events if e.event_name == eventBody.event_name]
-    if len(eventList) > 0:
-        problem = Problem(title="event with same name exists", status=HTTPStatus.CONFLICT)
-        logging.warning(f"create_subscription(): problem={problem}")
-        return problem, HTTPStatus.CONFLICT
-
     # object must refer to an existing program
     programs = objStore.search_all("PROGRAM")
     programList = [p for p in programs if p.id == eventBody.program_id]
