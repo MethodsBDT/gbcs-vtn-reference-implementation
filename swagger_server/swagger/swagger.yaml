@@ -1315,6 +1315,14 @@ paths:
         Use skip and pagination query params to limit response size.
       operationId: search_vens
       parameters:
+      - name: venName
+        in: query
+        description: Indicates ven objects w venName
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
       - name: targetType
         in: query
         description: "Indicates targeting type, e.g. GROUP"
@@ -1619,6 +1627,14 @@ paths:
         explode: false
         schema:
           $ref: '#/components/schemas/objectID'
+      - name: resourceName
+        in: query
+        description: Indicates resource objects with resourceName
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
       - name: targetType
         in: query
         description: "Indicates targeting type, e.g. GROUP"
