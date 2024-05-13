@@ -109,14 +109,16 @@ def search_ven_by_id(ven_id):  # noqa: E501
 
     return ven, HTTPStatus.OK
 
-def search_vens(target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
+def search_vens(ven_name=None, target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
     """search vens
 
     List all vens. Use skip and pagination query params to limit response size.  # noqa: E501
 
+    :param ven_name: return vens that match requested ven_name
+    :type ven_name: list | bytes
     :param targets: return vens that match requested targets
     :type targets: list | bytes
-     :param skip: number of records to skip for pagination.
+    :param skip: number of records to skip for pagination.
     :type skip: int
     :param limit: maximum number of records to return.
     :type limit: int
@@ -124,24 +126,31 @@ def search_vens(target_type=None, target_values=None, skip=None, limit=None):  #
     :rtype: List[Ven]
     """
     logging.info(
-        f"search_all_vens(): target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
+        f"search_vens(): ven_name={ven_name} target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
 
     vens = objStore.search_all("VEN")
-    logging.debug(f"search_all_vens(): vens={vens}")
+    logging.debug(f"search_vens(): vens={vens}")
     if type(vens) is not list:
         status = vens
         problem = Problem(title="object Storage issue", status=str(status))
-        logging.warning(f"search_all_vens(): problem={problem}")
+        logging.warning(f"search_vens(): problem={problem}")
         return problem, status
 
-    venList = util.getTargets(vens, target_type, target_values)
+    logging.info(f"search_vens(): vens={vens}")
+    venList = vens
+    if ven_name != None:
+        venList = [ven for ven in vens if ven.ven_name == ven_name]
+        if len(venList) == 0:
+            return venList, HTTPStatus.OK
+    venList = util.getTargets(venList, target_type, target_values)
     if skip != None:
         if len(vens) < skip:
             return [], HTTPStatus.OK
         venList = vens[skip:]
     if limit != None:
         venList = venList[:limit]
-    logging.debug(f"search_all_vens(): venList={venList}")
+
+    logging.debug(f"search_vens(): venList={venList}")
 
     subscription_callback("VEN", "GET", venList)
 
@@ -221,12 +230,6 @@ def create_resource(body, ven_id):  # noqa: E501
         problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"create_resource(): problem={problem}")
         return problem, status
-
-    # if len(ven.resources) >= MAX_RESOURCES:
-    #     status = HTTPStatus.INSUFFICIENT_STORAGE
-    #     problem = Problem(title="Insufficient Storage ", status=str(status))
-    #     logging.warning(f"create_resource(): problem={problem}")
-    #     return problem, status
 
     resourceBody = None
     if connexion.request.is_json:
@@ -317,13 +320,15 @@ def delete_ven_resource(ven_id, resource_id):  # noqa: E501
     subscription_callback("RESOURCE", "DELETE", venResource)
     return venResource
 
-def search_ven_resources(ven_id, target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
+def search_ven_resources(ven_id, resource_name: str =None, target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
     """search ven resources
 
     Return the ven resources specified by venID specified in path. # noqa: E501
 
     :param ven_id: Numeric ID of ven.
     :type ven_id: dict | bytes
+     param resource_name: return resources that match requested resource_name
+    :type resource_name: list | bytes
     :param targets: return resources that match requested targets
     :type targets: list | bytes
     :param skip: number of records to skip for pagination.
@@ -333,9 +338,11 @@ def search_ven_resources(ven_id, target_type=None, target_values=None, skip=None
 
     :rtype: Resource
     """
-
     logging.info(
-        f"search_ven_resources(): target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
+        f"search_ven_resources(): resource_name={resource_name} target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
+    # TBD: somehow string is received as '[/'name/']' ???
+    if resource_name != None and resource_name[0] == '[':
+        resource_name = resource_name[2: len(resource_name) - 2]
 
     ven = objStore.search("VEN", ven_id)
     if type(ven) is not Ven:
@@ -344,19 +351,29 @@ def search_ven_resources(ven_id, target_type=None, target_values=None, skip=None
         logging.warning(f"search_ven_resources(): problem={problem}")
         return problem, status
 
-    logging.debug(f"search_all_ven_resources(): ven.resources={ven.resources}")
-    ven_resourceList = util.getTargets(ven.resources, target_type, target_values)
+    resourceList = ven.resources
+    logging.info(f"search_ven_resources(): resourceList={resourceList}")
+    if resource_name != None:
+        # for resource in resourceList:
+        #     logging.info(f"resource.resource_name={resource.resource_name} resource_name={resource_name}")
+
+        resourceList = [resource for resource in ven.resources if resource.resource_name == resource_name]
+        # logging.info(f"search_ven_resources(): resourceList={resourceList}")
+        if len(resourceList) == 0:
+            return resourceList, HTTPStatus.OK
+    logging.info(f"search_ven_resources(): resourceList={resourceList}")
+    resourceList = util.getTargets(resourceList, target_type, target_values)
     if skip != None:
-        if len(ven_resourceList) < skip:
+        if len(resourceList) < skip:
             return [], HTTPStatus.OK
-        ven_resourceList = ven_resourceList[skip:]
+        resourceList = resourceList[skip:]
     if limit != None:
-        ven_resourceList = ven_resourceList[:limit]
-    logging.debug(f"search_all_ven_resources(): ven_resourceList={ven_resourceList}")
+        resourceList = resourceList[:limit]
+    logging.debug(f"search_ven_resources(): resourceList={resourceList}")
 
-    subscription_callback("RESOURCE", "GET", ven_resourceList)
+    subscription_callback("RESOURCE", "GET", resourceList)
 
-    return ven_resourceList
+    return resourceList
 
 def search_ven_resource_by_id(ven_id, resource_id):  # noqa: E501
     """search ven resources by ID
@@ -418,7 +435,7 @@ def update_ven_resource(ven_id, resource_id, body=None):  # noqa: E501
     if type(ven) is not Ven:
         status = ven
         problem = Problem(title="object Storage issue", status=str(status))
-        logging.warning(f"search_ven_by_id(): problem={problem}")
+        logging.warning(f"update_ven_resource(): problem={problem}")
         return problem, status
 
     logging.debug(f"update_ven_resource(): ven={ven}")
