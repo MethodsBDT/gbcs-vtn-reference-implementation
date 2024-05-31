@@ -2943,7 +2943,7 @@ components:
       format: date-time
       example: 2023-06-15T09:30:00Z
     duration:
-      pattern: "^P([0-9]+[YMD]){0,1}(T[0-9]+[HMS]){0,1}$"
+      pattern: "^(-?)P(?=\\d|T\\d)(?:(\\d+)Y)?(?:(\\d+)M)?(?:(\\d+)([DW]))?(?:T(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+(?:\\.\\d+)?)S)?)?$"
       type: string
       description: duration in ISO 8601 format
       example: PT1H
