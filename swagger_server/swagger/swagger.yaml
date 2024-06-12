@@ -3,6 +3,7 @@ info:
   title: OpenADR 3 API
   description: |
     The OpenADR 3 API supports energy retailer to energy customer Demand Response programs.
+    See OpenADR REST User Guide and Defintions for detailed descriptions of usage.
     The API includes the following capabilities and operations:
 
     __Manage programs:__
@@ -53,6 +54,7 @@ paths:
       summary: searches all programs
       description: |
         List all programs known to the server.
+        May filter results by targetType and targetValues as query params.
         Use skip and pagination query params to limit response size.
       operationId: search_all_programs
       parameters:
@@ -352,7 +354,7 @@ paths:
       summary: searches all reports
       description: |
         List all reports known to the server.
-        May filter results by programID and clientName as query param.
+        May filter results by programID, eventID,  and clientName as query param.
         Use skip and pagination query params to limit response size.
       operationId: search_all_reports
       parameters:
@@ -607,7 +609,7 @@ paths:
       tags:
       - reports
       summary: delete a report
-      description: Delete the program specified by the reportID in path.
+      description: Delete the report specified by the reportID in path.
       operationId: delete_report
       parameters:
       - name: reportID
@@ -660,7 +662,9 @@ paths:
       - events
       summary: searches all events
       description: |
-        List all events known to the server. May filter results by programID query param.
+        List all events known to the server.
+        May filter results by programID query param.
+        May filter results by targetType and targetValues as query params.
         Use skip and pagination query params to limit response size.
       operationId: search_all_events
       parameters:
@@ -970,7 +974,8 @@ paths:
       summary: search subscriptions
       description: |
         List all subscriptions.
-        May filter results by programID and clientID as query params.
+        May filter results by programID and clientName as query params.
+        May filter results by targetType and targetValues as query params.
         May filter results by objects as query param. See objectTypes schema.
         Use skip and pagination query params to limit response size.
       operationId: search_subscriptions
@@ -1312,6 +1317,8 @@ paths:
       summary: search vens
       description: |
         List all vens.
+        May filter results by venName as query param.
+        May filter results by targetType and targetValues as query params.
         Use skip and pagination query params to limit response size.
       operationId: search_vens
       parameters:
@@ -1616,7 +1623,11 @@ paths:
       tags:
       - vens
       summary: search ven resources
-      description: Return the ven resources specified by venID specified in path.
+      description: |
+        List all ven resources associated with ven with specified venID.
+        May filter results by resourceName as query params.
+        May filter results by targetType and targetValues as query params.
+        Use skip and pagination query params to limit response size.
       operationId: search_ven_resources
       parameters:
       - name: venID
@@ -1972,39 +1983,25 @@ paths:
       - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.vens_controller
   /auth/token:
-    get:
+    post:
       tags:
       - Auth
       summary: fetch a token
       description: Return an access token based on clientID and clientSecret.
       operationId: fetch_token
-      parameters:
-      - name: clientID
-        in: header
-        description: client ID to exchange for bearer token.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/clientCredentialRequest'
         required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          example: ven_client_99
-      - name: clientSecret
-        in: header
-        description: client secret to exchange for bearer token.
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          example: ven_secret_99
       responses:
         "200":
           description: OK.
           content:
             application/json:
               schema:
-                type: string
-                x-content-type: application/json
+                $ref: '#/components/schemas/clientCredentialResponse'
         "400":
           description: Bad Request.
           content:
@@ -2174,8 +2171,7 @@ components:
           maxLength: 128
           minLength: 1
           type: string
-          description: User generated identifier; may be VEN ID provisioned during
-            program enrollment.
+          description: User generated identifier; may be VEN ID provisioned out-of-band.
           example: VEN-999
         reportName:
           type: string
@@ -2279,7 +2275,7 @@ components:
           $ref: '#/components/schemas/dateTime'
         objectType:
           type: string
-          description: "Used as discriminator, e.g. notification.object"
+          description: Used as discriminator
           enum:
           - EVENT
         programID:
@@ -2411,7 +2407,7 @@ components:
           $ref: '#/components/schemas/dateTime'
         objectType:
           type: string
-          description: "Used as discriminator, e.g. notification.object"
+          description: Used as discriminator.
           enum:
           - SUBSCRIPTION
         clientName:
@@ -2419,7 +2415,7 @@ components:
           minLength: 1
           type: string
           description: "User generated identifier, may be VEN identifier provisioned\
-            \ during program enrollment."
+            \ out-of-band."
           example: VEN-999
         programID:
           $ref: '#/components/schemas/objectID'
@@ -2482,15 +2478,16 @@ components:
           $ref: '#/components/schemas/dateTime'
         objectType:
           type: string
-          description: "Used as discriminator, e.g. notification.object."
+          description: Used as discriminator.
           enum:
           - VEN
         venName:
           maxLength: 128
           minLength: 1
           type: string
-          description: "User generated identifier, may be VEN identifier provisioned\
-            \ during program enrollment."
+          description: |
+            User generated identifier, may be VEN identifier provisioned out-of-band.
+            venName is expected to be unqiue within the scope of a VTN
           example: VEN-999
         attributes:
           type: array
@@ -2565,15 +2562,16 @@ components:
           $ref: '#/components/schemas/dateTime'
         objectType:
           type: string
-          description: "Used as discriminator, e.g. notification.object"
+          description: Used as discriminator.
           enum:
           - RESOURCE
         resourceName:
           maxLength: 128
           minLength: 1
           type: string
-          description: "User generated identifier, resource may be configured with\
-            \ identifier out-of-band."
+          description: |
+            User generated identifier, resource may be configured with identifier out-of-band.
+            resourceName is expected to be unique within the scope of the associated VEN.
           example: RESOURCE-999
         venID:
           $ref: '#/components/schemas/objectID'
@@ -2649,7 +2647,7 @@ components:
           $ref: '#/components/schemas/duration'
       description: |
         Defines temporal aspects of intervals.
-        A duration of default null indicates infinity.
+        A duration of default PT0S indicates instantaneous or infinity, depending on payloadType.
         A randomizeStart of default null indicates no randomization.
       example:
         duration: null
@@ -2713,8 +2711,9 @@ components:
       properties:
         objectType:
           type: string
-          description: "Used as discriminator, e.g. program.payloadDescriptors"
-          default: EVENT_PAYLOAD_DESCRIPTOR
+          description: Used as discriminator.
+          enum:
+          - EVENT_PAYLOAD_DESCRIPTOR
         payloadType:
           maxLength: 128
           minLength: 1
@@ -2747,8 +2746,9 @@ components:
       properties:
         objectType:
           type: string
-          description: "Used as discriminator, e.g. program.payloadDescriptors"
-          default: REPORT_PAYLOAD_DESCRIPTOR
+          description: Used as discriminator.
+          enum:
+          - REPORT_PAYLOAD_DESCRIPTOR
         payloadType:
           maxLength: 128
           minLength: 1
@@ -2866,7 +2866,6 @@ components:
           default: 1
       description: |
         An object that may be used to request a report from a VEN.
-        See OpenADR REST User Guide for detailed description of how configure a report request.
       example:
         payloadType: USAGE
         startInterval: -1
@@ -2948,6 +2947,83 @@ components:
       description: duration in ISO 8601 format
       example: PT1H
       default: PT0S
+    clientCredentialRequest:
+      required:
+      - clientID
+      - clientSecret
+      type: object
+      properties:
+        grant_type:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: "OAuth2 grant type, must be 'client_credentials'"
+          example: client_credentials
+          enum:
+          - client_credentials
+        clientID:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: client ID to exchange for bearer token.
+          example: ven_client_99
+        clientSecret:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: client secret to exchange for bearer token.
+          example: ven_secret_99
+        scope:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: application defined scope.
+          example: read_all
+      description: |
+        Body of POST request to /auth/token.
+    clientCredentialResponse:
+      required:
+      - access_token
+      type: object
+      properties:
+        access_token:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: access token povided by Authorization service
+          example: MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3
+        token_type:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: "token type, must be Bearer."
+          example: Bearer
+          enum:
+          - Bearer
+        expires_in:
+          type: integer
+          description: expiration period in seconds.
+          example: 3600
+        refresh_token:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: refresh token povided by Authorization service
+          example: IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk
+        scope:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: application defined scope.
+          example: read_all
+      description: |
+        Body response from /auth/token.
+      example:
+        access_token: MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3
+        refresh_token: IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk
+        scope: read_all
+        token_type: Bearer
+        expires_in: 3600
     problem:
       type: object
       properties:
