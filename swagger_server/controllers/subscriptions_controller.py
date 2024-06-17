@@ -55,6 +55,12 @@ def create_subscription(body):  # noqa: E501
         logging.warning(f"create_subscription(): problem={problem}")
         return problem, status
 
+    status = subscription_callback_echo_test(subscriptionBody.object_operations)
+    if status != HTTPStatus.OK:
+        problem = Problem(title="Echo issue", status=str(status))
+        logging.warning(f"create_subscription(): problem={problem}")
+        return problem, status
+
     subscription_callback("SUBSCRIPTION", "POST", subscription)
 
     return subscription, HTTPStatus.CREATED
@@ -224,9 +230,9 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
 
     return (subscription)
 
-def subscription_callback(resourceName, operation, object):
+def subscription_callback(resourceName, operation, subscriptionObj):
     logging.info(f"subscription_callback(): resourceName={resourceName}, operation={operation}")
-    logging.debug(f"subscription_callback(): object={object}")
+    logging.debug(f"subscription_callback(): subscriptionObj={subscriptionObj}")
 
     subscriptions = objStore.search_all("SUBSCRIPTION")
     logging.debug(f"subscription_callback(): subscriptions={subscriptions}")
@@ -237,9 +243,9 @@ def subscription_callback(resourceName, operation, object):
         return problem, status
 
     for subscription in subscriptions:
-        resource = next((resource for resource in subscription.object_operations if
-                         resourceName in resource.objects and operation in resource.operations), None)
-        if resource is not None:
+        objOperation = next((objOperation for objOperation in subscription.object_operations if
+                         resourceName in objOperation.objects and operation in objOperation.operations), None)
+        if objOperation is not None:
             if hasattr(object, "targets") and object.targets is not None and hasattr(subscription, "targets") and subscription.targets is not None:
                 for target in object.targets:
                     targetObj = next((targetObj for targetObj in subscription.targets if
@@ -251,17 +257,35 @@ def subscription_callback(resourceName, operation, object):
                                        value in targetValue), None)
 
                             if targetValue is None:
-                                logging.debug(f"subscription_callback: no matching targets")
+                                logging.debug(f"subscription_callback: no matching targetValue")
                                 return None
                     else:
-                        logging.debug(f"subscription_callback: no matching targets")
+                        logging.debug(f"subscription_callback: no matching targetObj")
                         return None
 
-            notification = Notification(object_type=resourceName, operation=operation, targets=None, object=object)
+            notification = Notification(object_type=resourceName, operation=operation, targets=None, object=subscriptionObj)
 
-            logging.info(f"subscription_callback(): notification={notification} callback_url={resource.callback_url}")
-            headers = { "Authorization": f"Bearer {resource.bearer_token}"}
+            logging.info(f"subscription_callback(): notification={notification} callback_url={objOperation.callback_url}")
+            headers = { "Authorization": f"Bearer {objOperation.bearer_token}"}
 
-            response = requests.post(resource.callback_url, json=json.dumps(notification.to_dict()), headers=headers)
+            response = requests.post(objOperation.callback_url, json=json.dumps(notification.to_dict()), headers=headers)
             if response.status_code != HTTPStatus.OK:
                 logging.warning(f"subscription_callback: callback response.status_code={response.status_code}")
+
+
+def subscription_callback_echo_test(operations):
+    # verify callback service by sending request with echo parameter
+    for operation in operations:
+        logging.info(f"subscription_callback_echo_test(): operation={operation}")
+
+        headers = {"Authorization": f"Bearer {operation.bearer_token}"}
+        params = {"echo": "test_echo"}
+        response = requests.get(operation.callback_url+"/echo", params=params, headers=headers)
+
+        if response.status_code != HTTPStatus.OK:
+            logging.warning(f"subscription_callback: callback response.status_code={response.status_code}")
+        content = response.content.decode('utf8').replace("'", '"')
+        if "test_echo" not in content:
+            logging.warning(f"subscription_callback: callback content={content}")
+            return HTTPStatus.INTERNAL_SERVER_ERROR
+        return HTTPStatus.OK
