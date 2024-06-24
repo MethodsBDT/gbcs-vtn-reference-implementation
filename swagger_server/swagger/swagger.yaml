@@ -3,7 +3,7 @@ info:
   title: OpenADR 3 API
   description: |
     The OpenADR 3 API supports energy retailer to energy customer Demand Response programs.
-    See OpenADR REST User Guide and Defintions for detailed descriptions of usage.
+    See OpenADR 3 User Guide and Defintions for detailed descriptions of usage.
     The API includes the following capabilities and operations:
 
     __Manage programs:__
@@ -2036,7 +2036,7 @@ components:
           $ref: '#/components/schemas/dateTime'
         objectType:
           type: string
-          description: "Used as discriminator, e.g. notification.object"
+          description: Used as discriminator
           enum:
           - PROGRAM
         programName:
@@ -2160,7 +2160,7 @@ components:
           $ref: '#/components/schemas/dateTime'
         objectType:
           type: string
-          description: "Used as discriminator, e.g. notification.object"
+          description: Used as discriminator
           enum:
           - REPORT
         programID:
@@ -2319,7 +2319,7 @@ components:
             $ref: '#/components/schemas/interval'
       description: |
         Event object to communicate a Demand Response request to VEN.
-        If intervalPeriod is present, sets start time and duration of intervals.
+        If intervalPeriod is present, sets default start time and duration of intervals.
       example:
         payloadDescriptors:
         - payloadType: PRICE
@@ -2487,7 +2487,7 @@ components:
           type: string
           description: |
             User generated identifier, may be VEN identifier provisioned out-of-band.
-            venName is expected to be unqiue within the scope of a VTN
+            venName is expected to be unique within the scope of a VTN
           example: VEN-999
         attributes:
           type: array
