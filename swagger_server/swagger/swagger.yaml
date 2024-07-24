@@ -1991,7 +1991,7 @@ paths:
       operationId: fetch_token
       requestBody:
         content:
-          application/json:
+          application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/clientCredentialRequest'
         required: true
@@ -2942,18 +2942,19 @@ components:
       format: date-time
       example: 2023-06-15T09:30:00Z
     duration:
-      pattern: "^(-?)P(?=\\d|T\\d)(?:(\\d+)Y)?(?:(\\d+)M)?(?:(\\d+)([DW]))?(?:T(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+(?:\\.\\d+)?)S)?)?$"
+      pattern: "^(-?)P(?=\\d|T\\d)(?:(\\d+)Y)?(?:(\\d+)M)?(?:(\\d+)([DW]))?(?:T(?:(\\\
+        d+)H)?(?:(\\d+)M)?(?:(\\d+(?:\\.\\d+)?)S)?)?$"
       type: string
       description: duration in ISO 8601 format
       example: PT1H
       default: PT0S
     clientCredentialRequest:
       required:
-      - clientID
+      - clientId
       - clientSecret
       type: object
       properties:
-        grant_type:
+        grantType:
           maxLength: 128
           minLength: 1
           type: string
@@ -2961,7 +2962,7 @@ components:
           example: client_credentials
           enum:
           - client_credentials
-        clientID:
+        clientId:
           maxLength: 128
           minLength: 1
           type: string
@@ -2983,16 +2984,16 @@ components:
         Body of POST request to /auth/token.
     clientCredentialResponse:
       required:
-      - access_token
+      - accessToken
       type: object
       properties:
-        access_token:
+        accessToken:
           maxLength: 128
           minLength: 1
           type: string
           description: access token povided by Authorization service
           example: MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3
-        token_type:
+        tokenType:
           maxLength: 128
           minLength: 1
           type: string
@@ -3000,11 +3001,11 @@ components:
           example: Bearer
           enum:
           - Bearer
-        expires_in:
+        expiresIn:
           type: integer
           description: expiration period in seconds.
           example: 3600
-        refresh_token:
+        refreshToken:
           maxLength: 128
           minLength: 1
           type: string
@@ -3019,11 +3020,11 @@ components:
       description: |
         Body response from /auth/token.
       example:
-        access_token: MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3
-        refresh_token: IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk
+        expiresIn: 3600
         scope: read_all
-        token_type: Bearer
-        expires_in: 3600
+        accessToken: MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3
+        tokenType: Bearer
+        refreshToken: IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk
     problem:
       type: object
       properties:

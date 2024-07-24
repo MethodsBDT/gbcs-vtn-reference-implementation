@@ -10,21 +10,28 @@ from swagger_server import util
 from swagger_server.services.auth.auth_provider import AuthServiceProvider
 
 
-def fetch_token(body):  # noqa: E501
+def fetch_token(**kwargs):  # noqa: E501
+# def fetch_token(grant_type, client_id, client_secret, scope):  # noqa: E501
+
     """fetch a token
 
     Return an access token based on clientID and clientSecret. # noqa: E501
 
-    :param body:
-    :type body: dict | bytes
+    :param grant_type: 
+    :type grant_type: str
+    :param client_id: 
+    :type client_id: str
+    :param client_secret: 
+    :type client_secret: str
+    :param scope: 
+    :type scope: str
 
     :rtype: ClientCredentialResponse
     """
-    if connexion.request.is_json:
-        body = ClientCredentialRequest.from_dict(connexion.request.get_json())  # noqa: E501
 
-    client_id = body.client_id
-    client_secret = body.client_secret
+    body = kwargs.get('body')
+    client_id = body.get('client_id')
+    client_secret = body.get('client_secret')
     logging.debug(f'fetch_token: body={client_id} client_secret={client_secret}')
 
     auth_provider = AuthServiceProvider()
