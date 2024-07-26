@@ -37,10 +37,10 @@ class ClientCredentialResponse(Model):
         }
 
         self.attribute_map = {
-            'access_token': 'accessToken',
-            'token_type': 'tokenType',
-            'expires_in': 'expiresIn',
-            'refresh_token': 'refreshToken',
+            'access_token': 'access_token',
+            'token_type': 'token_type',
+            'expires_in': 'expires_in',
+            'refresh_token': 'refresh_token',
             'scope': 'scope'
         }
         self._access_token = access_token

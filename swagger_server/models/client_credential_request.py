@@ -34,9 +34,9 @@ class ClientCredentialRequest(Model):
         }
 
         self.attribute_map = {
-            'grant_type': 'grantType',
-            'client_id': 'clientId',
-            'client_secret': 'clientSecret',
+            'grant_type': 'grant_type',
+            'client_id': 'client_id',
+            'client_secret': 'client_secret',
             'scope': 'scope'
         }
         self._grant_type = grant_type
