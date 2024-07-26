@@ -2950,11 +2950,11 @@ components:
       default: PT0S
     clientCredentialRequest:
       required:
-      - clientId
-      - clientSecret
+      - client_id
+      - client_secret
       type: object
       properties:
-        grantType:
+        grant_type:
           maxLength: 128
           minLength: 1
           type: string
@@ -2962,13 +2962,13 @@ components:
           example: client_credentials
           enum:
           - client_credentials
-        clientId:
+        client_id:
           maxLength: 128
           minLength: 1
           type: string
           description: client ID to exchange for bearer token.
           example: ven_client_99
-        clientSecret:
+        client_secret:
           maxLength: 128
           minLength: 1
           type: string
@@ -2981,19 +2981,19 @@ components:
           description: application defined scope.
           example: read_all
       description: |
-        Body of POST request to /auth/token.
+        Body of POST request to /auth/token. Note snake case per https://www.rfc-editor.org/rfc/rfc6749
     clientCredentialResponse:
       required:
-      - accessToken
+      - access_token
       type: object
       properties:
-        accessToken:
+        access_token:
           maxLength: 128
           minLength: 1
           type: string
           description: access token povided by Authorization service
           example: MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3
-        tokenType:
+        token_type:
           maxLength: 128
           minLength: 1
           type: string
@@ -3001,11 +3001,11 @@ components:
           example: Bearer
           enum:
           - Bearer
-        expiresIn:
+        expires_in:
           type: integer
           description: expiration period in seconds.
           example: 3600
-        refreshToken:
+        refresh_token:
           maxLength: 128
           minLength: 1
           type: string
@@ -3018,13 +3018,13 @@ components:
           description: application defined scope.
           example: read_all
       description: |
-        Body response from /auth/token.
+        Body response from /auth/token. Note snake case per https://www.rfc-editor.org/rfc/rfc6749
       example:
-        expiresIn: 3600
+        access_token: MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3
+        refresh_token: IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk
         scope: read_all
-        accessToken: MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3
-        tokenType: Bearer
-        refreshToken: IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk
+        token_type: Bearer
+        expires_in: 3600
     problem:
       type: object
       properties:
