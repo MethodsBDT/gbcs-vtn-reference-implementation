@@ -2007,7 +2007,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/problem'
+                $ref: '#/components/schemas/authError'
         "403":
           description: Forbidden.
           content:
@@ -2952,30 +2952,29 @@ components:
       required:
       - client_id
       - client_secret
+      - grant_type
       type: object
       properties:
         grant_type:
-          maxLength: 128
-          minLength: 1
           type: string
           description: "OAuth2 grant type, must be 'client_credentials'"
           example: client_credentials
           enum:
           - client_credentials
         client_id:
-          maxLength: 128
+          maxLength: 4096
           minLength: 1
           type: string
           description: client ID to exchange for bearer token.
           example: ven_client_99
         client_secret:
-          maxLength: 128
+          maxLength: 4096
           minLength: 1
           type: string
           description: client secret to exchange for bearer token.
           example: ven_secret_99
         scope:
-          maxLength: 128
+          maxLength: 4096
           minLength: 1
           type: string
           description: application defined scope.
@@ -2985,17 +2984,16 @@ components:
     clientCredentialResponse:
       required:
       - access_token
+      - token_type
       type: object
       properties:
         access_token:
-          maxLength: 128
+          maxLength: 4096
           minLength: 1
           type: string
           description: access token povided by Authorization service
           example: MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3
         token_type:
-          maxLength: 128
-          minLength: 1
           type: string
           description: "token type, must be Bearer."
           example: Bearer
@@ -3006,13 +3004,13 @@ components:
           description: expiration period in seconds.
           example: 3600
         refresh_token:
-          maxLength: 128
+          maxLength: 4096
           minLength: 1
           type: string
           description: refresh token povided by Authorization service
           example: IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk
         scope:
-          maxLength: 128
+          maxLength: 4096
           minLength: 1
           type: string
           description: application defined scope.
@@ -3025,6 +3023,50 @@ components:
         scope: read_all
         token_type: Bearer
         expires_in: 3600
+    authError:
+      required:
+      - error
+      type: object
+      properties:
+        error:
+          type: string
+          description: "As described in rfc6749 | invalid_request – The request is\
+            \ missing a parameter so the server can’t proceed with the request. This\
+            \ may also be returned if the request includes an unsupported parameter\
+            \ or repeats a parameter. invalid_client – Client authentication failed,\
+            \ such as if the request contains an invalid client ID or secret. Send\
+            \ an HTTP 401 response in this case. invalid_grant – The authorization\
+            \ code (or user’s password for the password grant type) is invalid or\
+            \ expired. This is also the error you would return if the redirect URL\
+            \ given in the authorization grant does not match the URL provided in\
+            \ this access token request. invalid_scope – For access token requests\
+            \ that include a scope (password or client_credentials grants), this error\
+            \ indicates an invalid scope value in the request. unauthorized_client\
+            \ – This client is not authorized to use the requested grant type. For\
+            \ example, if you restrict which applications can use the Implicit grant,\
+            \ you would return this error for the other apps. unsupported_grant_type\
+            \ – If a grant type is requested that the authorization server doesn’\
+            t recognize, use this code. Note that unknown grant types also use this\
+            \ specific error code rather than using the invalid_request above."
+          example: invalid_request
+          enum:
+          - invalid_request
+          - invalid_client
+          - invalid_grant
+          - invalid_scope
+          - unauthorized_client
+          - unsupported_grant_type
+        error_description:
+          type: string
+          description: Should be a sentence or two at most describing the circumstance
+            of the error
+          example: Request was missing the 'client_id' parameter.
+        error_uri:
+          type: string
+          description: Optional reference to more detailed error description
+          format: uri
+          example: See the full API docs at https://authorization-server.com/docs/access_toke
+      description: error reponse on HTTP 400 from auth/token per https://www.rfc-editor.org/rfc/rfc6749
     problem:
       type: object
       properties:
