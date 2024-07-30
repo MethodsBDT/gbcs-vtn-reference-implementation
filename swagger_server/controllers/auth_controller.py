@@ -3,7 +3,7 @@ from http import HTTPStatus
 import logging
 import six
 
-from swagger_server.models.client_credential_request import ClientCredentialRequest  # noqa: E501
+from swagger_server.models.auth_error import AuthError  # noqa: E501
 from swagger_server.models.client_credential_response import ClientCredentialResponse  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server import util
@@ -11,8 +11,6 @@ from swagger_server.services.auth.auth_provider import AuthServiceProvider
 
 
 def fetch_token(**kwargs):  # noqa: E501
-# def fetch_token(grant_type, client_id, client_secret, scope):  # noqa: E501
-
     """fetch a token
 
     Return an access token based on clientID and clientSecret. # noqa: E501
