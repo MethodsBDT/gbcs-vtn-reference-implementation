@@ -2975,7 +2975,7 @@ components:
           example: ven_secret_99
         scope:
           maxLength: 4096
-          minLength: 1
+          minLength: 0
           type: string
           description: application defined scope.
           example: read_all
@@ -3011,7 +3011,7 @@ components:
           example: IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk
         scope:
           maxLength: 4096
-          minLength: 1
+          minLength: 0
           type: string
           description: application defined scope.
           example: read_all
