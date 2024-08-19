@@ -8,7 +8,7 @@ from swagger_server.models.client_credential_response import ClientCredentialRes
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server import util
 from swagger_server.services.auth.auth_provider import AuthServiceProvider
-
+from swagger_server.controllers.authorization_controller import check_oAuth2ClientCredentials
 
 def fetch_token(**kwargs):  # noqa: E501
     """fetch a token
@@ -35,7 +35,9 @@ def fetch_token(**kwargs):  # noqa: E501
     auth_provider = AuthServiceProvider()
     try:
         token =  auth_provider.get_token(client_id, client_secret)
-        response = ClientCredentialResponse(access_token=token, token_type="Bearer")
+        scopes = check_oAuth2ClientCredentials(token)
+        scope = scopes["scopes"]
+        response = ClientCredentialResponse(access_token=token, token_type="Bearer", scope=scope)
         return response, HTTPStatus.OK
     except IOError:
         problem = Problem(title="Could not fetch token", status=str(HTTPStatus.INTERNAL_SERVER_ERROR))
