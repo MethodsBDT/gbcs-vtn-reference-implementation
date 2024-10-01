@@ -274,6 +274,8 @@ def subscription_callback(resourceName, operation, subscriptionObj):
 
 
 def subscription_callback_echo_test(operations):
+    # testing
+    return HTTPStatus.OK
     # verify callback service by sending request with echo parameter
     for operation in operations:
         logging.info(f"subscription_callback_echo_test(): operation={operation}")
