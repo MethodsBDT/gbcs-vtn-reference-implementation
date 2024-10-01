@@ -274,8 +274,8 @@ def subscription_callback(resourceName, operation, subscriptionObj):
 
 
 def subscription_callback_echo_test(operations):
-    # testing
-    return HTTPStatus.OK
+    logging.info(f"subscription_callback_echo_test(): operations={operations}")
+
     # verify callback service by sending request with echo parameter
     for operation in operations:
         logging.info(f"subscription_callback_echo_test(): operation={operation}")
@@ -287,12 +287,12 @@ def subscription_callback_echo_test(operations):
         if response.status_code != HTTPStatus.OK:
             logging.warning(f"subscription_callback_echo_test(): response.status_code NOT OK")
             return response.status_code
-        if "test_echo" not in response.content:
-            # this appears to be an artifact of the framework
-            content = response.content.decode('utf8').replace("'", '"')
-            if "test_echo" not in content:
-                logging.warning(f"subscription_callback_echo_test(): test_echo not in response")
-                # TBD: return 500?
-                return HTTPStatus.OK
+        # if "test_echo" not in response.content:
+        #     # this appears to be an artifact of the framework
+        #     content = response.content.decode('utf8').replace("'", '"')
+        #     if "test_echo" not in content:
+        #         logging.warning(f"subscription_callback_echo_test(): test_echo not in response")
+        #         # TBD: return 500?
+        #         return HTTPStatus.OK
 
     return HTTPStatus.OK
