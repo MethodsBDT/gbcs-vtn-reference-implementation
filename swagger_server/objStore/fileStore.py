@@ -146,7 +146,7 @@ class FileStore(ObjStore):
         saved_data = self.__read_file()
         _list = __get_type__(object_type, saved_data)
         logging.debug(f"FileStore.search(): list={_list}")
-        return next((obj for obj in _list if str(obj.id) == str(id)), HTTPStatus.FORBIDDEN)
+        return next((obj for obj in _list if str(obj.id) == str(id)), HTTPStatus.NOT_FOUND)
 
 
 def __get_type__(object_type, data_model: DataModel) -> list:
