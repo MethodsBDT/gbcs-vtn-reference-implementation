@@ -282,7 +282,7 @@ def subscription_callback_echo_test(operations):
 
         headers = {"Authorization": f"Bearer {operation.bearer_token}"}
         params = {"echo": "test_echo"}
-        # response = requests.get(operation.callback_url+"/echo", params=params, headers=headers)
+        response = requests.get(operation.callback_url+"/echo", params=params, headers=headers)
 
         # if response.status_code != HTTPStatus.OK:
         #     logging.warning(f"subscription_callback_echo_test(): response.status_code NOT OK. response={response}")
