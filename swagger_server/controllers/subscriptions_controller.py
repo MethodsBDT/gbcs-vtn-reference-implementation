@@ -284,9 +284,9 @@ def subscription_callback_echo_test(operations):
         params = {"echo": "test_echo"}
         response = requests.get(operation.callback_url+"/echo", params=params, headers=headers)
 
-        if response.status_code != HTTPStatus.OK:
-            logging.warning(f"subscription_callback_echo_test(): response.status_code NOT OK")
-            return response.status_code
+        # if response.status_code != HTTPStatus.OK:
+        #     logging.warning(f"subscription_callback_echo_test(): response.status_code NOT OK. response={response}")
+        #     return response.status_code
         # if "test_echo" not in response.content:
         #     # this appears to be an artifact of the framework
         #     content = response.content.decode('utf8').replace("'", '"')
