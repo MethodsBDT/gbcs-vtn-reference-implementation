@@ -283,9 +283,16 @@ def subscription_callback_echo_test(operations):
         response = requests.get(operation.callback_url+"/echo", params=params, headers=headers)
 
         if response.status_code != HTTPStatus.OK:
-            logging.warning(f"subscription_callback: callback response.status_code={response.status_code}")
-        content = response.content.decode('utf8').replace("'", '"')
-        if "test_echo" not in content:
-            logging.warning(f"subscription_callback: callback content={content}")
-            # return HTTPStatus.INTERNAL_SERVER_ERROR
+            status = response.status_code
+            problem = Problem(title="subscription echo issue", status=str(status))
+            logging.warning(f"subscription_callback_echo_test(): problem={problem}")
+            return problem, status
+        if "test_echo" not in response.content:
+            # this appears to be an artifact of the framework
+            content = response.content.decode('utf8').replace("'", '"')
+            if "test_echo" not in response.content:
+                status = response.status_code
+                problem = Problem(title="subscription echo issue: test_echo not returned", status=str(status))
+                logging.warning(f"subscription_callback_echo_test(): problem={problem}")
+                return problem, status
         return HTTPStatus.OK
