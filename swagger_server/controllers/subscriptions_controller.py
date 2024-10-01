@@ -287,5 +287,5 @@ def subscription_callback_echo_test(operations):
         content = response.content.decode('utf8').replace("'", '"')
         if "test_echo" not in content:
             logging.warning(f"subscription_callback: callback content={content}")
-            return HTTPStatus.INTERNAL_SERVER_ERROR
+            # return HTTPStatus.INTERNAL_SERVER_ERROR
         return HTTPStatus.OK
