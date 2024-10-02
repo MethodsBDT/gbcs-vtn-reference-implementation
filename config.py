@@ -4,7 +4,10 @@ import sys
 
 # Server configuration
 SERVER_PORT = 8080
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+
+# Logging
+LOG_LEVEL = os.getenv('LOG_LEVEL', logging.INFO)
+logging.basicConfig(stream=sys.stdout, level=LOG_LEVEL)
 
 # OIDC Authorization Provider
 OIDC_AUTH_ENABLED = os.getenv('OIDC_AUTH_ENABLED', False)
