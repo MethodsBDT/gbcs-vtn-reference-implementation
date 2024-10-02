@@ -5,7 +5,7 @@ import sys
 # Server configuration
 SERVER_PORT = 8080
 
-# Logging
+# Control log level via ENV variable
 LOG_LEVEL = os.getenv('LOG_LEVEL', logging.INFO)
 logging.basicConfig(stream=sys.stdout, level=LOG_LEVEL)
 
