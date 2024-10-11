@@ -76,21 +76,21 @@ class FileStore(ObjStore):
         self.id_counter = 0
 
     def __read_file(self) -> DataModel:
-        print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        logging.debug(f"FileStore.__read_file(): datetime={datetime.now().strftime('%Y-%m-%d %H:%M:%S')}" )
         with open(self.file_path, "r+") as f:
             read = f.read()
-            print(f'Read: {read}')
+            logging.debug(f'FileStore.__read_file(): Read: {read}')
             data = from_dict(jsonpickle.decode(read))
-            print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            logging.debug(f"FileStore.__read_file(): datetime={datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
             return data
 
     def __write_file(self, data: DataModel):
-        print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        logging.debug(f"FileStore.__write_file(): datetime={datetime.now().strftime('%Y-%m-%d %H:%M:%S')}" )
         with open(self.file_path, "w+") as f:
             json_data = data.to_json()
-            print(f'Write: {json_data}')
+            logging.debug(f'FileStore.__write_file(): Write: {json_data}')
             f.write(json_data)
-            print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            logging.debug(f"FileStore.__write_file(): datetime={datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
     def insert(self, obj):
         object_type = obj.object_type
