@@ -7,6 +7,7 @@ SERVER_PORT = 8080
 
 # Control log level via ENV variable
 LOG_LEVEL = int(os.getenv('LOG_LEVEL', logging.INFO))
+LOG_LEVEL = logging.DEBUG
 logging.basicConfig(stream=sys.stdout, level=LOG_LEVEL)
 logging.info(f"config: log level = {LOG_LEVEL}")
 
