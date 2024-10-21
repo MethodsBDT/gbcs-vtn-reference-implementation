@@ -1,4 +1,4 @@
-# OpenADR 3 Virtual Top Note (VTN) Reference Implementation
+# OpenADR 3 Virtual Top Node (VTN) Reference Implementation
 
 ## Requirements
 Python 3.5.2+ (tested on 3.9.0)
