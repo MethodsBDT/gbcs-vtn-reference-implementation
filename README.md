@@ -46,7 +46,7 @@ The [openadr3-test-tool](https://github.com/oadr3-org/openadr3-test-tool) repo c
 
 ### Integration Tests
 
-**NOTE: This feature is currently not working, see Issue #63, PRs to fix this are welcome!**
+**NOTE: This feature is currently not working, see Issue [#63](https://github.com/oadr3-org/openadr3-vtn-reference-implementation/issues/63), PRs to fix this are welcome!**
 
 ```
 pip install tox
@@ -55,7 +55,7 @@ tox
 
 ## Viewing the OpenAPI specs from the running VTN
 
-**NOTE: This feature is currently not working, see Issue #81, PRs to fix this are welcome!**
+**NOTE: This feature is currently not working, see Issue [#81](https://github.com/oadr3-org/openadr3-vtn-reference-implementation/issues/81), PRs to fix this are welcome!**
 
 Open your browser to: `http://localhost:8080/openadr3/3.0.1/ui/`
 
@@ -64,8 +64,6 @@ Before interacting with API, select the `Authorize` button at top Right of API o
 
 In dialog, type one of two pre-defined tokens, "ven_token" or "bl_token", into BearerAuth value text box.
 Select `Authorize`, and `Close`.
-
-```
 
 ## Implementation Details
 
