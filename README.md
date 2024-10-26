@@ -28,6 +28,12 @@ Note the presence of Dockerfile-lambda. This is used by a CI/CD pipeline to crea
 docker image which is pushed to a cloud environment to support the online OADR3 Test Tool. 
 The details of the CI/CD pipeline are described elsewhere.
 
+The above assumes that you are building a Docker image for the same architecture as the host you are building them on.
+If building a Docker image for another architecture, the `--platform` flag must be specified.
+And to build a multi-platform image, list each architecture, e.g. `--platform linux/arm64,linux/amd64`
+[This blog post from David Herron](https://techsparx.com/software-development/docker/tutorials/multi-stage-multi-platform.html) provides further explanation and insight.
+
+
 ## Interacting with the running VTN
 
 The VTN listens for requests on
