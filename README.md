@@ -24,6 +24,9 @@ docker build -t swagger_server .
 # starting up a container
 docker run -p 8080:8080 swagger_server
 ```
+Note the presence of Dockerfile-lambda. This is used by a CI/CD pipeline to create a 
+docker image which is pushed to a cloud environment to support the online OADR3 Test Tool. 
+The details of the CI/CD pipeline are described elsewhere.
 
 ## Interacting with the running VTN
 
