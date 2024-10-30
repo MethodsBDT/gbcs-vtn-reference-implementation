@@ -13,11 +13,8 @@ if root.handlers:
 # Control log level via ENV variable
 LOG_LEVEL = int(os.getenv('LOG_LEVEL', logging.DEBUG))
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-
-logging.info(f"config: info log level is working, log level = {LOG_LEVEL}")
-logging.debug(f"config: debug log level is working, log level = {LOG_LEVEL}")
-logging.warning(f"config: warning log level is working, log level = {LOG_LEVEL}")
+logging.basicConfig(stream=sys.stdout, level=LOG_LEVEL)
+logging.info(f"config:log level is working, log level = {LOG_LEVEL}")
 
 # OIDC Authorization Provider
 OIDC_AUTH_ENABLED = os.getenv('OIDC_AUTH_ENABLED', False)
