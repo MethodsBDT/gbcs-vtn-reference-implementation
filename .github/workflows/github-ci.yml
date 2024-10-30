@@ -4,8 +4,6 @@ on:
   push:
      branches:
        - "main"
-       - "feature/config-debug-log-level"
-
   workflow_dispatch:
 
 jobs:
