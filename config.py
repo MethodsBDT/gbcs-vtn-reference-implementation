@@ -5,11 +5,16 @@ import sys
 # Server configuration
 SERVER_PORT = 8080
 
+root = logging.getLogger()
+if root.handlers:
+    for handler in root.handlers:
+        root.removeHandler(handler)
+
 # Control log level via ENV variable
-LOG_LEVEL = int(os.getenv('LOG_LEVEL', logging.INFO))
-LOG_LEVEL = logging.DEBUG
+LOG_LEVEL = int(os.getenv('LOG_LEVEL', logging.DEBUG))
+
 logging.basicConfig(stream=sys.stdout, level=LOG_LEVEL)
-logging.info(f"config: log level = {LOG_LEVEL}")
+logging.info(f"config:log level is working, log level = {LOG_LEVEL}")
 
 # OIDC Authorization Provider
 OIDC_AUTH_ENABLED = os.getenv('OIDC_AUTH_ENABLED', False)
