@@ -50,13 +50,13 @@ two pre-configured tokens are available for test requests:
 A simple way to verify the VTN is running and accessible is to execute the following curl cmd:
 ```bash
 $ curl -H "Content-type: application/json" -H "Authorization: Bearer bl_token" http://localhost:8080/openadr3/3.0.1/programs
-
+```
 The expected result:
-
+```bash
 []
 ```
 
-In typical scenarions, the VTN will need to be "loaded" with OpenADR 3 objects (programs, events, etc) via
+In typical scenarios, the VTN will need to be "loaded" with OpenADR 3 objects (programs, events, etc) via
 the Business Logic (BL) client endpoints (using the `bl_token` above),
 subsequently VEN client endpoints/requests may be invoked to retrieve these objecs.
 
