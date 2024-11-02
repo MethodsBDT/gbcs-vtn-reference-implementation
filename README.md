@@ -24,15 +24,15 @@ docker build -t swagger_server .
 # starting up a container
 docker run -p 8080:8080 swagger_server
 ```
-Note the presence of Dockerfile-lambda. This is used by a CI/CD pipeline to create a 
-docker image which is pushed to a cloud environment to support the online OADR3 Test Tool. 
-The details of the CI/CD pipeline are described elsewhere.
 
 The above assumes that you are building a Docker image for the same architecture as the host you are building them on.
 If building a Docker image for another architecture, the `--platform` flag must be specified.
 And to build a multi-platform image, list each architecture, e.g. `--platform linux/arm64,linux/amd64`
 [This blog post from David Herron](https://techsparx.com/software-development/docker/tutorials/multi-stage-multi-platform.html) provides further explanation and insight.
 
+Note the presence of Dockerfile-lambda. This is used by a CI/CD pipeline to create a
+Docker image which is pushed to a cloud environment to support the online OADR3 Test Tool.
+The details of the CI/CD pipeline are described elsewhere.
 
 ## Interacting with the running VTN
 
@@ -47,7 +47,16 @@ two pre-configured tokens are available for test requests:
 * `bl_token`
 * `ven_token`
 
-The VTN will need to be "loaded" with OpenADR 3 objects (programs, events, etc) via
+A simple way to verify the VTN is running and accessible is to execute the following curl cmd:
+```bash
+$ curl -H "Content-type: application/json" -H "Authorization: Bearer bl_token" http://localhost:8080/openadr3/3.0.1/programs
+
+The expected result:
+
+[]
+```
+
+In typical scenarions, the VTN will need to be "loaded" with OpenADR 3 objects (programs, events, etc) via
 the Business Logic (BL) client endpoints (using the `bl_token` above),
 subsequently VEN client endpoints/requests may be invoked to retrieve these objecs.
 
