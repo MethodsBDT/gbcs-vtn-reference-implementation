@@ -8,8 +8,11 @@ from typing import List, Dict  # noqa: F401
 from swagger_server.models.base_model_ import Model
 from swagger_server.models.model_date_time import ModelDateTime  # noqa: F401,E501
 from swagger_server.models.object_id import ObjectID  # noqa: F401,E501
+from swagger_server.models.object_metadata import ObjectMetadata  # noqa: F401,E501
+from swagger_server.models.object_types import ObjectTypes  # noqa: F401,E501
 from swagger_server.models.resource import Resource  # noqa: F401,E501
 from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
+from swagger_server.models.ven_request import VenRequest  # noqa: F401,E501
 import re  # noqa: F401,E501
 from swagger_server import util
 
@@ -19,17 +22,9 @@ class Ven(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, ven_name: str=None, attributes: List[ValuesMap]=None, targets: List[ValuesMap]=None, resources: List[Resource]=None):  # noqa: E501
+    def __init__(self, ven_name: str=None, attributes: List[ValuesMap]=None, targets: List[ValuesMap]=None, resources: List[Resource]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
         """Ven - a model defined in Swagger
 
-        :param id: The id of this Ven.  # noqa: E501
-        :type id: ObjectID
-        :param created_date_time: The created_date_time of this Ven.  # noqa: E501
-        :type created_date_time: ModelDateTime
-        :param modification_date_time: The modification_date_time of this Ven.  # noqa: E501
-        :type modification_date_time: ModelDateTime
-        :param object_type: The object_type of this Ven.  # noqa: E501
-        :type object_type: str
         :param ven_name: The ven_name of this Ven.  # noqa: E501
         :type ven_name: str
         :param attributes: The attributes of this Ven.  # noqa: E501
@@ -38,36 +33,44 @@ class Ven(Model):
         :type targets: List[ValuesMap]
         :param resources: The resources of this Ven.  # noqa: E501
         :type resources: List[Resource]
+        :param id: The id of this Ven.  # noqa: E501
+        :type id: ObjectID
+        :param created_date_time: The created_date_time of this Ven.  # noqa: E501
+        :type created_date_time: ModelDateTime
+        :param modification_date_time: The modification_date_time of this Ven.  # noqa: E501
+        :type modification_date_time: ModelDateTime
+        :param object_type: The object_type of this Ven.  # noqa: E501
+        :type object_type: ObjectTypes
         """
         self.swagger_types = {
-            'id': ObjectID,
-            'created_date_time': ModelDateTime,
-            'modification_date_time': ModelDateTime,
-            'object_type': str,
             'ven_name': str,
             'attributes': List[ValuesMap],
             'targets': List[ValuesMap],
-            'resources': List[Resource]
+            'resources': List[Resource],
+            'id': ObjectID,
+            'created_date_time': ModelDateTime,
+            'modification_date_time': ModelDateTime,
+            'object_type': ObjectTypes
         }
 
         self.attribute_map = {
-            'id': 'id',
-            'created_date_time': 'createdDateTime',
-            'modification_date_time': 'modificationDateTime',
-            'object_type': 'objectType',
             'ven_name': 'venName',
             'attributes': 'attributes',
             'targets': 'targets',
-            'resources': 'resources'
+            'resources': 'resources',
+            'id': 'id',
+            'created_date_time': 'createdDateTime',
+            'modification_date_time': 'modificationDateTime',
+            'object_type': 'objectType'
         }
-        self._id = id
-        self._created_date_time = created_date_time
-        self._modification_date_time = modification_date_time
-        self._object_type = object_type
         self._ven_name = ven_name
         self._attributes = attributes
         self._targets = targets
         self._resources = resources
+        self._id = id
+        self._created_date_time = created_date_time
+        self._modification_date_time = modification_date_time
+        self._object_type = object_type
 
     @classmethod
     def from_dict(cls, dikt) -> 'Ven':
@@ -81,102 +84,10 @@ class Ven(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def id(self) -> ObjectID:
-        """Gets the id of this Ven.
-
-
-        :return: The id of this Ven.
-        :rtype: ObjectID
-        """
-        return self._id
-
-    @id.setter
-    def id(self, id: ObjectID):
-        """Sets the id of this Ven.
-
-
-        :param id: The id of this Ven.
-        :type id: ObjectID
-        """
-
-        self._id = id
-
-    @property
-    def created_date_time(self) -> ModelDateTime:
-        """Gets the created_date_time of this Ven.
-
-
-        :return: The created_date_time of this Ven.
-        :rtype: ModelDateTime
-        """
-        return self._created_date_time
-
-    @created_date_time.setter
-    def created_date_time(self, created_date_time: ModelDateTime):
-        """Sets the created_date_time of this Ven.
-
-
-        :param created_date_time: The created_date_time of this Ven.
-        :type created_date_time: ModelDateTime
-        """
-
-        self._created_date_time = created_date_time
-
-    @property
-    def modification_date_time(self) -> ModelDateTime:
-        """Gets the modification_date_time of this Ven.
-
-
-        :return: The modification_date_time of this Ven.
-        :rtype: ModelDateTime
-        """
-        return self._modification_date_time
-
-    @modification_date_time.setter
-    def modification_date_time(self, modification_date_time: ModelDateTime):
-        """Sets the modification_date_time of this Ven.
-
-
-        :param modification_date_time: The modification_date_time of this Ven.
-        :type modification_date_time: ModelDateTime
-        """
-
-        self._modification_date_time = modification_date_time
-
-    @property
-    def object_type(self) -> str:
-        """Gets the object_type of this Ven.
-
-        Used as discriminator, e.g. notification.object.  # noqa: E501
-
-        :return: The object_type of this Ven.
-        :rtype: str
-        """
-        return self._object_type
-
-    @object_type.setter
-    def object_type(self, object_type: str):
-        """Sets the object_type of this Ven.
-
-        Used as discriminator, e.g. notification.object.  # noqa: E501
-
-        :param object_type: The object_type of this Ven.
-        :type object_type: str
-        """
-        allowed_values = ["VEN"]  # noqa: E501
-        if object_type not in allowed_values:
-            raise ValueError(
-                "Invalid value for `object_type` ({0}), must be one of {1}"
-                .format(object_type, allowed_values)
-            )
-
-        self._object_type = object_type
-
-    @property
     def ven_name(self) -> str:
         """Gets the ven_name of this Ven.
 
-        User generated identifier, may be VEN identifier provisioned during program enrollment.  # noqa: E501
+        User generated identifier, may be VEN identifier provisioned out-of-band. venName is expected to be unique within the scope of a VTN   # noqa: E501
 
         :return: The ven_name of this Ven.
         :rtype: str
@@ -187,7 +98,7 @@ class Ven(Model):
     def ven_name(self, ven_name: str):
         """Sets the ven_name of this Ven.
 
-        User generated identifier, may be VEN identifier provisioned during program enrollment.  # noqa: E501
+        User generated identifier, may be VEN identifier provisioned out-of-band. venName is expected to be unique within the scope of a VTN   # noqa: E501
 
         :param ven_name: The ven_name of this Ven.
         :type ven_name: str
@@ -265,3 +176,95 @@ class Ven(Model):
         """
 
         self._resources = resources
+
+    @property
+    def id(self) -> ObjectID:
+        """Gets the id of this Ven.
+
+
+        :return: The id of this Ven.
+        :rtype: ObjectID
+        """
+        return self._id
+
+    @id.setter
+    def id(self, id: ObjectID):
+        """Sets the id of this Ven.
+
+
+        :param id: The id of this Ven.
+        :type id: ObjectID
+        """
+        if id is None:
+            raise ValueError("Invalid value for `id`, must not be `None`")  # noqa: E501
+
+        self._id = id
+
+    @property
+    def created_date_time(self) -> ModelDateTime:
+        """Gets the created_date_time of this Ven.
+
+
+        :return: The created_date_time of this Ven.
+        :rtype: ModelDateTime
+        """
+        return self._created_date_time
+
+    @created_date_time.setter
+    def created_date_time(self, created_date_time: ModelDateTime):
+        """Sets the created_date_time of this Ven.
+
+
+        :param created_date_time: The created_date_time of this Ven.
+        :type created_date_time: ModelDateTime
+        """
+        if created_date_time is None:
+            raise ValueError("Invalid value for `created_date_time`, must not be `None`")  # noqa: E501
+
+        self._created_date_time = created_date_time
+
+    @property
+    def modification_date_time(self) -> ModelDateTime:
+        """Gets the modification_date_time of this Ven.
+
+
+        :return: The modification_date_time of this Ven.
+        :rtype: ModelDateTime
+        """
+        return self._modification_date_time
+
+    @modification_date_time.setter
+    def modification_date_time(self, modification_date_time: ModelDateTime):
+        """Sets the modification_date_time of this Ven.
+
+
+        :param modification_date_time: The modification_date_time of this Ven.
+        :type modification_date_time: ModelDateTime
+        """
+        if modification_date_time is None:
+            raise ValueError("Invalid value for `modification_date_time`, must not be `None`")  # noqa: E501
+
+        self._modification_date_time = modification_date_time
+
+    @property
+    def object_type(self) -> ObjectTypes:
+        """Gets the object_type of this Ven.
+
+
+        :return: The object_type of this Ven.
+        :rtype: ObjectTypes
+        """
+        return self._object_type
+
+    @object_type.setter
+    def object_type(self, object_type: ObjectTypes):
+        """Sets the object_type of this Ven.
+
+
+        :param object_type: The object_type of this Ven.
+        :type object_type: ObjectTypes
+        """
+        if object_type is None:
+            raise ValueError("Invalid value for `object_type`, must not be `None`")  # noqa: E501
+
+        self._object_type = object_type

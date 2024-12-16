@@ -11,7 +11,7 @@ if root.handlers:
         root.removeHandler(handler)
 
 # Control log level via ENV variable
-LOG_LEVEL = int(os.getenv('LOG_LEVEL', logging.DEBUG))
+LOG_LEVEL = int(os.getenv('LOG_LEVEL', logging.INFO))
 
 logging.basicConfig(stream=sys.stdout, level=LOG_LEVEL)
 logging.info(f"config:log level is working, log level = {LOG_LEVEL}")

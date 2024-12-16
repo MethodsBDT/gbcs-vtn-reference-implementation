@@ -32,20 +32,20 @@ class Notification(Model):
         self.swagger_types = {
             'object_type': ObjectTypes,
             'operation': str,
-            'targets': List[ValuesMap],
-            'object': OneOfnotificationObject
+            'object': OneOfnotificationObject,
+            'targets': List[ValuesMap]
         }
 
         self.attribute_map = {
             'object_type': 'objectType',
             'operation': 'operation',
-            'targets': 'targets',
-            'object': 'object'
+            'object': 'object',
+            'targets': 'targets'
         }
         self._object_type = object_type
         self._operation = operation
-        self._targets = targets
         self._object = object
+        self._targets = targets
 
     @classmethod
     def from_dict(cls, dikt) -> 'Notification':
@@ -111,29 +111,6 @@ class Notification(Model):
         self._operation = operation
 
     @property
-    def targets(self) -> List[ValuesMap]:
-        """Gets the targets of this Notification.
-
-        A list of valuesMap objects.  # noqa: E501
-
-        :return: The targets of this Notification.
-        :rtype: List[ValuesMap]
-        """
-        return self._targets
-
-    @targets.setter
-    def targets(self, targets: List[ValuesMap]):
-        """Sets the targets of this Notification.
-
-        A list of valuesMap objects.  # noqa: E501
-
-        :param targets: The targets of this Notification.
-        :type targets: List[ValuesMap]
-        """
-
-        self._targets = targets
-
-    @property
     def object(self) -> OneOfnotificationObject:
         """Gets the object of this Notification.
 
@@ -157,3 +134,26 @@ class Notification(Model):
             raise ValueError("Invalid value for `object`, must not be `None`")  # noqa: E501
 
         self._object = object
+
+    @property
+    def targets(self) -> List[ValuesMap]:
+        """Gets the targets of this Notification.
+
+        A list of valuesMap objects.  # noqa: E501
+
+        :return: The targets of this Notification.
+        :rtype: List[ValuesMap]
+        """
+        return self._targets
+
+    @targets.setter
+    def targets(self, targets: List[ValuesMap]):
+        """Sets the targets of this Notification.
+
+        A list of valuesMap objects.  # noqa: E501
+
+        :param targets: The targets of this Notification.
+        :type targets: List[ValuesMap]
+        """
+
+        self._targets = targets
