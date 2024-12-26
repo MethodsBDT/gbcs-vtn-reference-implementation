@@ -14,7 +14,7 @@ class EventPayloadDescriptor(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, object_type: str='EVENT_PAYLOAD_DESCRIPTOR', payload_type: str=None, units: str=None, currency: str=None):  # noqa: E501
+    def __init__(self, object_type: str=None, payload_type: str=None, units: str=None, currency: str=None):  # noqa: E501
         """EventPayloadDescriptor - a model defined in Swagger
 
         :param object_type: The object_type of this EventPayloadDescriptor.  # noqa: E501
@@ -59,7 +59,7 @@ class EventPayloadDescriptor(Model):
     def object_type(self) -> str:
         """Gets the object_type of this EventPayloadDescriptor.
 
-        Used as discriminator, e.g. program.payloadDescriptors  # noqa: E501
+        Used as discriminator.  # noqa: E501
 
         :return: The object_type of this EventPayloadDescriptor.
         :rtype: str
@@ -70,11 +70,17 @@ class EventPayloadDescriptor(Model):
     def object_type(self, object_type: str):
         """Sets the object_type of this EventPayloadDescriptor.
 
-        Used as discriminator, e.g. program.payloadDescriptors  # noqa: E501
+        Used as discriminator.  # noqa: E501
 
         :param object_type: The object_type of this EventPayloadDescriptor.
         :type object_type: str
         """
+        allowed_values = ["EVENT_PAYLOAD_DESCRIPTOR"]  # noqa: E501
+        if object_type not in allowed_values:
+            raise ValueError(
+                "Invalid value for `object_type` ({0}), must be one of {1}"
+                .format(object_type, allowed_values)
+            )
 
         self._object_type = object_type
 

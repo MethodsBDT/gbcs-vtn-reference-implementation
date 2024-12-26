@@ -6,6 +6,7 @@ import logging
 from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.report import Report  # noqa: E501
+from swagger_server.models.report_request import ReportRequest  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
 
@@ -23,7 +24,7 @@ def create_report(body=None):  # noqa: E501
 
     reportBody = None
     if connexion.request.is_json:
-        reportBody = Report.from_dict(connexion.request.get_json())  # noqa: E501
+        reportBody = ReportRequest.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"create_report(): reportBody={reportBody}")
 
     # object must refer to an existing program
@@ -64,7 +65,7 @@ def create_report(body=None):  # noqa: E501
         return problem, status
     logging.debug(f"create_report(): report={report}")
 
-    subscription_callback("REPORT", "POST", report)
+    subscription_callback("REPORT", "CREATE", report)
 
     return report, status
 
@@ -139,7 +140,7 @@ def search_all_reports(program_id=None, event_id=None, client_name=None, skip=No
 
     logging.debug(f"search_all_reports(): reports={reports}")
 
-    subscription_callback("REPORT", "GET", reports)
+    subscription_callback("REPORT", "READ", reports)
 
     return reports, HTTPStatus.OK
 
@@ -164,7 +165,7 @@ def search_reports_by_report_id(report_id):  # noqa: E501
 
     logging.debug(f"search_reports_by_report_id(): report={report}")
 
-    subscription_callback("REPORT", "GET", report)
+    subscription_callback("REPORT", "READ", report)
 
     return report, HTTPStatus.OK
 
@@ -183,12 +184,8 @@ def update_report(report_id, body=None):  # noqa: E501
     logging.info(f"update_report(): report_id={report_id}")
     reportBody = None
     if connexion.request.is_json:
-        reportBody = Report.from_dict(connexion.request.get_json())  # noqa: E501
+        reportBody = ReportRequest.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"update_report(): reportBody={reportBody}")
-    # if reportBody is None:
-    #     problem = Problem(title="Bad Request: No request body", status="400")
-    #     logging.warning(f"update_ven(): problem={problem}")
-    #     return problem, 400
     
     report, status = search_reports_by_report_id(report_id)
     if report is None or status == HTTPStatus.NOT_FOUND:
@@ -223,7 +220,7 @@ def update_report(report_id, body=None):  # noqa: E501
 
     logging.debug(f"update_report: report={report}")
 
-    subscription_callback("REPORT", "PUT", report)
+    subscription_callback("REPORT", "UPDATE", report)
 
     return report, HTTPStatus.OK
 

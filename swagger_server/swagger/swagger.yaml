@@ -42,9 +42,9 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 3.0.1
+  version: 3.1.0
 servers:
-- url: http://localhost:8081/openadr3/3.0.1
+- url: http://localhost:8081/openadr3/3.1.0
   description: base path
 paths:
   /programs:
@@ -141,7 +141,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/program'
+              $ref: '#/components/schemas/program_request'
       responses:
         "201":
           description: Created.
@@ -252,7 +252,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/program'
+              $ref: '#/components/schemas/program_request'
       responses:
         "200":
           description: OK.
@@ -450,7 +450,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/report'
+              $ref: '#/components/schemas/report_request'
       responses:
         "201":
           description: Created.
@@ -561,7 +561,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/report'
+              $ref: '#/components/schemas/report_request'
       responses:
         "200":
           description: OK.
@@ -760,7 +760,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/event'
+              $ref: '#/components/schemas/event_request'
       responses:
         "201":
           description: Created.
@@ -871,7 +871,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/event'
+              $ref: '#/components/schemas/event_request'
       responses:
         "200":
           description: OK.
@@ -1088,7 +1088,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/subscription'
+              $ref: '#/components/schemas/subscription_request'
         required: true
       responses:
         "201":
@@ -1214,7 +1214,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/subscription'
+              $ref: '#/components/schemas/subscription_request'
       responses:
         "200":
           description: OK.
@@ -1412,7 +1412,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ven'
+              $ref: '#/components/schemas/ven_request'
         required: true
       responses:
         "201":
@@ -1523,7 +1523,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ven'
+              $ref: '#/components/schemas/ven_request'
       responses:
         "200":
           description: OK.
@@ -1743,7 +1743,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/resource'
+              $ref: '#/components/schemas/resource_request'
         required: true
       responses:
         "201":
@@ -1878,7 +1878,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/resource'
+              $ref: '#/components/schemas/resource_request'
       responses:
         "200":
           description: OK.
@@ -2024,21 +2024,16 @@ paths:
 components:
   schemas:
     program:
+      type: object
+      description: Server provided representation of program
+      allOf:
+      - $ref: '#/components/schemas/object_metadata'
+      - $ref: '#/components/schemas/program_request'
+    program_request:
       required:
       - programName
       type: object
       properties:
-        id:
-          $ref: '#/components/schemas/objectID'
-        createdDateTime:
-          $ref: '#/components/schemas/dateTime'
-        modificationDateTime:
-          $ref: '#/components/schemas/dateTime'
-        objectType:
-          type: string
-          description: Used as discriminator
-          enum:
-          - PROGRAM
         programName:
           maxLength: 128
           minLength: 1
@@ -2084,7 +2079,7 @@ components:
           description: A list of programDescriptions
           nullable: true
           items:
-            $ref: '#/components/schemas/program_programDescriptions'
+            $ref: '#/components/schemas/program_request_programDescriptions'
         bindingEvents:
           type: boolean
           description: True if events are fixed once transmitted.
@@ -2111,40 +2106,14 @@ components:
           nullable: true
           items:
             $ref: '#/components/schemas/valuesMap'
-      description: Provides program specific metadata from VTN to VEN.
-      example:
-        country: US
-        programType: PRICING_TARIFF
-        bindingEvents: false
-        programLongName: Residential Time of Use-A
-        timeZoneOffset: PT1H
-        createdDateTime: 2023-06-15T09:30:00Z
-        modificationDateTime: null
-        targets:
-        - values:
-          - 0.17
-          type: PRICE
-        - values:
-          - 0.17
-          type: PRICE
-        objectType: PROGRAM
-        payloadDescriptors:
-        - ""
-        - ""
-        principalSubdivision: CO
-        programName: ResTOU
-        retailerName: ACME
-        id: object-999
-        programDescriptions:
-        - URL: www.myCorporation.com/myProgramDescription
-        - URL: www.myCorporation.com/myProgramDescription
-        intervalPeriod:
-          duration: null
-          randomizeStart: null
-          start: null
-        localPrice: false
-        retailerLongName: ACME Electric Inc.
+      description: Client provided description of program
     report:
+      type: object
+      description: Server provided representation of report
+      allOf:
+      - $ref: '#/components/schemas/object_metadata'
+      - $ref: '#/components/schemas/report_request'
+    report_request:
       required:
       - clientName
       - eventID
@@ -2152,17 +2121,6 @@ components:
       - resources
       type: object
       properties:
-        id:
-          $ref: '#/components/schemas/objectID'
-        createdDateTime:
-          $ref: '#/components/schemas/dateTime'
-        modificationDateTime:
-          $ref: '#/components/schemas/dateTime'
-        objectType:
-          type: string
-          description: Used as discriminator
-          enum:
-          - REPORT
         programID:
           $ref: '#/components/schemas/objectID'
         eventID:
@@ -2188,96 +2146,20 @@ components:
           type: array
           description: A list of objects containing report data for a set of resources.
           items:
-            $ref: '#/components/schemas/report_resources'
+            $ref: '#/components/schemas/report_request_resources'
       description: report object.
-      example:
-        payloadDescriptors:
-        - payloadType: USAGE
-          confidence: 100
-          accuracy: 0
-          units: KWH
-          readingType: DIRECT_READ
-          objectType: REPORT_PAYLOAD_DESCRIPTOR
-        - payloadType: USAGE
-          confidence: 100
-          accuracy: 0
-          units: KWH
-          readingType: DIRECT_READ
-          objectType: REPORT_PAYLOAD_DESCRIPTOR
-        eventID: null
-        reportName: Battery_usage_04112023
-        clientName: VEN-999
-        createdDateTime: 2023-06-15T09:30:00Z
-        resources:
-        - intervals:
-          - payloads:
-            - values:
-              - 0.17
-              type: PRICE
-            - values:
-              - 0.17
-              type: PRICE
-            id: 0
-            intervalPeriod: null
-          - payloads:
-            - values:
-              - 0.17
-              type: PRICE
-            - values:
-              - 0.17
-              type: PRICE
-            id: 0
-            intervalPeriod: null
-          resourceName: RESOURCE-999
-          intervalPeriod:
-            duration: null
-            randomizeStart: null
-            start: null
-        - intervals:
-          - payloads:
-            - values:
-              - 0.17
-              type: PRICE
-            - values:
-              - 0.17
-              type: PRICE
-            id: 0
-            intervalPeriod: null
-          - payloads:
-            - values:
-              - 0.17
-              type: PRICE
-            - values:
-              - 0.17
-              type: PRICE
-            id: 0
-            intervalPeriod: null
-          resourceName: RESOURCE-999
-          intervalPeriod:
-            duration: null
-            randomizeStart: null
-            start: null
-        id: object-999
-        modificationDateTime: null
-        programID: null
-        objectType: REPORT
     event:
+      type: object
+      description: Server provided representation of event
+      allOf:
+      - $ref: '#/components/schemas/object_metadata'
+      - $ref: '#/components/schemas/event_request'
+    event_request:
       required:
       - intervals
       - programID
       type: object
       properties:
-        id:
-          $ref: '#/components/schemas/objectID'
-        createdDateTime:
-          $ref: '#/components/schemas/dateTime'
-        modificationDateTime:
-          $ref: '#/components/schemas/dateTime'
-        objectType:
-          type: string
-          description: Used as discriminator
-          enum:
-          - EVENT
         programID:
           $ref: '#/components/schemas/objectID'
         eventName:
@@ -2320,96 +2202,19 @@ components:
       description: |
         Event object to communicate a Demand Response request to VEN.
         If intervalPeriod is present, sets default start time and duration of intervals.
-      example:
-        payloadDescriptors:
-        - payloadType: PRICE
-          currency: USD
-          units: KWH
-          objectType: EVENT_PAYLOAD_DESCRIPTOR
-        - payloadType: PRICE
-          currency: USD
-          units: KWH
-          objectType: EVENT_PAYLOAD_DESCRIPTOR
-        reportDescriptors:
-        - payloadType: USAGE
-          startInterval: -1
-          numIntervals: -1
-          repeat: 1
-          historical: true
-          units: KWH
-          readingType: DIRECT_READ
-          targets:
-          - null
-          - null
-          aggregate: false
-          frequency: -1
-        - payloadType: USAGE
-          startInterval: -1
-          numIntervals: -1
-          repeat: 1
-          historical: true
-          units: KWH
-          readingType: DIRECT_READ
-          targets:
-          - null
-          - null
-          aggregate: false
-          frequency: -1
-        intervals:
-        - payloads:
-          - values:
-            - 0.17
-            type: PRICE
-          - values:
-            - 0.17
-            type: PRICE
-          id: 0
-          intervalPeriod: null
-        - payloads:
-          - values:
-            - 0.17
-            type: PRICE
-          - values:
-            - 0.17
-            type: PRICE
-          id: 0
-          intervalPeriod: null
-        createdDateTime: 2023-06-15T09:30:00Z
-        eventName: price event 11-18-2022
-        id: object-999
-        priority: 0
-        modificationDateTime: null
-        targets:
-        - values:
-          - 0.17
-          type: PRICE
-        - values:
-          - 0.17
-          type: PRICE
-        programID: null
-        intervalPeriod:
-          duration: null
-          randomizeStart: null
-          start: null
-        objectType: EVENT
     subscription:
+      type: object
+      description: Server provided representation of subscription
+      allOf:
+      - $ref: '#/components/schemas/object_metadata'
+      - $ref: '#/components/schemas/subscription_request'
+    subscription_request:
       required:
       - clientName
       - objectOperations
       - programID
       type: object
       properties:
-        id:
-          $ref: '#/components/schemas/objectID'
-        createdDateTime:
-          $ref: '#/components/schemas/dateTime'
-        modificationDateTime:
-          $ref: '#/components/schemas/dateTime'
-        objectType:
-          type: string
-          description: Used as discriminator.
-          enum:
-          - SUBSCRIPTION
         clientName:
           maxLength: 128
           minLength: 1
@@ -2423,7 +2228,7 @@ components:
           type: array
           description: list of objects and operations to subscribe to.
           items:
-            $ref: '#/components/schemas/subscription_objectOperations'
+            $ref: '#/components/schemas/subscription_request_objectOperations'
         targets:
           type: array
           description: A list of valuesMap objects. Used by server to filter callbacks.
@@ -2434,53 +2239,17 @@ components:
         An object created by a client to receive notification of operations on objects.
         Clients may subscribe to be notified when a type of object is created,
         updated, or deleted.
-      example:
-        objectOperations:
-        - operations:
-          - POST
-          - POST
-          bearerToken: NCEJGI9E8ER9802UT9HUG
-          objects:
-          - EVENT
-          - EVENT
-          callbackUrl: https://myserver.com/send/callback/here
-        - operations:
-          - POST
-          - POST
-          bearerToken: NCEJGI9E8ER9802UT9HUG
-          objects:
-          - EVENT
-          - EVENT
-          callbackUrl: https://myserver.com/send/callback/here
-        clientName: VEN-999
-        createdDateTime: 2023-06-15T09:30:00Z
-        id: object-999
-        modificationDateTime: null
-        targets:
-        - values:
-          - 0.17
-          type: PRICE
-        - values:
-          - 0.17
-          type: PRICE
-        programID: null
-        objectType: SUBSCRIPTION
     ven:
+      type: object
+      description: Server provided representation of ven
+      allOf:
+      - $ref: '#/components/schemas/object_metadata'
+      - $ref: '#/components/schemas/ven_request'
+    ven_request:
       required:
       - venName
       type: object
       properties:
-        id:
-          $ref: '#/components/schemas/objectID'
-        createdDateTime:
-          $ref: '#/components/schemas/dateTime'
-        modificationDateTime:
-          $ref: '#/components/schemas/dateTime'
-        objectType:
-          type: string
-          description: Used as discriminator.
-          enum:
-          - VEN
         venName:
           maxLength: 128
           minLength: 1
@@ -2510,32 +2279,9 @@ components:
       description: Ven represents a client with the ven role.
       example:
         venName: VEN-999
-        createdDateTime: 2023-06-15T09:30:00Z
         resources:
-        - venID: null
-          createdDateTime: null
-          resourceName: RESOURCE-999
-          attributes:
-          - null
-          - null
-          id: null
-          modificationDateTime: null
-          targets:
-          - null
-          - null
-          objectType: RESOURCE
-        - venID: null
-          createdDateTime: null
-          resourceName: RESOURCE-999
-          attributes:
-          - null
-          - null
-          id: null
-          modificationDateTime: null
-          targets:
-          - null
-          - null
-          objectType: RESOURCE
+        - ""
+        - ""
         attributes:
         - values:
           - 0.17
@@ -2543,28 +2289,20 @@ components:
         - values:
           - 0.17
           type: PRICE
-        id: object-999
-        modificationDateTime: null
         targets:
         - null
         - null
-        objectType: VEN
     resource:
+      type: object
+      description: Server provided representation of resource
+      allOf:
+      - $ref: '#/components/schemas/object_metadata'
+      - $ref: '#/components/schemas/resource_request'
+    resource_request:
       required:
       - resourceName
       type: object
       properties:
-        id:
-          $ref: '#/components/schemas/objectID'
-        createdDateTime:
-          $ref: '#/components/schemas/dateTime'
-        modificationDateTime:
-          $ref: '#/components/schemas/dateTime'
-        objectType:
-          type: string
-          description: Used as discriminator.
-          enum:
-          - RESOURCE
         resourceName:
           maxLength: 128
           minLength: 1
@@ -2589,19 +2327,24 @@ components:
             $ref: '#/components/schemas/valuesMap'
       description: |
         A resource is an energy device or system subject to control by a VEN.
-      example:
-        venID: null
-        createdDateTime: null
-        resourceName: RESOURCE-999
-        attributes:
-        - null
-        - null
-        id: null
-        modificationDateTime: null
-        targets:
-        - null
-        - null
-        objectType: RESOURCE
+    object_metadata:
+      required:
+      - createdDateTime
+      - id
+      - modificationDateTime
+      - objectType
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/objectID'
+        createdDateTime:
+          $ref: '#/components/schemas/dateTime'
+        modificationDateTime:
+          $ref: '#/components/schemas/dateTime'
+        objectType:
+          $ref: '#/components/schemas/objectTypes'
+      description: metadata common to all addressable objects. Values provided by
+        VTN on object creation.
     interval:
       required:
       - id
@@ -2624,16 +2367,6 @@ components:
       description: |
         An object defining a temporal window and a list of valuesMaps.
         if intervalPeriod present may set temporal aspects of interval or override event.intervalPeriod.
-      example:
-        payloads:
-        - values:
-          - 0.17
-          type: PRICE
-        - values:
-          - 0.17
-          type: PRICE
-        id: 0
-        intervalPeriod: null
     intervalPeriod:
       required:
       - start
@@ -2649,10 +2382,6 @@ components:
         Defines temporal aspects of intervals.
         A duration of default PT0S indicates instantaneous or infinity, depending on payloadType.
         A randomizeStart of default null indicates no randomization.
-      example:
-        duration: null
-        randomizeStart: null
-        start: null
     valuesMap:
       required:
       - type
@@ -2734,11 +2463,6 @@ components:
         Contextual information used to interpret event valuesMap values.
         E.g. a PRICE payload simply contains a price value, an
         associated descriptor provides necessary context such as units and currency.
-      example:
-        payloadType: PRICE
-        currency: USD
-        units: KWH
-        objectType: EVENT_PAYLOAD_DESCRIPTOR
     reportPayloadDescriptor:
       required:
       - payloadType
@@ -2783,13 +2507,6 @@ components:
         Contextual information used to interpret report payload values.
         E.g. a USAGE payload simply contains a usage value, an
         associated descriptor provides necessary context such as units and data quality.
-      example:
-        payloadType: USAGE
-        confidence: 100
-        accuracy: 0
-        units: KWH
-        readingType: DIRECT_READ
-        objectType: REPORT_PAYLOAD_DESCRIPTOR
     reportDescriptor:
       required:
       - payloadType
@@ -2866,19 +2583,6 @@ components:
           default: 1
       description: |
         An object that may be used to request a report from a VEN.
-      example:
-        payloadType: USAGE
-        startInterval: -1
-        numIntervals: -1
-        repeat: 1
-        historical: true
-        units: KWH
-        readingType: DIRECT_READ
-        targets:
-        - null
-        - null
-        aggregate: false
-        frequency: -1
     objectID:
       maxLength: 128
       minLength: 1
@@ -2898,11 +2602,11 @@ components:
         operation:
           type: string
           description: the operation on on object that triggered the notification.
-          example: POST
+          example: CREATE
           enum:
-          - GET
-          - POST
-          - PUT
+          - CREATE
+          - READ
+          - UPDATE
           - DELETE
         object:
           type: object
@@ -3109,7 +2813,7 @@ components:
           format: uri
       description: |
         reusable error response. From https://opensource.zalando.com/problem/schema.yaml.
-    program_programDescriptions:
+    program_request_programDescriptions:
       required:
       - URL
       properties:
@@ -3118,9 +2822,7 @@ components:
           description: A human or machine readable program description
           format: uri
           example: www.myCorporation.com/myProgramDescription
-      example:
-        URL: www.myCorporation.com/myProgramDescription
-    report_resources:
+    report_request_resources:
       required:
       - intervals
       - resourceName
@@ -3141,32 +2843,7 @@ components:
           items:
             $ref: '#/components/schemas/interval'
       description: Report data associated with a resource.
-      example:
-        intervals:
-        - payloads:
-          - values:
-            - 0.17
-            type: PRICE
-          - values:
-            - 0.17
-            type: PRICE
-          id: 0
-          intervalPeriod: null
-        - payloads:
-          - values:
-            - 0.17
-            type: PRICE
-          - values:
-            - 0.17
-            type: PRICE
-          id: 0
-          intervalPeriod: null
-        resourceName: RESOURCE-999
-        intervalPeriod:
-          duration: null
-          randomizeStart: null
-          start: null
-    subscription_objectOperations:
+    subscription_request_objectOperations:
       required:
       - callbackUrl
       - objects
@@ -3184,11 +2861,11 @@ components:
           items:
             type: string
             description: object operation to subscribe to.
-            example: POST
+            example: CREATE
             enum:
-            - GET
-            - POST
-            - PUT
+            - READ
+            - CREATE
+            - UPDATE
             - DELETE
         callbackUrl:
           type: string
@@ -3204,15 +2881,6 @@ components:
           nullable: true
           example: NCEJGI9E8ER9802UT9HUG
       description: "object type, operations, and callbackUrl."
-      example:
-        operations:
-        - POST
-        - POST
-        bearerToken: NCEJGI9E8ER9802UT9HUG
-        objects:
-        - EVENT
-        - EVENT
-        callbackUrl: https://myserver.com/send/callback/here
   securitySchemes:
     oAuth2ClientCredentials:
       type: oauth2

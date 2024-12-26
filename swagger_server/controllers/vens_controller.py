@@ -6,6 +6,8 @@ import logging
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.resource import Resource  # noqa: E501
 from swagger_server.models.ven import Ven  # noqa: E501
+from swagger_server.models.resource_request import ResourceRequest  # noqa: E501
+from swagger_server.models.ven_request import VenRequest  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
 from swagger_server import util
@@ -29,7 +31,7 @@ def create_ven(body):  # noqa: E501
 
     venBody = None
     if connexion.request.is_json:
-        venBody = Ven.from_dict(connexion.request.get_json())  # noqa: E501
+        venBody = VenRequest.from_dict(connexion.request.get_json())  # noqa: E501
 
     # object must have unique name
     vens = objStore.search_all("VEN")
@@ -60,7 +62,7 @@ def create_ven(body):  # noqa: E501
         logging.warning(f"create_ven(): problem={problem}")
         return problem, status
 
-    subscription_callback("VEN", "POST", ven)
+    subscription_callback("VEN", "CREATE", ven)
     return ven, HTTPStatus.CREATED
 
 def delete_ven(ven_id):  # noqa: E501
@@ -105,7 +107,7 @@ def search_ven_by_id(ven_id):  # noqa: E501
         logging.warning(f"search_ven_by_id(): problem={problem}")
         return problem, status
 
-    subscription_callback("VEN", "GET", ven)
+    subscription_callback("VEN", "READ", ven)
 
     return ven, HTTPStatus.OK
 
@@ -152,7 +154,7 @@ def search_vens(ven_name=None, target_type=None, target_values=None, skip=None, 
 
     logging.debug(f"search_vens(): venList={venList}")
 
-    subscription_callback("VEN", "GET", venList)
+    subscription_callback("VEN", "READ", venList)
 
     return venList
 
@@ -172,7 +174,7 @@ def update_ven(ven_id, body=None):  # noqa: E501
 
     venBody = None
     if connexion.request.is_json:
-        venBody = Ven.from_dict(connexion.request.get_json())  # noqa: E501
+        venBody = VenRequest.from_dict(connexion.request.get_json())  # noqa: E501
 
     if venBody is None:
         problem = Problem(title="Bad Request: No request body", status="400")
@@ -206,7 +208,7 @@ def update_ven(ven_id, body=None):  # noqa: E501
         logging.warning(f"update_ven(): problem={problem}")
         return problem, status
 
-    subscription_callback("VEN", "PUT", ven)
+    subscription_callback("VEN", "UPDATE", ven)
     return ven
 
 def create_resource(body, ven_id):  # noqa: E501
@@ -233,7 +235,7 @@ def create_resource(body, ven_id):  # noqa: E501
 
     resourceBody = None
     if connexion.request.is_json:
-        resourceBody = Resource.from_dict(connexion.request.get_json())  # noqa: E501
+        resourceBody = ResourceRequest.from_dict(connexion.request.get_json())  # noqa: E501
 
     logging.debug(f"search_all_ven_resources(): ven.resources={ven.resources}")
 
@@ -269,7 +271,7 @@ def create_resource(body, ven_id):  # noqa: E501
 
     logging.debug(f"create_resource(): venResource={venResource}")
 
-    subscription_callback("RESOURCE", "POST", venResource)
+    subscription_callback("RESOURCE", "CREATE", venResource)
     return venResource, HTTPStatus.CREATED
 
 def delete_ven_resource(ven_id, resource_id):  # noqa: E501
@@ -364,7 +366,7 @@ def search_ven_resources(ven_id, resource_name: str =None, target_type=None, tar
         resourceList = resourceList[:limit]
     logging.debug(f"search_ven_resources(): resourceList={resourceList}")
 
-    subscription_callback("RESOURCE", "GET", resourceList)
+    subscription_callback("RESOURCE", "READ", resourceList)
 
     return resourceList
 
@@ -405,7 +407,7 @@ def search_ven_resource_by_id(ven_id, resource_id):  # noqa: E501
 
     logging.debug(f"search_ven_resource_by_id(): resource={resource}")
 
-    subscription_callback("RESOURCE", "GET", resource)
+    subscription_callback("RESOURCE", "READ", resource)
 
     return resource
 
@@ -440,7 +442,7 @@ def update_ven_resource(ven_id, resource_id, body=None):  # noqa: E501
 
     resourceBody = None
     if connexion.request.is_json:
-        resourceBody = Resource.from_dict(connexion.request.get_json())  # noqa: E501
+        resourceBody = ResourceRequest.from_dict(connexion.request.get_json())  # noqa: E501
 
     if resourceBody is None:
         problem = Problem(title="Bad Request: No request body", status="400")
@@ -469,5 +471,5 @@ def update_ven_resource(ven_id, resource_id, body=None):  # noqa: E501
 
     logging.debug(f"update_ven_resource(): venResource={venResource}")
     ven.resources.append(venResource)
-    subscription_callback("RESOURCE", "PUT", venResource)
+    subscription_callback("RESOURCE", "UPDATE", venResource)
     return (venResource)

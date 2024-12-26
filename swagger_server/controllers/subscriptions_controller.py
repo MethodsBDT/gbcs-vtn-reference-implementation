@@ -8,6 +8,7 @@ import requests
 from swagger_server.models.notification import Notification  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.subscription import Subscription  # noqa: E501
+from swagger_server.models.subscription_request import SubscriptionRequest  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
 from swagger_server import util
 
@@ -25,7 +26,7 @@ def create_subscription(body):  # noqa: E501
 
     subscriptionBody = None
     if connexion.request.is_json:
-        subscriptionBody = Subscription.from_dict(connexion.request.get_json())  # noqa: E501
+        subscriptionBody = SubscriptionRequest.from_dict(connexion.request.get_json())  # noqa: E501
 
     # object must refer to an existing program
     programs = objStore.search_all("PROGRAM")
@@ -61,7 +62,7 @@ def create_subscription(body):  # noqa: E501
         logging.warning(f"create_subscription(): problem={problem}")
         return problem, status
 
-    subscription_callback("SUBSCRIPTION", "POST", subscription)
+    subscription_callback("SUBSCRIPTION", "CREATE", subscription)
 
     return subscription, HTTPStatus.CREATED
 
@@ -109,7 +110,7 @@ def search_subscription_by_id(subscription_id):  # noqa: E501
         logging.warning(f"search_all_subscriptions(): problem={problem}")
         return problem, status
 
-    subscription_callback("SUBSCRIPTION", "GET", subscription)
+    subscription_callback("SUBSCRIPTION", "READ", subscription)
 
     return subscription, HTTPStatus.OK
 
@@ -169,7 +170,7 @@ def search_subscriptions(program_id=None, client_name=None, target_type=None, ta
 
     logging.debug(f"search_all_subscriptions(): subscriptions={subscriptions}")
 
-    subscription_callback("SUBSCRIPTION", "GET", subscriptions)
+    subscription_callback("SUBSCRIPTION", "READ", subscriptions)
     return subscriptions
 
 
@@ -188,7 +189,7 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
     logging.info(f"update_subscription(): subscription_id={subscription_id}")
     subscriptionBody = None
     if connexion.request.is_json:
-        subscriptionBody = Subscription.from_dict(connexion.request.get_json())  # noqa: E501
+        subscriptionBody = SubscriptionRequest.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"update_subscription(): subscriptionBody={subscriptionBody}")
     if subscriptionBody is None:
         problem = Problem(title="Bad Request: No request body", status="400")
@@ -226,7 +227,7 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
 
     logging.debug(f"update_subscription(): subscription={subscription}")
 
-    subscription_callback("SUBSCRIPTION", "PUT", subscription)
+    subscription_callback("SUBSCRIPTION", "UPDATE", subscription)
 
     return (subscription)
 
@@ -280,6 +281,7 @@ def subscription_callback_echo_test(operations):
     for operation in operations:
         logging.info(f"subscription_callback_echo_test(): operation={operation}")
 
+        # TBD: clean up this section
         headers = {"Authorization": f"Bearer {operation.bearer_token}"}
         params = {"echo": "test_echo"}
         # response = requests.get(operation.callback_url+"/echo", params=params, headers=headers)

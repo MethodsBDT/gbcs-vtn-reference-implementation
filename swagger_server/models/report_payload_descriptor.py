@@ -14,7 +14,7 @@ class ReportPayloadDescriptor(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, object_type: str='REPORT_PAYLOAD_DESCRIPTOR', payload_type: str=None, reading_type: str=None, units: str=None, accuracy: float=None, confidence: int=None):  # noqa: E501
+    def __init__(self, object_type: str=None, payload_type: str=None, reading_type: str=None, units: str=None, accuracy: float=None, confidence: int=None):  # noqa: E501
         """ReportPayloadDescriptor - a model defined in Swagger
 
         :param object_type: The object_type of this ReportPayloadDescriptor.  # noqa: E501
@@ -69,7 +69,7 @@ class ReportPayloadDescriptor(Model):
     def object_type(self) -> str:
         """Gets the object_type of this ReportPayloadDescriptor.
 
-        Used as discriminator, e.g. program.payloadDescriptors  # noqa: E501
+        Used as discriminator.  # noqa: E501
 
         :return: The object_type of this ReportPayloadDescriptor.
         :rtype: str
@@ -80,11 +80,17 @@ class ReportPayloadDescriptor(Model):
     def object_type(self, object_type: str):
         """Sets the object_type of this ReportPayloadDescriptor.
 
-        Used as discriminator, e.g. program.payloadDescriptors  # noqa: E501
+        Used as discriminator.  # noqa: E501
 
         :param object_type: The object_type of this ReportPayloadDescriptor.
         :type object_type: str
         """
+        allowed_values = ["REPORT_PAYLOAD_DESCRIPTOR"]  # noqa: E501
+        if object_type not in allowed_values:
+            raise ValueError(
+                "Invalid value for `object_type` ({0}), must be one of {1}"
+                .format(object_type, allowed_values)
+            )
 
         self._object_type = object_type
 

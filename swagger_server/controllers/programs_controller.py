@@ -5,6 +5,7 @@ import logging
 
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.program import Program  # noqa: E501
+from swagger_server.models.program_request import ProgramRequest  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
 from swagger_server import util
@@ -23,7 +24,7 @@ def create_program(body=None):  # noqa: E501
 
     programBody = None
     if connexion.request.is_json:
-        programBody = Program.from_dict(connexion.request.get_json())  # noqa: E501
+        programBody = ProgramRequest.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"create_program(): programBody={programBody}")
 
     # object must have unique name
@@ -65,7 +66,7 @@ def create_program(body=None):  # noqa: E501
 
     logging.debug(f"create_program(): program={program}")
 
-    subscription_callback("PROGRAM", "POST", program)
+    subscription_callback("PROGRAM", "CREATE", program)
 
     return program, status
 
@@ -129,7 +130,7 @@ def search_all_programs(target_type=None, target_values=None, skip=None, limit=N
         programList = programList[:limit]
     logging.debug(f"search_all_programs(): programList={programList}")
 
-    subscription_callback("PROGRAM", "GET", programList)
+    subscription_callback("PROGRAM", "READ", programList)
 
     return programList, HTTPStatus.OK
 
@@ -155,7 +156,7 @@ def search_program_by_program_id(program_id):  # noqa: E501
 
     logging.debug(f"search_program_by_program_id(): program={program}")
 
-    subscription_callback("PROGRAM", "GET", program)
+    subscription_callback("PROGRAM", "READ", program)
 
     return program, HTTPStatus.OK
 
@@ -174,12 +175,8 @@ def update_program(program_id, body=None):  # noqa: E501
     logging.info(f"update_program(): program_id={program_id}")
     programBody = None
     if connexion.request.is_json:
-        programBody = Program.from_dict(connexion.request.get_json())  # noqa: E501
+        programBody = ProgramRequest.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"update_program(): programBody={programBody}")
-    # if programBody is None:
-    #     problem = Problem(title="Bad Request: No request body", status="400")
-    #     logging.warning(f"update_program(): problem={problem}")
-    #     return problem, 400
 
     program, status = search_program_by_program_id(program_id)
     if program is None or status == HTTPStatus.NOT_FOUND:
@@ -230,7 +227,7 @@ def update_program(program_id, body=None):  # noqa: E501
 
     logging.debug(f"update_program: program={program}")
 
-    subscription_callback("PROGRAM", "PUT", program)
+    subscription_callback("PROGRAM", "UPDATE", program)
 
     return program, HTTPStatus.OK
 
