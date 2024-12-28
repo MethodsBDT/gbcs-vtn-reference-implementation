@@ -35,7 +35,7 @@ class ProgramRequestProgramDescriptions(Model):
 
         :param dikt: A dict.
         :type: dict
-        :return: The program_request_programDescriptions of this ProgramRequestProgramDescriptions.  # noqa: E501
+        :return: The programRequest_programDescriptions of this ProgramRequestProgramDescriptions.  # noqa: E501
         :rtype: ProgramRequestProgramDescriptions
         """
         return util.deserialize_model(dikt, cls)

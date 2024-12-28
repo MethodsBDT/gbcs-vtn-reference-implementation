@@ -101,7 +101,7 @@ class Notification(Model):
         :param operation: The operation of this Notification.
         :type operation: str
         """
-        allowed_values = ["GET", "POST", "PUT", "DELETE"]  # noqa: E501
+        allowed_values = ["CREATE", "READ", "UPDATE", "DELETE"]  # noqa: E501
         if operation not in allowed_values:
             raise ValueError(
                 "Invalid value for `operation` ({0}), must be one of {1}"

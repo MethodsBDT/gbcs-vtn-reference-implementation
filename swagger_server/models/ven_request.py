@@ -52,7 +52,7 @@ class VenRequest(Model):
 
         :param dikt: A dict.
         :type: dict
-        :return: The ven_request of this VenRequest.  # noqa: E501
+        :return: The venRequest of this VenRequest.  # noqa: E501
         :rtype: VenRequest
         """
         return util.deserialize_model(dikt, cls)

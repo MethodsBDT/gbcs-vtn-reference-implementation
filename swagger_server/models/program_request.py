@@ -106,7 +106,7 @@ class ProgramRequest(Model):
 
         :param dikt: A dict.
         :type: dict
-        :return: The program_request of this ProgramRequest.  # noqa: E501
+        :return: The programRequest of this ProgramRequest.  # noqa: E501
         :rtype: ProgramRequest
         """
         return util.deserialize_model(dikt, cls)

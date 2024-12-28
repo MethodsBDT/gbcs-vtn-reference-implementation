@@ -51,7 +51,7 @@ class SubscriptionRequestObjectOperations(Model):
 
         :param dikt: A dict.
         :type: dict
-        :return: The subscription_request_objectOperations of this SubscriptionRequestObjectOperations.  # noqa: E501
+        :return: The subscriptionRequest_objectOperations of this SubscriptionRequestObjectOperations.  # noqa: E501
         :rtype: SubscriptionRequestObjectOperations
         """
         return util.deserialize_model(dikt, cls)

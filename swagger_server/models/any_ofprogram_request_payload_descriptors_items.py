@@ -30,7 +30,7 @@ class AnyOfprogramRequestPayloadDescriptorsItems(Model):
 
         :param dikt: A dict.
         :type: dict
-        :return: The AnyOfprogram_requestPayloadDescriptorsItems of this AnyOfprogramRequestPayloadDescriptorsItems.  # noqa: E501
+        :return: The AnyOfprogramRequestPayloadDescriptorsItems of this AnyOfprogramRequestPayloadDescriptorsItems.  # noqa: E501
         :rtype: AnyOfprogramRequestPayloadDescriptorsItems
         """
         return util.deserialize_model(dikt, cls)

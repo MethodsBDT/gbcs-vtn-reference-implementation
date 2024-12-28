@@ -77,7 +77,7 @@ class EventRequest(Model):
 
         :param dikt: A dict.
         :type: dict
-        :return: The event_request of this EventRequest.  # noqa: E501
+        :return: The eventRequest of this EventRequest.  # noqa: E501
         :rtype: EventRequest
         """
         return util.deserialize_model(dikt, cls)
