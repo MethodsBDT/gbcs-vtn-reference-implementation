@@ -141,7 +141,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/program_request'
+              $ref: '#/components/schemas/programRequest'
       responses:
         "201":
           description: Created.
@@ -252,7 +252,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/program_request'
+              $ref: '#/components/schemas/programRequest'
       responses:
         "200":
           description: OK.
@@ -450,7 +450,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/report_request'
+              $ref: '#/components/schemas/reportRequest'
       responses:
         "201":
           description: Created.
@@ -561,7 +561,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/report_request'
+              $ref: '#/components/schemas/reportRequest'
       responses:
         "200":
           description: OK.
@@ -760,7 +760,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/event_request'
+              $ref: '#/components/schemas/eventRequest'
       responses:
         "201":
           description: Created.
@@ -871,7 +871,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/event_request'
+              $ref: '#/components/schemas/eventRequest'
       responses:
         "200":
           description: OK.
@@ -1088,7 +1088,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/subscription_request'
+              $ref: '#/components/schemas/subscriptionRequest'
         required: true
       responses:
         "201":
@@ -1214,7 +1214,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/subscription_request'
+              $ref: '#/components/schemas/subscriptionRequest'
       responses:
         "200":
           description: OK.
@@ -1412,7 +1412,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ven_request'
+              $ref: '#/components/schemas/venRequest'
         required: true
       responses:
         "201":
@@ -1523,7 +1523,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ven_request'
+              $ref: '#/components/schemas/venRequest'
       responses:
         "200":
           description: OK.
@@ -1743,7 +1743,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/resource_request'
+              $ref: '#/components/schemas/resourceRequest'
         required: true
       responses:
         "201":
@@ -1878,7 +1878,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/resource_request'
+              $ref: '#/components/schemas/resourceRequest'
       responses:
         "200":
           description: OK.
@@ -2027,9 +2027,9 @@ components:
       type: object
       description: Server provided representation of program
       allOf:
-      - $ref: '#/components/schemas/object_metadata'
-      - $ref: '#/components/schemas/program_request'
-    program_request:
+      - $ref: '#/components/schemas/objectMetadata'
+      - $ref: '#/components/schemas/programRequest'
+    programRequest:
       required:
       - programName
       type: object
@@ -2079,7 +2079,7 @@ components:
           description: A list of programDescriptions
           nullable: true
           items:
-            $ref: '#/components/schemas/program_request_programDescriptions'
+            $ref: '#/components/schemas/programRequest_programDescriptions'
         bindingEvents:
           type: boolean
           description: True if events are fixed once transmitted.
@@ -2111,9 +2111,9 @@ components:
       type: object
       description: Server provided representation of report
       allOf:
-      - $ref: '#/components/schemas/object_metadata'
-      - $ref: '#/components/schemas/report_request'
-    report_request:
+      - $ref: '#/components/schemas/objectMetadata'
+      - $ref: '#/components/schemas/reportRequest'
+    reportRequest:
       required:
       - clientName
       - eventID
@@ -2146,15 +2146,15 @@ components:
           type: array
           description: A list of objects containing report data for a set of resources.
           items:
-            $ref: '#/components/schemas/report_request_resources'
+            $ref: '#/components/schemas/reportRequest_resources'
       description: report object.
     event:
       type: object
       description: Server provided representation of event
       allOf:
-      - $ref: '#/components/schemas/object_metadata'
-      - $ref: '#/components/schemas/event_request'
-    event_request:
+      - $ref: '#/components/schemas/objectMetadata'
+      - $ref: '#/components/schemas/eventRequest'
+    eventRequest:
       required:
       - intervals
       - programID
@@ -2206,9 +2206,9 @@ components:
       type: object
       description: Server provided representation of subscription
       allOf:
-      - $ref: '#/components/schemas/object_metadata'
-      - $ref: '#/components/schemas/subscription_request'
-    subscription_request:
+      - $ref: '#/components/schemas/objectMetadata'
+      - $ref: '#/components/schemas/subscriptionRequest'
+    subscriptionRequest:
       required:
       - clientName
       - objectOperations
@@ -2228,7 +2228,7 @@ components:
           type: array
           description: list of objects and operations to subscribe to.
           items:
-            $ref: '#/components/schemas/subscription_request_objectOperations'
+            $ref: '#/components/schemas/subscriptionRequest_objectOperations'
         targets:
           type: array
           description: A list of valuesMap objects. Used by server to filter callbacks.
@@ -2243,9 +2243,9 @@ components:
       type: object
       description: Server provided representation of ven
       allOf:
-      - $ref: '#/components/schemas/object_metadata'
-      - $ref: '#/components/schemas/ven_request'
-    ven_request:
+      - $ref: '#/components/schemas/objectMetadata'
+      - $ref: '#/components/schemas/venRequest'
+    venRequest:
       required:
       - venName
       type: object
@@ -2277,28 +2277,13 @@ components:
           items:
             $ref: '#/components/schemas/resource'
       description: Ven represents a client with the ven role.
-      example:
-        venName: VEN-999
-        resources:
-        - ""
-        - ""
-        attributes:
-        - values:
-          - 0.17
-          type: PRICE
-        - values:
-          - 0.17
-          type: PRICE
-        targets:
-        - null
-        - null
     resource:
       type: object
       description: Server provided representation of resource
       allOf:
-      - $ref: '#/components/schemas/object_metadata'
-      - $ref: '#/components/schemas/resource_request'
-    resource_request:
+      - $ref: '#/components/schemas/objectMetadata'
+      - $ref: '#/components/schemas/resourceRequest'
+    resourceRequest:
       required:
       - resourceName
       type: object
@@ -2327,7 +2312,7 @@ components:
             $ref: '#/components/schemas/valuesMap'
       description: |
         A resource is an energy device or system subject to control by a VEN.
-    object_metadata:
+    objectMetadata:
       required:
       - createdDateTime
       - id
@@ -2412,10 +2397,6 @@ components:
       description: |
         Represents one or more values associated with a type.
         E.g. a type of PRICE contains a single float value.
-      example:
-        values:
-        - 0.17
-        type: PRICE
     point:
       required:
       - x
@@ -2602,7 +2583,7 @@ components:
         operation:
           type: string
           description: the operation on on object that triggered the notification.
-          example: CREATE
+          example: POST
           enum:
           - CREATE
           - READ
@@ -2813,7 +2794,7 @@ components:
           format: uri
       description: |
         reusable error response. From https://opensource.zalando.com/problem/schema.yaml.
-    program_request_programDescriptions:
+    programRequest_programDescriptions:
       required:
       - URL
       properties:
@@ -2822,7 +2803,7 @@ components:
           description: A human or machine readable program description
           format: uri
           example: www.myCorporation.com/myProgramDescription
-    report_request_resources:
+    reportRequest_resources:
       required:
       - intervals
       - resourceName
@@ -2843,7 +2824,7 @@ components:
           items:
             $ref: '#/components/schemas/interval'
       description: Report data associated with a resource.
-    subscription_request_objectOperations:
+    subscriptionRequest_objectOperations:
       required:
       - callbackUrl
       - objects

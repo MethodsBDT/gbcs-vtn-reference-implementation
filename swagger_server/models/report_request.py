@@ -64,7 +64,7 @@ class ReportRequest(Model):
 
         :param dikt: A dict.
         :type: dict
-        :return: The report_request of this ReportRequest.  # noqa: E501
+        :return: The reportRequest of this ReportRequest.  # noqa: E501
         :rtype: ReportRequest
         """
         return util.deserialize_model(dikt, cls)

@@ -54,7 +54,7 @@ class ObjectMetadata(Model):
 
         :param dikt: A dict.
         :type: dict
-        :return: The object_metadata of this ObjectMetadata.  # noqa: E501
+        :return: The objectMetadata of this ObjectMetadata.  # noqa: E501
         :rtype: ObjectMetadata
         """
         return util.deserialize_model(dikt, cls)

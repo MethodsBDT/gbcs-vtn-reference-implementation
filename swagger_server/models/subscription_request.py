@@ -54,7 +54,7 @@ class SubscriptionRequest(Model):
 
         :param dikt: A dict.
         :type: dict
-        :return: The subscription_request of this SubscriptionRequest.  # noqa: E501
+        :return: The subscriptionRequest of this SubscriptionRequest.  # noqa: E501
         :rtype: SubscriptionRequest
         """
         return util.deserialize_model(dikt, cls)

@@ -53,7 +53,7 @@ class ResourceRequest(Model):
 
         :param dikt: A dict.
         :type: dict
-        :return: The resource_request of this ResourceRequest.  # noqa: E501
+        :return: The resourceRequest of this ResourceRequest.  # noqa: E501
         :rtype: ResourceRequest
         """
         return util.deserialize_model(dikt, cls)
