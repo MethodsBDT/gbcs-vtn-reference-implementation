@@ -11,13 +11,15 @@ from swagger_server.models.subscription import Subscription  # noqa: E501
 from swagger_server.models.subscription_request import SubscriptionRequest  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
 from swagger_server import util
+from swagger_server import notifiers
+
 
 def create_subscription(body):  # noqa: E501
     """create subscription
 
     Create a new subscription. # noqa: E501
 
-    :param body: 
+    :param body:
     :type body: dict | bytes
 
     :rtype: Subscription
@@ -234,6 +236,9 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
 def subscription_callback(resourceName, operation, subscriptionObj):
     logging.info(f"subscription_callback(): resourceName={resourceName}, operation={operation}")
     logging.debug(f"subscription_callback(): subscriptionObj={subscriptionObj}")
+
+    # Dispatch notifiers for non-WEBHOOK bindings
+    notifiers.dispatch(resourceName, operation, subscriptionObj)
 
     subscriptions = objStore.search_all("SUBSCRIPTION")
     logging.debug(f"subscription_callback(): subscriptions={subscriptions}")

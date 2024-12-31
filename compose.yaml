@@ -1,0 +1,13 @@
+services:
+  vtn:
+    image: "sha256:0f58feab2058ca63cefbc1b3833fdc9496897fcb2e71125a51a8422753de44a0"
+    ports:
+      - "8080:8080"
+  mqtt:
+    image: "eclipse-mosquitto"
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./cfg/mosquitto/config:/mosquitto/config
+
+# https://hub.docker.com/_/eclipse-mosquitto
