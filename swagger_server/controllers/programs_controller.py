@@ -49,7 +49,6 @@ def create_program(body=None):  # noqa: E501
         program_type=programBody.program_type,
         country=programBody.country,
         principal_subdivision=programBody.principal_subdivision,
-        time_zone_offset=programBody.time_zone_offset,
         interval_period=programBody.interval_period,
         program_descriptions=programBody.program_descriptions,
         binding_events=programBody.binding_events,
