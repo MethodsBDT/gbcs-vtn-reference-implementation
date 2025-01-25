@@ -2,6 +2,8 @@ import connexion
 from http import HTTPStatus
 import logging
 
+from swagger_server.models.auth_error import AuthError  # noqa: E501
+from swagger_server.models.auth_server_info import AuthServerInfo  # noqa: E501
 from swagger_server.models.client_credential_response import ClientCredentialResponse  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.services.auth.auth_provider import AuthServiceProvider
@@ -40,3 +42,16 @@ def fetch_token(**kwargs):  # noqa: E501
         problem = Problem(title="Could not fetch token", status=str(HTTPStatus.INTERNAL_SERVER_ERROR))
         logging.warning(f"fetch_token(): problem={problem}")
         return problem, HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+def get_auth_server_info():  # noqa: E501
+    """fetch auth server info
+
+    Return information about the authorization server, specifically the URL of the token endpoint.  # noqa: E501
+
+    :rtype: AuthServerInfo
+    """
+    this_url = connexion.request.base_url # type: str
+    assert this_url.endswith("/server"), f"get_auth_server_info(): unexpected URL: {this_url}"
+    ri_token_endpoint = this_url[:len(this_url) - len("/server")] + "/token"
+    return AuthServerInfo(token_url=ri_token_endpoint), HTTPStatus.OK

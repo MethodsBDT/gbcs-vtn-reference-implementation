@@ -2149,6 +2149,28 @@ paths:
         - write_vens
       - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.vens_controller
+  /auth/server:
+    get:
+      tags:
+      - Auth
+      summary: fetch server info
+      description: |
+        Return information about the authorization server, specifically the URL of the token endpoint.
+      operationId: get_auth_server_info
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/authServerInfo'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+      x-openapi-router-controller: swagger_server.controllers.auth_controller
   /auth/token:
     post:
       tags:
@@ -2183,6 +2205,12 @@ paths:
                 $ref: '#/components/schemas/problem'
         "500":
           description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "501":
+          description: Not implemented
           content:
             application/json:
               schema:
@@ -2914,6 +2942,17 @@ components:
           format: uri
           example: See the full API docs at https://authorization-server.com/docs/access_toke
       description: error response on HTTP 400 from auth/token per https://www.rfc-editor.org/rfc/rfc6749
+    authServerInfo:
+      required:
+      - tokenURL
+      type: object
+      properties:
+        tokenURL:
+          type: string
+          description: URL of the token endpoint.
+          format: uri
+      example:
+        tokenURL: http://example.com/aeiou
     problem:
       type: object
       properties:
@@ -3058,6 +3097,12 @@ components:
             $ref: '#/components/schemas/problem'
     internalServerError:
       description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/problem'
+    notImplemented:
+      description: Not implemented
       content:
         application/json:
           schema:
