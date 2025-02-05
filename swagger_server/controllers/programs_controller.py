@@ -202,8 +202,6 @@ def update_program(program_id, body=None):  # noqa: E501
         program.country = programBody.country
     if programBody.principal_subdivision is not None:
         program.principal_subdivision = programBody.principal_subdivision
-    if programBody.time_zone_offset is not None:
-        program.time_zone_offset = programBody.time_zone_offset
     if programBody.interval_period is not None:
         program.active_period = programBody.interval_period
     if programBody.program_descriptions is not None:
