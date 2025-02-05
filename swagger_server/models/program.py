@@ -6,7 +6,6 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.duration import Duration  # noqa: F401,E501
 from swagger_server.models.interval_period import IntervalPeriod  # noqa: F401,E501
 from swagger_server.models.model_date_time import ModelDateTime  # noqa: F401,E501
 from swagger_server.models.object_id import ObjectID  # noqa: F401,E501
@@ -25,7 +24,7 @@ class Program(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, program_name: str=None, program_long_name: str=None, retailer_name: str=None, retailer_long_name: str=None, program_type: str=None, country: str=None, principal_subdivision: str=None, time_zone_offset: Duration=None, interval_period: IntervalPeriod=None, program_descriptions: List[ProgramRequestProgramDescriptions]=None, binding_events: bool=None, local_price: bool=None, payload_descriptors: List[AnyOfprogramRequestPayloadDescriptorsItems]=None, targets: List[ValuesMap]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
+    def __init__(self, program_name: str=None, program_long_name: str=None, retailer_name: str=None, retailer_long_name: str=None, program_type: str=None, country: str=None, principal_subdivision: str=None, interval_period: IntervalPeriod=None, program_descriptions: List[ProgramRequestProgramDescriptions]=None, binding_events: bool=None, local_price: bool=None, payload_descriptors: List[AnyOfprogramRequestPayloadDescriptorsItems]=None, targets: List[ValuesMap]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
         """Program - a model defined in Swagger
 
         :param program_name: The program_name of this Program.  # noqa: E501
@@ -42,8 +41,6 @@ class Program(Model):
         :type country: str
         :param principal_subdivision: The principal_subdivision of this Program.  # noqa: E501
         :type principal_subdivision: str
-        :param time_zone_offset: The time_zone_offset of this Program.  # noqa: E501
-        :type time_zone_offset: Duration
         :param interval_period: The interval_period of this Program.  # noqa: E501
         :type interval_period: IntervalPeriod
         :param program_descriptions: The program_descriptions of this Program.  # noqa: E501
@@ -73,7 +70,6 @@ class Program(Model):
             'program_type': str,
             'country': str,
             'principal_subdivision': str,
-            'time_zone_offset': Duration,
             'interval_period': IntervalPeriod,
             'program_descriptions': List[ProgramRequestProgramDescriptions],
             'binding_events': bool,
@@ -94,7 +90,6 @@ class Program(Model):
             'program_type': 'programType',
             'country': 'country',
             'principal_subdivision': 'principalSubdivision',
-            'time_zone_offset': 'timeZoneOffset',
             'interval_period': 'intervalPeriod',
             'program_descriptions': 'programDescriptions',
             'binding_events': 'bindingEvents',
@@ -113,7 +108,6 @@ class Program(Model):
         self._program_type = program_type
         self._country = country
         self._principal_subdivision = principal_subdivision
-        self._time_zone_offset = time_zone_offset
         self._interval_period = interval_period
         self._program_descriptions = program_descriptions
         self._binding_events = binding_events
@@ -298,27 +292,6 @@ class Program(Model):
         """
 
         self._principal_subdivision = principal_subdivision
-
-    @property
-    def time_zone_offset(self) -> Duration:
-        """Gets the time_zone_offset of this Program.
-
-
-        :return: The time_zone_offset of this Program.
-        :rtype: Duration
-        """
-        return self._time_zone_offset
-
-    @time_zone_offset.setter
-    def time_zone_offset(self, time_zone_offset: Duration):
-        """Sets the time_zone_offset of this Program.
-
-
-        :param time_zone_offset: The time_zone_offset of this Program.
-        :type time_zone_offset: Duration
-        """
-
-        self._time_zone_offset = time_zone_offset
 
     @property
     def interval_period(self) -> IntervalPeriod:

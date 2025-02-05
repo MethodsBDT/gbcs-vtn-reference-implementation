@@ -3,7 +3,7 @@ info:
   title: OpenADR 3 API
   description: |
     The OpenADR 3 API supports energy retailer to energy customer Demand Response programs.
-    See OpenADR 3 User Guide and Defintions for detailed descriptions of usage.
+    See OpenADR 3 User Guide and Definitions for detailed descriptions of usage.
     The API includes the following capabilities and operations:
 
     __Manage programs:__
@@ -108,19 +108,25 @@ paths:
                   $ref: '#/components/schemas/program'
                 x-content-type: application/json
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -150,26 +156,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/program'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "409":
-          description: Conflict. Implementation dependent response if program with
-            the same programName exists.
+          description: Conflict. Could for example be a violation of a foreign key
+            constraint or of a unique constraint on a name or id.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -204,25 +216,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/program'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -319,25 +337,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/program'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -384,7 +408,7 @@ paths:
         explode: true
         schema:
           type: string
-        example: 999
+        example: "999"
       - name: skip
         in: query
         description: number of records to skip for pagination.
@@ -417,19 +441,25 @@ paths:
                   $ref: '#/components/schemas/report'
                 x-content-type: application/json
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -459,26 +489,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/report'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "409":
-          description: Conflict. Implementation dependent response if identical report
-            exists.
+          description: Conflict. Could for example be a violation of a foreign key
+            constraint or of a unique constraint on a name or id.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -513,25 +549,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/report'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -570,32 +612,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/report'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "409":
-          description: Conflict. Implementation dependent response if program with
-            the same programName exists.
+          description: Conflict. Could for example be a violation of a foreign key
+            constraint or of a unique constraint on a name or id.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -628,25 +676,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/report'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -727,19 +781,25 @@ paths:
                   $ref: '#/components/schemas/event'
                 x-content-type: application/json
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -769,26 +829,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/event'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "409":
-          description: Conflict. Implementation dependent response if event with  same
-            name already exists.
+          description: Conflict. Could for example be a violation of a foreign key
+            constraint or of a unique constraint on a name or id.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -823,25 +889,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/event'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -880,32 +952,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/event'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "409":
-          description: Conflict. Implementation dependent response if program with
-            the same programName exists.
+          description: Conflict. Could for example be a violation of a foreign key
+            constraint or of a unique constraint on a name or id.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -939,25 +1017,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/event'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -1056,19 +1140,25 @@ paths:
                   $ref: '#/components/schemas/subscription'
                 x-content-type: application/json
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -1098,26 +1188,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/subscription'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "409":
-          description: Conflict. Implementation dependent response if identical object
-            already exists.
+          description: Conflict. Could for example be a violation of a foreign key
+            constraint or of a unique constraint on a name or id.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -1165,25 +1261,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/subscription'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -1223,32 +1325,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/subscription'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "409":
-          description: Conflict. Implementation dependent response if program with
-            the same programName exists.
+          description: Conflict. Could for example be a violation of a foreign key
+            constraint or of a unique constraint on a name or id.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -1282,25 +1390,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/subscription'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -1380,19 +1494,25 @@ paths:
                   $ref: '#/components/schemas/ven'
                 x-content-type: application/json
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -1422,26 +1542,25 @@ paths:
               schema:
                 $ref: '#/components/schemas/ven'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/problem'
-        "409":
-          description: Conflict. Implementation dependent response if ven with same
-            venIdentifier already exists.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -1475,25 +1594,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/ven'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -1532,32 +1657,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/ven'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "409":
-          description: Conflict. Implementation dependent response if program with
-            the same programName exists.
+          description: Conflict. Could for example be a violation of a foreign key
+            constraint or of a unique constraint on a name or id.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -1590,25 +1721,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/ven'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -1696,25 +1833,31 @@ paths:
                   $ref: '#/components/schemas/resource'
                 x-content-type: application/json
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -1753,32 +1896,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/resource'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "409":
-          description: Conflict. Implementation dependent response if resource with  same
-            resourceIdentifier already exists.
+          description: Conflict. Could for example be a violation of a foreign key
+            constraint or of a unique constraint on a name or id.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -1821,25 +1970,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/resource'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -1887,32 +2042,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/resource'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "409":
-          description: Conflict. Implementation dependent response if program with
-            the same programName exists.
+          description: Conflict. Could for example be a violation of a foreign key
+            constraint or of a unique constraint on a name or id.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -1954,25 +2115,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/resource'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "403":
-          description: Forbidden.
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "404":
-          description: Not Found.
+          description: The specified resource was not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -2003,19 +2170,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/clientCredentialResponse'
         "400":
-          description: Bad Request.
+          description: The request is malformed or invalid
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/authError'
-        "403":
-          description: Forbidden.
+                $ref: '#/components/schemas/problem'
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/problem'
         "500":
-          description: Internal Server Error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -2070,8 +2237,6 @@ components:
           description: Coding per ISO 3166-2. E.g. state in US.
           nullable: true
           example: CO
-        timeZoneOffset:
-          $ref: '#/components/schemas/duration'
         intervalPeriod:
           $ref: '#/components/schemas/intervalPeriod'
         programDescriptions:
@@ -2407,12 +2572,12 @@ components:
           type: number
           description: A value on an x axis.
           format: float
-          example: 1
+          example: 1.0
         "y":
           type: number
           description: A value on a y axis.
           format: float
-          example: 2
+          example: 2.0
       description: A pair of floats typically used as a point on a 2 dimensional grid.
     eventPayloadDescriptor:
       required:
@@ -2475,7 +2640,7 @@ components:
           description: A quantification of the accuracy of a set of payload values.
           format: float
           nullable: true
-          example: 0
+          example: 0.0
         confidence:
           maximum: 100
           minimum: 0
@@ -2676,7 +2841,7 @@ components:
           maxLength: 4096
           minLength: 1
           type: string
-          description: access token povided by Authorization service
+          description: access token provided by Authorization service
           example: MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3
         token_type:
           type: string
@@ -2692,7 +2857,7 @@ components:
           maxLength: 4096
           minLength: 1
           type: string
-          description: refresh token povided by Authorization service
+          description: refresh token provided by Authorization service
           example: IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk
         scope:
           maxLength: 4096
@@ -2751,7 +2916,7 @@ components:
           description: Optional reference to more detailed error description
           format: uri
           example: See the full API docs at https://authorization-server.com/docs/access_toke
-      description: error reponse on HTTP 400 from auth/token per https://www.rfc-editor.org/rfc/rfc6749
+      description: error response on HTTP 400 from auth/token per https://www.rfc-editor.org/rfc/rfc6749
     problem:
       type: object
       properties:
@@ -2862,6 +3027,44 @@ components:
           nullable: true
           example: NCEJGI9E8ER9802UT9HUG
       description: "object type, operations, and callbackUrl."
+  responses:
+    badRequest:
+      description: The request is malformed or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/problem'
+    unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/problem'
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/problem'
+    notFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/problem'
+    conflict:
+      description: Conflict. Could for example be a violation of a foreign key constraint
+        or of a unique constraint on a name or id.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/problem'
+    internalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/problem'
   securitySchemes:
     oAuth2ClientCredentials:
       type: oauth2
