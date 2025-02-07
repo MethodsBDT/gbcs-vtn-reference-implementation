@@ -91,12 +91,14 @@ def delete_event(event_id):  # noqa: E501
 def search_all_events(program_id=None, target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
     """searches all events
 
-    List all events known to the server. May filter results by programID query param. Use skip and pagination query params to limit reponse size.  # noqa: E501
+    List all events known to the server. May filter results by programID query param. May filter results by targetType and targetValues as query params. Use skip and pagination query params to limit response size.  # noqa: E501
 
     :param program_id: filter results to events with programID.
     :type program_id: dict | bytes
-    :param targets: return programs that match requested targets
-    :type targets: list | bytes
+    :param target_type: Indicates targeting type, e.g. GROUP
+    :type target_type: str
+    :param target_values: List of target values, e.g. group names
+    :type target_values: List[str]
     :param skip: number of records to skip for pagination.
     :type skip: int
     :param limit: maximum number of records to return.
@@ -139,12 +141,12 @@ def search_all_events(program_id=None, target_type=None, target_values=None, ski
 def search_events_by_id(event_id):  # noqa: E501
     """search events by ID
 
-    Fetch event associated with the eventID in path.   # noqa: E501
+    Fetch event associated with the eventID in path.  # noqa: E501
 
     :param event_id: object ID of event.
     :type event_id: dict | bytes
 
-    :rtype: List[Event]
+    :rtype: Event
     """
     logging.info(f"search_events_by_id(): event_id={event_id}")
     event = objStore.search("EVENT", event_id)

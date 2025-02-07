@@ -1,12 +1,9 @@
 import connexion
 from http import HTTPStatus
 import logging
-import six
 
-from swagger_server.models.auth_error import AuthError  # noqa: E501
 from swagger_server.models.client_credential_response import ClientCredentialResponse  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
-from swagger_server import util
 from swagger_server.services.auth.auth_provider import AuthServiceProvider
 from swagger_server.controllers.authorization_controller import check_oAuth2ClientCredentials
 
