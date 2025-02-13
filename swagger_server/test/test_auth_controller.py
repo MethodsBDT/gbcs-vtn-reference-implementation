@@ -2,9 +2,12 @@
 
 from __future__ import absolute_import
 
-from swagger_server.test import BaseTestCase
+from flask import json
+from six import BytesIO
 
-BASE_URL = 'http://localhost:8080/openadr3/3.0.1'
+from swagger_server.models.client_credential_response import ClientCredentialResponse  # noqa: E501
+from swagger_server.models.problem import Problem  # noqa: E501
+from swagger_server.test import BaseTestCase
 
 
 class TestAuthController(BaseTestCase):
@@ -15,17 +18,19 @@ class TestAuthController(BaseTestCase):
 
         fetch a token
         """
-        headers = [('clientID', 'ven_client'),
-                   ('clientSecret', 999)]
+        data = dict(grant_type='grant_type_example',
+                    client_id='client_id_example',
+                    client_secret='client_secret_example',
+                    scope='scope_example')
         response = self.client.open(
-            BASE_URL + 'auth/token',
-            method='GET',
-            headers=headers)
+            '/openadr3/3.1.0/auth/token',
+            method='POST',
+            data=data,
+            content_type='application/x-www-form-urlencoded')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
 
 if __name__ == '__main__':
     import unittest
-
     unittest.main()

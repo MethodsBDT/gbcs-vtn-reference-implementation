@@ -3,6 +3,8 @@ from datetime import datetime
 from http import HTTPStatus
 import logging
 
+from swagger_server.controllers.events_controller import search_events_by_id
+from swagger_server.controllers.programs_controller import search_program_by_program_id
 from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.report import Report  # noqa: E501
@@ -27,14 +29,6 @@ def create_report(body=None):  # noqa: E501
         reportBody = ReportRequest.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"create_report(): reportBody={reportBody}")
 
-    # object must refer to an existing program
-    programs = objStore.search_all("PROGRAM")
-    programList = [p for p in programs if p.id == reportBody.program_id]
-    if len(programList) == 0:
-        problem = Problem(title="program_id does not refer to an existing program", status=HTTPStatus.BAD_REQUEST)
-        logging.warning(f"create_subscription(): problem={problem}")
-        return problem, HTTPStatus.BAD_REQUEST
-
     # object must refer to an existing event
     events = objStore.search_all("EVENT")
     eventList = [p for p in events if p.id == reportBody.event_id]
@@ -50,7 +44,6 @@ def create_report(body=None):  # noqa: E501
         created_date_time=current_time,
         modification_date_time=None,
         object_type='REPORT',
-        program_id=reportBody.program_id,
         event_id=reportBody.event_id,
         client_name=reportBody.client_name,
         report_name=reportBody.report_name,
@@ -72,7 +65,7 @@ def create_report(body=None):  # noqa: E501
 def delete_report(report_id):  # noqa: E501
     """delete a report
 
-    Delete the repoprt specified by the reportID in path. # noqa: E501
+    Delete the report specified by the reportID in path. # noqa: E501
 
     :param report_id: object ID of a report.
     :type report_id: dict | bytes
@@ -95,7 +88,7 @@ def delete_report(report_id):  # noqa: E501
 def search_all_reports(program_id=None, event_id=None, client_name=None, skip=None, limit=None):  # noqa: E501
     """searches all reports
 
-    List all reports known to the server. May filter results by programID and clientName as query param. Use skip and pagination query params to limit response size.  # noqa: E501
+    List all reports known to the server. May filter results by programID, eventID,  and clientName as query param. Use skip and pagination query params to limit response size.  # noqa: E501
 
     :param program_id: filter results to reports with programID.
     :type program_id: dict | bytes
@@ -120,7 +113,12 @@ def search_all_reports(program_id=None, event_id=None, client_name=None, skip=No
         return problem, status
 
     if program_id != None:
-        reports = [report for report in reports if report.program_id == program_id]
+        reports_filtered = []
+        for report in reports:
+            event, status = search_events_by_id(report.event_id)
+            if event.program_id == program_id:
+                reports_filtered.append(report)
+        reports = reports_filtered
         if len(reports) == 0:
             return reports, HTTPStatus.OK
     if event_id != None:
@@ -148,7 +146,7 @@ def search_all_reports(program_id=None, event_id=None, client_name=None, skip=No
 def search_reports_by_report_id(report_id):  # noqa: E501
     """searches reports by reportID
 
-    Fetch the report specified by the reportID in path. # noqa: E501
+    Fetch the report specified by the reportID in path.  # noqa: E501
 
     :param report_id: object ID of a report.
     :type report_id: dict | bytes
@@ -198,10 +196,6 @@ def update_report(report_id, body=None):  # noqa: E501
     current_time = now.strftime("%H:%M:%S")
     report.modification_date_time = current_time
 
-    if reportBody.program_id != report.program_id:
-        problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
-        logging.warning(f"update_report(): problem={problem}")
-        return problem, HTTPStatus.BAD_REQUEST
     if reportBody.event_id is not None:
         report.event_id = reportBody.event_id
     if reportBody.client_name is not None:

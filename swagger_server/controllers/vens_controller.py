@@ -114,12 +114,14 @@ def search_ven_by_id(ven_id):  # noqa: E501
 def search_vens(ven_name=None, target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
     """search vens
 
-    List all vens. Use skip and pagination query params to limit response size.  # noqa: E501
+    List all vens. May filter results by venName as query param. May filter results by targetType and targetValues as query params. Use skip and pagination query params to limit response size.  # noqa: E501
 
-    :param ven_name: return vens that match requested ven_name
-    :type ven_name: list | bytes
-    :param targets: return vens that match requested targets
-    :type targets: list | bytes
+    :param ven_name: Indicates ven objects w venName
+    :type ven_name: str
+    :param target_type: Indicates targeting type, e.g. GROUP
+    :type target_type: str
+    :param target_values: List of target values, e.g. group names
+    :type target_values: List[str]
     :param skip: number of records to skip for pagination.
     :type skip: int
     :param limit: maximum number of records to return.
