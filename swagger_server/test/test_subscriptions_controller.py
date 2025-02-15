@@ -3,12 +3,14 @@
 from __future__ import absolute_import
 
 from flask import json
+from six import BytesIO
 
+from swagger_server.models.object_id import ObjectID  # noqa: E501
+from swagger_server.models.object_types import ObjectTypes  # noqa: E501
+from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.subscription import Subscription  # noqa: E501
+from swagger_server.models.subscription_request import SubscriptionRequest  # noqa: E501
 from swagger_server.test import BaseTestCase
-
-BASE_URL = 'http://localhost:8080/openadr3/3.0.1'
-auth_header = {'Authorization': 'Bearer ven_token'}
 
 
 class TestSubscriptionsController(BaseTestCase):
@@ -19,26 +21,23 @@ class TestSubscriptionsController(BaseTestCase):
 
         create subscription
         """
-        body = Subscription(client_name="myClient", object_operations=[], program_id="0")
+        body = SubscriptionRequest()
         response = self.client.open(
-            BASE_URL + 'subscriptions',
+            '/openadr3/3.1.0/subscriptions',
             method='POST',
             data=json.dumps(body),
-            content_type='application/json',
-            headers=auth_header)
+            content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    # Tests run in alphabetical order, so put this last so search_by_id and update work on id=0
-    def test_xdelete_subscription(self):
+    def test_delete_subscription(self):
         """Test case for delete_subscription
 
         delete  subscription
         """
         response = self.client.open(
-            BASE_URL + 'subscriptions/0',
-            method='DELETE',
-            headers=auth_header)
+            '/openadr3/3.1.0/subscriptions/{subscriptionID}'.format(subscription_id=ObjectID()),
+            method='DELETE')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -48,9 +47,8 @@ class TestSubscriptionsController(BaseTestCase):
         search subscriptions by ID
         """
         response = self.client.open(
-            BASE_URL + 'subscriptions/0',
-            method='GET',
-            headers=auth_header)
+            '/openadr3/3.1.0/subscriptions/{subscriptionID}'.format(subscription_id=ObjectID()),
+            method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -59,10 +57,17 @@ class TestSubscriptionsController(BaseTestCase):
 
         search subscriptions
         """
+        query_string = [('program_id', ObjectID()),
+                        ('client_name', 'client_name_example'),
+                        ('target_type', 'target_type_example'),
+                        ('target_values', 'target_values_example'),
+                        ('objects', ObjectTypes()),
+                        ('skip', 1),
+                        ('limit', 50)]
         response = self.client.open(
-            BASE_URL + 'subscriptions',
+            '/openadr3/3.1.0/subscriptions',
             method='GET',
-            headers=auth_header)
+            query_string=query_string)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -71,18 +76,16 @@ class TestSubscriptionsController(BaseTestCase):
 
         update  subscription
         """
-        body = Subscription(client_name="myClient", object_operations=[], program_id="0")
+        body = SubscriptionRequest()
         response = self.client.open(
-            BASE_URL + 'subscriptions/0',
+            '/openadr3/3.1.0/subscriptions/{subscriptionID}'.format(subscription_id=ObjectID()),
             method='PUT',
             data=json.dumps(body),
-            content_type='application/json',
-            headers=auth_header)
+            content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
 
 if __name__ == '__main__':
     import unittest
-
     unittest.main()

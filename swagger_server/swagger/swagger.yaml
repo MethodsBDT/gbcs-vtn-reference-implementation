@@ -2281,12 +2281,9 @@ components:
       required:
       - clientName
       - eventID
-      - programID
       - resources
       type: object
       properties:
-        programID:
-          $ref: '#/components/schemas/objectID'
         eventID:
           $ref: '#/components/schemas/objectID'
         clientName:

@@ -117,7 +117,7 @@ def search_subscription_by_id(subscription_id):  # noqa: E501
 def search_subscriptions(program_id=None, client_name=None, target_type=None, target_values=None, objects=None, skip=None, limit=None):  # noqa: E501
     """search subscriptions
 
-    List all subscriptions. May filter results by programID and clientID as query params. May filter results by objects as query param. See objectTypes schema. Use skip and pagination query params to limit response size.  # noqa: E501
+    List all subscriptions. May filter results by programID and clientName as query params. May filter results by targetType and targetValues as query params. May filter results by objects as query param. See objectTypes schema. Use skip and pagination query params to limit response size.  # noqa: E501
 
     :param program_id: filter results to subscriptions with programID.
     :type program_id: dict | bytes

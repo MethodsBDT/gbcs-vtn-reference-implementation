@@ -22,11 +22,9 @@ class Report(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, program_id: ObjectID=None, event_id: ObjectID=None, client_name: str=None, report_name: str=None, payload_descriptors: List[ReportPayloadDescriptor]=None, resources: List[ReportRequestResources]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
+    def __init__(self, event_id: ObjectID=None, client_name: str=None, report_name: str=None, payload_descriptors: List[ReportPayloadDescriptor]=None, resources: List[ReportRequestResources]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
         """Report - a model defined in Swagger
 
-        :param program_id: The program_id of this Report.  # noqa: E501
-        :type program_id: ObjectID
         :param event_id: The event_id of this Report.  # noqa: E501
         :type event_id: ObjectID
         :param client_name: The client_name of this Report.  # noqa: E501
@@ -47,7 +45,6 @@ class Report(Model):
         :type object_type: ObjectTypes
         """
         self.swagger_types = {
-            'program_id': ObjectID,
             'event_id': ObjectID,
             'client_name': str,
             'report_name': str,
@@ -60,7 +57,6 @@ class Report(Model):
         }
 
         self.attribute_map = {
-            'program_id': 'programID',
             'event_id': 'eventID',
             'client_name': 'clientName',
             'report_name': 'reportName',
@@ -71,7 +67,6 @@ class Report(Model):
             'modification_date_time': 'modificationDateTime',
             'object_type': 'objectType'
         }
-        self._program_id = program_id
         self._event_id = event_id
         self._client_name = client_name
         self._report_name = report_name
@@ -92,29 +87,6 @@ class Report(Model):
         :rtype: Report
         """
         return util.deserialize_model(dikt, cls)
-
-    @property
-    def program_id(self) -> ObjectID:
-        """Gets the program_id of this Report.
-
-
-        :return: The program_id of this Report.
-        :rtype: ObjectID
-        """
-        return self._program_id
-
-    @program_id.setter
-    def program_id(self, program_id: ObjectID):
-        """Sets the program_id of this Report.
-
-
-        :param program_id: The program_id of this Report.
-        :type program_id: ObjectID
-        """
-        if program_id is None:
-            raise ValueError("Invalid value for `program_id`, must not be `None`")  # noqa: E501
-
-        self._program_id = program_id
 
     @property
     def event_id(self) -> ObjectID:

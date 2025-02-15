@@ -3,12 +3,14 @@ from datetime import datetime
 from http import HTTPStatus
 import logging
 
+from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.program import Program  # noqa: E501
 from swagger_server.models.program_request import ProgramRequest  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
 from swagger_server import util
+
 
 def create_program(body=None):  # noqa: E501
     """create a program
@@ -97,7 +99,7 @@ def search_all_programs(target_type=None, target_values=None, skip=None, limit=N
 
     """searches all programs
 
-    List all programs known to the server. Use skip and pagination query params to limit response size.  # noqa: E501
+    List all programs known to the server. May filter results by targetType and targetValues as query params. Use skip and pagination query params to limit response size.  # noqa: E501
 
     :param target_type: Indicates targeting type, e.g. GROUP
     :type target_type: str

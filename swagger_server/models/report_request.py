@@ -18,11 +18,9 @@ class ReportRequest(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, program_id: ObjectID=None, event_id: ObjectID=None, client_name: str=None, report_name: str=None, payload_descriptors: List[ReportPayloadDescriptor]=None, resources: List[ReportRequestResources]=None):  # noqa: E501
+    def __init__(self, event_id: ObjectID=None, client_name: str=None, report_name: str=None, payload_descriptors: List[ReportPayloadDescriptor]=None, resources: List[ReportRequestResources]=None):  # noqa: E501
         """ReportRequest - a model defined in Swagger
 
-        :param program_id: The program_id of this ReportRequest.  # noqa: E501
-        :type program_id: ObjectID
         :param event_id: The event_id of this ReportRequest.  # noqa: E501
         :type event_id: ObjectID
         :param client_name: The client_name of this ReportRequest.  # noqa: E501
@@ -35,7 +33,6 @@ class ReportRequest(Model):
         :type resources: List[ReportRequestResources]
         """
         self.swagger_types = {
-            'program_id': ObjectID,
             'event_id': ObjectID,
             'client_name': str,
             'report_name': str,
@@ -44,14 +41,12 @@ class ReportRequest(Model):
         }
 
         self.attribute_map = {
-            'program_id': 'programID',
             'event_id': 'eventID',
             'client_name': 'clientName',
             'report_name': 'reportName',
             'payload_descriptors': 'payloadDescriptors',
             'resources': 'resources'
         }
-        self._program_id = program_id
         self._event_id = event_id
         self._client_name = client_name
         self._report_name = report_name
@@ -68,29 +63,6 @@ class ReportRequest(Model):
         :rtype: ReportRequest
         """
         return util.deserialize_model(dikt, cls)
-
-    @property
-    def program_id(self) -> ObjectID:
-        """Gets the program_id of this ReportRequest.
-
-
-        :return: The program_id of this ReportRequest.
-        :rtype: ObjectID
-        """
-        return self._program_id
-
-    @program_id.setter
-    def program_id(self, program_id: ObjectID):
-        """Sets the program_id of this ReportRequest.
-
-
-        :param program_id: The program_id of this ReportRequest.
-        :type program_id: ObjectID
-        """
-        if program_id is None:
-            raise ValueError("Invalid value for `program_id`, must not be `None`")  # noqa: E501
-
-        self._program_id = program_id
 
     @property
     def event_id(self) -> ObjectID:
