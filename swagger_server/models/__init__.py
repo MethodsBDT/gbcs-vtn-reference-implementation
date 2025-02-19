@@ -6,6 +6,7 @@ from __future__ import absolute_import
 from swagger_server.models.any_ofprogram_request_payload_descriptors_items import AnyOfprogramRequestPayloadDescriptorsItems
 from swagger_server.models.any_ofvalues_map_values_items import AnyOfvaluesMapValuesItems
 from swagger_server.models.auth_error import AuthError
+from swagger_server.models.auth_server_info import AuthServerInfo
 from swagger_server.models.client_credential_request import ClientCredentialRequest
 from swagger_server.models.client_credential_response import ClientCredentialResponse
 from swagger_server.models.duration import Duration
