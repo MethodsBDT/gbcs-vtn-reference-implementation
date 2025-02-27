@@ -1,10 +1,9 @@
 name: Build image in ECR
 
 on:
-#  // currently on main branch 3.1.0 version is developed, and there is no need to push it to ecr
-#  push:
-#     branches:
-#       - "main"
+  push:
+     branches:
+       - "v3_0_1"
   workflow_dispatch:
 
 jobs:
