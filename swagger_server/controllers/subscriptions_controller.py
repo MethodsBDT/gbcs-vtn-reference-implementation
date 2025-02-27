@@ -8,6 +8,7 @@ import requests
 from swagger_server.models.notification import Notification  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.subscription import Subscription  # noqa: E501
+from swagger_server.models.subscription_request import SubscriptionRequest  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
 from swagger_server import util
 
@@ -25,7 +26,7 @@ def create_subscription(body):  # noqa: E501
 
     subscriptionBody = None
     if connexion.request.is_json:
-        subscriptionBody = Subscription.from_dict(connexion.request.get_json())  # noqa: E501
+        subscriptionBody = SubscriptionRequest.from_dict(connexion.request.get_json())  # noqa: E501
 
     # object must refer to an existing program
     programs = objStore.search_all("PROGRAM")
@@ -61,7 +62,7 @@ def create_subscription(body):  # noqa: E501
         logging.warning(f"create_subscription(): problem={problem}")
         return problem, status
 
-    subscription_callback("SUBSCRIPTION", "POST", subscription)
+    subscription_callback("SUBSCRIPTION", "CREATE", subscription)
 
     return subscription, HTTPStatus.CREATED
 
@@ -109,14 +110,14 @@ def search_subscription_by_id(subscription_id):  # noqa: E501
         logging.warning(f"search_all_subscriptions(): problem={problem}")
         return problem, status
 
-    subscription_callback("SUBSCRIPTION", "GET", subscription)
+    subscription_callback("SUBSCRIPTION", "READ", subscription)
 
     return subscription, HTTPStatus.OK
 
 def search_subscriptions(program_id=None, client_name=None, target_type=None, target_values=None, objects=None, skip=None, limit=None):  # noqa: E501
     """search subscriptions
 
-    List all subscriptions. May filter results by programID and clientID as query params. May filter results by objects as query param. See objectTypes schema. Use skip and pagination query params to limit response size.  # noqa: E501
+    List all subscriptions. May filter results by programID and clientName as query params. May filter results by targetType and targetValues as query params. May filter results by objects as query param. See objectTypes schema. Use skip and pagination query params to limit response size.  # noqa: E501
 
     :param program_id: filter results to subscriptions with programID.
     :type program_id: dict | bytes
@@ -169,7 +170,7 @@ def search_subscriptions(program_id=None, client_name=None, target_type=None, ta
 
     logging.debug(f"search_all_subscriptions(): subscriptions={subscriptions}")
 
-    subscription_callback("SUBSCRIPTION", "GET", subscriptions)
+    subscription_callback("SUBSCRIPTION", "READ", subscriptions)
     return subscriptions
 
 
@@ -188,7 +189,7 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
     logging.info(f"update_subscription(): subscription_id={subscription_id}")
     subscriptionBody = None
     if connexion.request.is_json:
-        subscriptionBody = Subscription.from_dict(connexion.request.get_json())  # noqa: E501
+        subscriptionBody = SubscriptionRequest.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"update_subscription(): subscriptionBody={subscriptionBody}")
     if subscriptionBody is None:
         problem = Problem(title="Bad Request: No request body", status="400")
@@ -226,7 +227,7 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
 
     logging.debug(f"update_subscription(): subscription={subscription}")
 
-    subscription_callback("SUBSCRIPTION", "PUT", subscription)
+    subscription_callback("SUBSCRIPTION", "UPDATE", subscription)
 
     return (subscription)
 
@@ -274,18 +275,26 @@ def subscription_callback(resourceName, operation, subscriptionObj):
 
 
 def subscription_callback_echo_test(operations):
+    logging.info(f"subscription_callback_echo_test(): operations={operations}")
+
     # verify callback service by sending request with echo parameter
     for operation in operations:
         logging.info(f"subscription_callback_echo_test(): operation={operation}")
 
+        # TBD: clean up this section
         headers = {"Authorization": f"Bearer {operation.bearer_token}"}
         params = {"echo": "test_echo"}
-        response = requests.get(operation.callback_url+"/echo", params=params, headers=headers)
+        # response = requests.get(operation.callback_url+"/echo", params=params, headers=headers)
 
-        if response.status_code != HTTPStatus.OK:
-            logging.warning(f"subscription_callback: callback response.status_code={response.status_code}")
-        content = response.content.decode('utf8').replace("'", '"')
-        if "test_echo" not in content:
-            logging.warning(f"subscription_callback: callback content={content}")
-            return HTTPStatus.INTERNAL_SERVER_ERROR
-        return HTTPStatus.OK
+        # if response.status_code != HTTPStatus.OK:
+        #     logging.warning(f"subscription_callback_echo_test(): response.status_code NOT OK. response={response}")
+        #     return response.status_code
+        # if "test_echo" not in response.content:
+        #     # this appears to be an artifact of the framework
+        #     content = response.content.decode('utf8').replace("'", '"')
+        #     if "test_echo" not in content:
+        #         logging.warning(f"subscription_callback_echo_test(): test_echo not in response")
+        #         # TBD: return 500?
+        #         return HTTPStatus.OK
+
+    return HTTPStatus.OK

@@ -70,7 +70,7 @@ class ListStore(ObjStore):
             logging.warning(f"ListStore.insert(): unknown obj.object_type={obj.object_type}")
             return HTTPStatus.BAD_REQUEST
 
-        # Insufficient storage
+        #
         logging.debug(f"ListStore.insert(): list={list}")
 
         obj.id = str(id)

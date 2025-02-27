@@ -6,6 +6,7 @@ import logging
 from swagger_server import util
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server.models.event import Event  # noqa: E501
+from swagger_server.models.event_request import EventRequest  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
 
@@ -24,7 +25,7 @@ def create_event(body=None):  # noqa: E501
 
     eventBody = None
     if connexion.request.is_json:
-        eventBody = Event.from_dict(connexion.request.get_json())  # noqa: E501
+        eventBody = EventRequest.from_dict(connexion.request.get_json())  # noqa: E501
         logging.info(f"create_event(): eventBody={eventBody}")
 
     # object must refer to an existing program
@@ -58,7 +59,7 @@ def create_event(body=None):  # noqa: E501
         logging.warning(f"create_event(): problem={problem}")
         return problem, status
 
-    subscription_callback("EVENT", "POST", event)
+    subscription_callback("EVENT", "CREATE", event)
 
     return event, status
 
@@ -90,12 +91,14 @@ def delete_event(event_id):  # noqa: E501
 def search_all_events(program_id=None, target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
     """searches all events
 
-    List all events known to the server. May filter results by programID query param. Use skip and pagination query params to limit reponse size.  # noqa: E501
+    List all events known to the server. May filter results by programID query param. May filter results by targetType and targetValues as query params. Use skip and pagination query params to limit response size.  # noqa: E501
 
     :param program_id: filter results to events with programID.
     :type program_id: dict | bytes
-    :param targets: return programs that match requested targets
-    :type targets: list | bytes
+    :param target_type: Indicates targeting type, e.g. GROUP
+    :type target_type: str
+    :param target_values: List of target values, e.g. group names
+    :type target_values: List[str]
     :param skip: number of records to skip for pagination.
     :type skip: int
     :param limit: maximum number of records to return.
@@ -130,7 +133,7 @@ def search_all_events(program_id=None, target_type=None, target_values=None, ski
     if limit != None:
         eventList = eventList[:limit]
 
-    subscription_callback("EVENT", "GET", eventList)
+    subscription_callback("EVENT", "READ", eventList)
 
     return eventList
 
@@ -138,12 +141,12 @@ def search_all_events(program_id=None, target_type=None, target_values=None, ski
 def search_events_by_id(event_id):  # noqa: E501
     """search events by ID
 
-    Fetch event associated with the eventID in path.   # noqa: E501
+    Fetch event associated with the eventID in path.  # noqa: E501
 
     :param event_id: object ID of event.
     :type event_id: dict | bytes
 
-    :rtype: List[Event]
+    :rtype: Event
     """
     logging.info(f"search_events_by_id(): event_id={event_id}")
     event = objStore.search("EVENT", event_id)
@@ -154,7 +157,7 @@ def search_events_by_id(event_id):  # noqa: E501
         return problem, status
     logging.debug(f"search_events_by_id(): event={event}")
 
-    subscription_callback("EVENT", "GET", event)
+    subscription_callback("EVENT", "READ", event)
 
     return event, HTTPStatus.OK
 
@@ -175,7 +178,7 @@ def update_event(event_id, body=None):  # noqa: E501
 
     eventBody = None
     if connexion.request.is_json:
-        eventBody = Event.from_dict(connexion.request.get_json())  # noqa: E501
+        eventBody = EventRequest.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"update_event(): eventBody={eventBody}")
     if eventBody is None:
         problem = Problem(title="Bad Request: No request body", status="400")
@@ -220,6 +223,6 @@ def update_event(event_id, body=None):  # noqa: E501
         return problem, status
     logging.debug(f"update_event(): event={event}")
 
-    subscription_callback("EVENT", "PUT", event)
+    subscription_callback("EVENT", "UPDATE", event)
 
     return event, HTTPStatus.OK

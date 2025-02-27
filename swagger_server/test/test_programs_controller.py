@@ -3,12 +3,13 @@
 from __future__ import absolute_import
 
 from flask import json
+from six import BytesIO
 
+from swagger_server.models.object_id import ObjectID  # noqa: E501
+from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.program import Program  # noqa: E501
+from swagger_server.models.program_request import ProgramRequest  # noqa: E501
 from swagger_server.test import BaseTestCase
-
-BASE_URL = 'http://localhost:8080/openadr3/3.0.1'
-auth_header = {'Authorization': 'Bearer bl_token'}
 
 
 class TestProgramsController(BaseTestCase):
@@ -19,13 +20,23 @@ class TestProgramsController(BaseTestCase):
 
         create a program
         """
-        body = Program(program_name='myProgram')
+        body = ProgramRequest()
         response = self.client.open(
-            BASE_URL + 'programs',
+            '/openadr3/3.1.0/programs',
             method='POST',
             data=json.dumps(body),
-            content_type='application/json',
-            headers=auth_header)
+            content_type='application/json')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_delete_program(self):
+        """Test case for delete_program
+
+        delete a program
+        """
+        response = self.client.open(
+            '/openadr3/3.1.0/programs/{programID}'.format(program_id=ObjectID()),
+            method='DELETE')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -34,9 +45,14 @@ class TestProgramsController(BaseTestCase):
 
         searches all programs
         """
-        response = self.client.get(
-            BASE_URL + 'programs',
-            headers=auth_header)
+        query_string = [('target_type', 'target_type_example'),
+                        ('target_values', 'target_values_example'),
+                        ('skip', 1),
+                        ('limit', 50)]
+        response = self.client.open(
+            '/openadr3/3.1.0/programs',
+            method='GET',
+            query_string=query_string)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -46,9 +62,8 @@ class TestProgramsController(BaseTestCase):
         searches programs by program ID
         """
         response = self.client.open(
-            BASE_URL + 'programs/0',
-            method='GET',
-            headers=auth_header)
+            '/openadr3/3.1.0/programs/{programID}'.format(program_id=ObjectID()),
+            method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -57,31 +72,16 @@ class TestProgramsController(BaseTestCase):
 
         update a program
         """
-        body = Program(program_name="myProgram")
+        body = ProgramRequest()
         response = self.client.open(
-            BASE_URL + 'programs/0',
+            '/openadr3/3.1.0/programs/{programID}'.format(program_id=ObjectID()),
             method='PUT',
             data=json.dumps(body),
-            content_type='application/json',
-            headers=auth_header)
-        self.assert200(response,
-                       'Response body is : ' + response.data.decode('utf-8'))
-
-    # Tests run in alphabetical order, so put this last so search_by_id and update work on id=0
-    def test_xdelete_program(self):
-        """Test case for delete_program
-
-        delete a program
-        """
-        response = self.client.open(
-            BASE_URL + 'programs/0',
-            method='DELETE',
-            headers=auth_header)
+            content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
 
 if __name__ == '__main__':
     import unittest
-
     unittest.main()
