@@ -15,8 +15,9 @@ class ReportDescriptor(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, payload_type: str=None, reading_type: str=None, units: str=None, targets: List[ValuesMap]=None, aggregate: bool=False, start_interval: int=-1, num_intervals: int=-1, historical: bool=True, frequency: int=-1, repeat: int=1):  # noqa: E501
-        """ReportDescriptor - a model defined in Swagger
+
+    def __init__(self, payload_type=None, reading_type=None, units=None, targets=None, aggregate=False, start_interval=-1, num_intervals=-1, historical=True, frequency=-1, repeat=1, report_intervals=None):  # noqa: E501
+        """ReportDescriptor - a model defined in OpenAPI
 
         :param payload_type: The payload_type of this ReportDescriptor.  # noqa: E501
         :type payload_type: str
@@ -38,6 +39,8 @@ class ReportDescriptor(Model):
         :type frequency: int
         :param repeat: The repeat of this ReportDescriptor.  # noqa: E501
         :type repeat: int
+        :param report_intervals: The report_intervals of this ReportDescriptor.  # noqa: E501
+        :type report_intervals: str
         """
         self.swagger_types = {
             'payload_type': str,
@@ -49,7 +52,8 @@ class ReportDescriptor(Model):
             'num_intervals': int,
             'historical': bool,
             'frequency': int,
-            'repeat': int
+            'repeat': int,
+            'report_intervals': str
         }
 
         self.attribute_map = {
@@ -62,7 +66,8 @@ class ReportDescriptor(Model):
             'num_intervals': 'numIntervals',
             'historical': 'historical',
             'frequency': 'frequency',
-            'repeat': 'repeat'
+            'repeat': 'repeat',
+            'report_intervals': 'reportIntervals'
         }
         self._payload_type = payload_type
         self._reading_type = reading_type
@@ -74,6 +79,7 @@ class ReportDescriptor(Model):
         self._historical = historical
         self._frequency = frequency
         self._repeat = repeat
+        self._report_intervals = report_intervals
 
     @classmethod
     def from_dict(cls, dikt) -> 'ReportDescriptor':
@@ -108,6 +114,10 @@ class ReportDescriptor(Model):
         """
         if payload_type is None:
             raise ValueError("Invalid value for `payload_type`, must not be `None`")  # noqa: E501
+        if payload_type is not None and len(payload_type) > 128:
+            raise ValueError("Invalid value for `payload_type`, length must be less than or equal to `128`")  # noqa: E501
+        if payload_type is not None and len(payload_type) < 1:
+            raise ValueError("Invalid value for `payload_type`, length must be greater than or equal to `1`")  # noqa: E501
 
         self._payload_type = payload_type
 
@@ -317,3 +327,32 @@ class ReportDescriptor(Model):
         """
 
         self._repeat = repeat
+
+    @property
+    def report_intervals(self) -> str:
+        """Gets the report_intervals of this ReportDescriptor.
+
+        Indicates VEN report interval options. See User Guide.  # noqa: E501
+
+        :return: The report_intervals of this ReportDescriptor.
+        :rtype: str
+        """
+        return self._report_intervals
+
+    @report_intervals.setter
+    def report_intervals(self, report_intervals: str):
+        """Sets the report_intervals of this ReportDescriptor.
+
+        Indicates VEN report interval options. See User Guide.  # noqa: E501
+
+        :param report_intervals: The report_intervals of this ReportDescriptor.
+        :type report_intervals: str
+        """
+        allowed_values = ["INTERVALS", "SUB_INTERVALS", "OPEN_INTERVALS"]  # noqa: E501
+        if report_intervals not in allowed_values:
+            raise ValueError(
+                "Invalid value for `report_intervals` ({0}), must be one of {1}"
+                .format(report_intervals, allowed_values)
+            )
+
+        self._report_intervals = report_intervals
