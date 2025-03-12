@@ -2523,53 +2523,6 @@ components:
       - $ref: '#/components/schemas/eventRequest'
       description: Server provided representation of event
       example:
-        reportDescriptors:
-        - payloadType: USAGE
-          startInterval: -1
-          numIntervals: -1
-          repeat: 1
-          reportIntervals: INTERVALS
-          historical: true
-          units: KWH
-          readingType: DIRECT_READ
-          targets:
-          - values:
-            - 0.17
-            type: PRICE
-          - values:
-            - 0.17
-            type: PRICE
-          aggregate: false
-          frequency: -1
-        - payloadType: USAGE
-          startInterval: -1
-          numIntervals: -1
-          repeat: 1
-          reportIntervals: INTERVALS
-          historical: true
-          units: KWH
-          readingType: DIRECT_READ
-          targets:
-          - values:
-            - 0.17
-            type: PRICE
-          - values:
-            - 0.17
-            type: PRICE
-          aggregate: false
-          frequency: -1
-        createdDateTime: 2023-06-15T09:30:00Z
-        priority: 0
-        modificationDateTime: 2023-06-15T09:30:00Z
-        targets:
-        - values:
-          - 0.17
-          type: PRICE
-        - values:
-          - 0.17
-          type: PRICE
-        objectType: EVENT
-        duration: PT1H
         payloadDescriptors:
         - payloadType: PRICE
           currency: USD
@@ -2579,6 +2532,39 @@ components:
           currency: USD
           units: KWH
           objectType: EVENT_PAYLOAD_DESCRIPTOR
+        reportDescriptors:
+        - payloadType: USAGE
+          startInterval: -1
+          numIntervals: -1
+          repeat: 1
+          historical: true
+          units: KWH
+          readingType: DIRECT_READ
+          targets:
+          - values:
+            - 0.17
+            type: PRICE
+          - values:
+            - 0.17
+            type: PRICE
+          aggregate: false
+          frequency: -1
+        - payloadType: USAGE
+          startInterval: -1
+          numIntervals: -1
+          repeat: 1
+          historical: true
+          units: KWH
+          readingType: DIRECT_READ
+          targets:
+          - values:
+            - 0.17
+            type: PRICE
+          - values:
+            - 0.17
+            type: PRICE
+          aggregate: false
+          frequency: -1
         intervals:
         - payloads:
           - values:
@@ -2604,13 +2590,24 @@ components:
             duration: PT1H
             randomizeStart: PT1H
             start: 2023-06-15T09:30:00Z
+        createdDateTime: 2023-06-15T09:30:00Z
         eventName: price event 11-18-2022
         id: object-999
+        priority: 0
+        modificationDateTime: 2023-06-15T09:30:00Z
+        targets:
+        - values:
+          - 0.17
+          type: PRICE
+        - values:
+          - 0.17
+          type: PRICE
         programID: object-999
         intervalPeriod:
           duration: PT1H
           randomizeStart: PT1H
           start: 2023-06-15T09:30:00Z
+        objectType: EVENT
       title: event
       type: object
     eventRequest:
@@ -2631,14 +2628,6 @@ components:
           example: price event 11-18-2022
           nullable: true
           title: eventName
-          type: string
-        duration:
-          default: PT0S
-          description: duration in ISO 8601 format
-          example: PT1H
-          pattern: "^(-?)P(?=\\d|T\\d)(?:(\\d+)Y)?(?:(\\d+)M)?(?:(\\d+)([DW]))?(?:T(?:(\\\
-            d+)H)?(?:(\\d+)M)?(?:(\\d+(?:\\.\\d+)?)S)?)?$"
-          title: duration
           type: string
         priority:
           description: Relative priority of event. A lower number is a higher priority.
@@ -2678,6 +2667,7 @@ components:
           title: intervals
           type: array
       required:
+      - intervals
       - programID
       title: eventRequest
       type: object
@@ -3006,9 +2996,8 @@ components:
     intervalPeriod:
       description: |
         Defines temporal aspects of intervals.
-        A start of "0000-00-00" or "0000-00-00T00:00:00" may indicate 'now'. See User Guide.
-        A duration of default "P9999Y" may indicate infinity. See User Guide.
-        A randomizeStart indicates absolute range of client applied offset to start. See User Guide.
+        A duration of default PT0S indicates instantaneous or infinity, depending on payloadType.
+        A randomizeStart of default null indicates no randomization.
       example:
         duration: PT1H
         randomizeStart: PT1H
@@ -3036,6 +3025,8 @@ components:
             d+)H)?(?:(\\d+)M)?(?:(\\d+(?:\\.\\d+)?)S)?)?$"
           title: duration
           type: string
+      required:
+      - start
       title: intervalPeriod
       type: object
     valuesMap:
@@ -3196,7 +3187,6 @@ components:
         startInterval: -1
         numIntervals: -1
         repeat: 1
-        reportIntervals: INTERVALS
         historical: true
         units: KWH
         readingType: DIRECT_READ
@@ -3289,15 +3279,6 @@ components:
           format: int32
           title: repeat
           type: integer
-        reportIntervals:
-          description: Indicates VEN report interval options. See User Guide.
-          enum:
-          - INTERVALS
-          - SUB_INTERVALS
-          - OPEN_INTERVALS
-          example: INTERVALS
-          title: reportIntervals
-          type: string
       required:
       - payloadType
       title: reportDescriptor
