@@ -17,6 +17,7 @@ class MockAuthProvider:
         self.allowed_authorities = [
             #// todo: REPLACE TOKEN VALUES
             AuthorityModel('ven_client', '999', ['test/VEN'], 'ven_token'),
+            AuthorityModel('ven_client2', '9999', ['test/VEN'], 'ven_token2'),
             AuthorityModel('bl_client', '1001', ['test/BL'], 'bl_token'),
             AuthorityModel('admin_client', '1000', ['test/VEN', 'test/BL'], 'admin_token')
         ]
@@ -40,3 +41,9 @@ class MockAuthProvider:
             if token == authority.token:
                 return authority.scope
         return []
+
+    def get_client_id(self, token: str) -> str:
+        for authority in self.allowed_authorities:
+            if token == authority.token:
+                return authority.client_id
+        return None

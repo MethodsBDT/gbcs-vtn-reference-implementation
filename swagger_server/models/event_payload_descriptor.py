@@ -6,6 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.units import Units  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -14,7 +15,7 @@ class EventPayloadDescriptor(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, object_type: str=None, payload_type: str=None, units: str=None, currency: str=None):  # noqa: E501
+    def __init__(self, object_type: str=None, payload_type: str=None, units: Units=None, currency: str=None):  # noqa: E501
         """EventPayloadDescriptor - a model defined in Swagger
 
         :param object_type: The object_type of this EventPayloadDescriptor.  # noqa: E501
@@ -22,14 +23,14 @@ class EventPayloadDescriptor(Model):
         :param payload_type: The payload_type of this EventPayloadDescriptor.  # noqa: E501
         :type payload_type: str
         :param units: The units of this EventPayloadDescriptor.  # noqa: E501
-        :type units: str
+        :type units: Units
         :param currency: The currency of this EventPayloadDescriptor.  # noqa: E501
         :type currency: str
         """
         self.swagger_types = {
             'object_type': str,
             'payload_type': str,
-            'units': str,
+            'units': Units,
             'currency': str
         }
 
@@ -110,24 +111,22 @@ class EventPayloadDescriptor(Model):
         self._payload_type = payload_type
 
     @property
-    def units(self) -> str:
+    def units(self) -> Units:
         """Gets the units of this EventPayloadDescriptor.
 
-        Units of measure.  # noqa: E501
 
         :return: The units of this EventPayloadDescriptor.
-        :rtype: str
+        :rtype: Units
         """
         return self._units
 
     @units.setter
-    def units(self, units: str):
+    def units(self, units: Units):
         """Sets the units of this EventPayloadDescriptor.
 
-        Units of measure.  # noqa: E501
 
         :param units: The units of this EventPayloadDescriptor.
-        :type units: str
+        :type units: Units
         """
 
         self._units = units

@@ -92,8 +92,6 @@ class IntervalPeriod(Model):
         :param duration: The duration of this IntervalPeriod.
         :type duration: Duration
         """
-        if duration is not None and not re.search(r'^(-?)P(?=\d|T\d)(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)([DW]))?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$', duration):  # noqa: E501
-            raise ValueError(r"Invalid value for `duration`, must be a follow pattern or equal to `/^(-?)P(?=\d|T\d)(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)([DW]))?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$/`")  # noqa: E501
 
         self._duration = duration
 
@@ -115,7 +113,5 @@ class IntervalPeriod(Model):
         :param randomize_start: The randomize_start of this IntervalPeriod.
         :type randomize_start: Duration
         """
-        if randomize_start is not None and not re.search(r'^(-?)P(?=\d|T\d)(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)([DW]))?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$', randomize_start):  # noqa: E501
-            raise ValueError(r"Invalid value for `randomize_start`, must be a follow pattern or equal to `/^(-?)P(?=\d|T\d)(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)([DW]))?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$/`")  # noqa: E501
 
         self._randomize_start = randomize_start

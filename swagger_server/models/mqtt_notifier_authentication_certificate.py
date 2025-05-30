@@ -59,6 +59,7 @@ class MqttNotifierAuthenticationCertificate(Model):
     def method(self) -> str:
         """Gets the method of this MqttNotifierAuthenticationCertificate.
 
+        Specifies certificate authentication  # noqa: E501
 
         :return: The method of this MqttNotifierAuthenticationCertificate.
         :rtype: str
@@ -69,6 +70,7 @@ class MqttNotifierAuthenticationCertificate(Model):
     def method(self, method: str):
         """Sets the method of this MqttNotifierAuthenticationCertificate.
 
+        Specifies certificate authentication  # noqa: E501
 
         :param method: The method of this MqttNotifierAuthenticationCertificate.
         :type method: str

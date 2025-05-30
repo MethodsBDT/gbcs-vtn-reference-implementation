@@ -6,11 +6,11 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.bl_resource_request import BlResourceRequest  # noqa: F401,E501
 from swagger_server.models.model_date_time import ModelDateTime  # noqa: F401,E501
 from swagger_server.models.object_id import ObjectID  # noqa: F401,E501
 from swagger_server.models.object_metadata import ObjectMetadata  # noqa: F401,E501
-from swagger_server.models.object_types import ObjectTypes  # noqa: F401,E501
-from swagger_server.models.resource_request import ResourceRequest  # noqa: F401,E501
+from swagger_server.models.resource_name import ResourceName  # noqa: F401,E501
 from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
 import re  # noqa: F401,E501
 from swagger_server import util
@@ -21,55 +21,55 @@ class Resource(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, resource_name: str=None, ven_id: ObjectID=None, attributes: List[ValuesMap]=None, targets: List[ValuesMap]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
+    def __init__(self, object_type: str=None, targets: List[ValuesMap]=None, resource_name: ResourceName=None, ven_id: ObjectID=None, attributes: List[ValuesMap]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None):  # noqa: E501
         """Resource - a model defined in Swagger
 
+        :param object_type: The object_type of this Resource.  # noqa: E501
+        :type object_type: str
+        :param targets: The targets of this Resource.  # noqa: E501
+        :type targets: List[ValuesMap]
         :param resource_name: The resource_name of this Resource.  # noqa: E501
-        :type resource_name: str
+        :type resource_name: ResourceName
         :param ven_id: The ven_id of this Resource.  # noqa: E501
         :type ven_id: ObjectID
         :param attributes: The attributes of this Resource.  # noqa: E501
         :type attributes: List[ValuesMap]
-        :param targets: The targets of this Resource.  # noqa: E501
-        :type targets: List[ValuesMap]
         :param id: The id of this Resource.  # noqa: E501
         :type id: ObjectID
         :param created_date_time: The created_date_time of this Resource.  # noqa: E501
         :type created_date_time: ModelDateTime
         :param modification_date_time: The modification_date_time of this Resource.  # noqa: E501
         :type modification_date_time: ModelDateTime
-        :param object_type: The object_type of this Resource.  # noqa: E501
-        :type object_type: ObjectTypes
         """
         self.swagger_types = {
-            'resource_name': str,
+            'object_type': str,
+            'targets': List[ValuesMap],
+            'resource_name': ResourceName,
             'ven_id': ObjectID,
             'attributes': List[ValuesMap],
-            'targets': List[ValuesMap],
             'id': ObjectID,
             'created_date_time': ModelDateTime,
-            'modification_date_time': ModelDateTime,
-            'object_type': ObjectTypes
+            'modification_date_time': ModelDateTime
         }
 
         self.attribute_map = {
+            'object_type': 'objectType',
+            'targets': 'targets',
             'resource_name': 'resourceName',
             'ven_id': 'venID',
             'attributes': 'attributes',
-            'targets': 'targets',
             'id': 'id',
             'created_date_time': 'createdDateTime',
-            'modification_date_time': 'modificationDateTime',
-            'object_type': 'objectType'
+            'modification_date_time': 'modificationDateTime'
         }
+        self._object_type = object_type
+        self._targets = targets
         self._resource_name = resource_name
         self._ven_id = ven_id
         self._attributes = attributes
-        self._targets = targets
         self._id = id
         self._created_date_time = created_date_time
         self._modification_date_time = modification_date_time
-        self._object_type = object_type
 
     @classmethod
     def from_dict(cls, dikt) -> 'Resource':
@@ -83,24 +83,74 @@ class Resource(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def resource_name(self) -> str:
+    def object_type(self) -> str:
+        """Gets the object_type of this Resource.
+
+        Used as discriminator.  # noqa: E501
+
+        :return: The object_type of this Resource.
+        :rtype: str
+        """
+        return self._object_type
+
+    @object_type.setter
+    def object_type(self, object_type: str):
+        """Sets the object_type of this Resource.
+
+        Used as discriminator.  # noqa: E501
+
+        :param object_type: The object_type of this Resource.
+        :type object_type: str
+        """
+        allowed_values = ["BL_RESOURCE_REQUEST"]  # noqa: E501
+        if object_type not in allowed_values:
+            raise ValueError(
+                "Invalid value for `object_type` ({0}), must be one of {1}"
+                .format(object_type, allowed_values)
+            )
+
+        self._object_type = object_type
+
+    @property
+    def targets(self) -> List[ValuesMap]:
+        """Gets the targets of this Resource.
+
+        A list of valuesMap objects describing target criteria.  # noqa: E501
+
+        :return: The targets of this Resource.
+        :rtype: List[ValuesMap]
+        """
+        return self._targets
+
+    @targets.setter
+    def targets(self, targets: List[ValuesMap]):
+        """Sets the targets of this Resource.
+
+        A list of valuesMap objects describing target criteria.  # noqa: E501
+
+        :param targets: The targets of this Resource.
+        :type targets: List[ValuesMap]
+        """
+
+        self._targets = targets
+
+    @property
+    def resource_name(self) -> ResourceName:
         """Gets the resource_name of this Resource.
 
-        User generated identifier, resource may be configured with identifier out-of-band. resourceName is expected to be unique within the scope of the associated VEN.   # noqa: E501
 
         :return: The resource_name of this Resource.
-        :rtype: str
+        :rtype: ResourceName
         """
         return self._resource_name
 
     @resource_name.setter
-    def resource_name(self, resource_name: str):
+    def resource_name(self, resource_name: ResourceName):
         """Sets the resource_name of this Resource.
 
-        User generated identifier, resource may be configured with identifier out-of-band. resourceName is expected to be unique within the scope of the associated VEN.   # noqa: E501
 
         :param resource_name: The resource_name of this Resource.
-        :type resource_name: str
+        :type resource_name: ResourceName
         """
         if resource_name is None:
             raise ValueError("Invalid value for `resource_name`, must not be `None`")  # noqa: E501
@@ -150,29 +200,6 @@ class Resource(Model):
         """
 
         self._attributes = attributes
-
-    @property
-    def targets(self) -> List[ValuesMap]:
-        """Gets the targets of this Resource.
-
-        A list of valuesMap objects describing target criteria.  # noqa: E501
-
-        :return: The targets of this Resource.
-        :rtype: List[ValuesMap]
-        """
-        return self._targets
-
-    @targets.setter
-    def targets(self, targets: List[ValuesMap]):
-        """Sets the targets of this Resource.
-
-        A list of valuesMap objects describing target criteria.  # noqa: E501
-
-        :param targets: The targets of this Resource.
-        :type targets: List[ValuesMap]
-        """
-
-        self._targets = targets
 
     @property
     def id(self) -> ObjectID:
@@ -242,26 +269,3 @@ class Resource(Model):
             raise ValueError("Invalid value for `modification_date_time`, must not be `None`")  # noqa: E501
 
         self._modification_date_time = modification_date_time
-
-    @property
-    def object_type(self) -> ObjectTypes:
-        """Gets the object_type of this Resource.
-
-
-        :return: The object_type of this Resource.
-        :rtype: ObjectTypes
-        """
-        return self._object_type
-
-    @object_type.setter
-    def object_type(self, object_type: ObjectTypes):
-        """Sets the object_type of this Resource.
-
-
-        :param object_type: The object_type of this Resource.
-        :type object_type: ObjectTypes
-        """
-        if object_type is None:
-            raise ValueError("Invalid value for `object_type`, must not be `None`")  # noqa: E501
-
-        self._object_type = object_type

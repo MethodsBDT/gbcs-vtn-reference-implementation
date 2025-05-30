@@ -21,3 +21,9 @@ class AuthServiceProvider:
             return self.auth_provider.get_scope(token)
         else:
             raise ProblemException(status=403, title='Forbidden', detail='Provided token is invalid')
+
+    def get_client_id(self, token: str) -> str:
+        if self.auth_provider.validate_token(token):
+            return self.auth_provider.get_client_id(token)
+        else:
+            raise ProblemException(status=403, title='Forbidden', detail='Provided token is invalid')

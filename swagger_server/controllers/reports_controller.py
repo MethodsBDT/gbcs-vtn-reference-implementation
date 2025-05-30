@@ -1,26 +1,33 @@
 import connexion
-from datetime import datetime
-from http import HTTPStatus
+import six
+from typing import Dict
+from typing import Tuple
+from typing import Union
 import logging
+from http import HTTPStatus
+from datetime import datetime
+from flask import request
+
 
 from swagger_server.controllers.events_controller import search_events_by_id
 from swagger_server.controllers.programs_controller import search_program_by_program_id
-from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.report import Report  # noqa: E501
 from swagger_server.models.report_request import ReportRequest  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
+from swagger_server import util
+
 
 def create_report(body=None):  # noqa: E501
     """add a report
 
     Create a new report in the server. # noqa: E501
 
-    :param body: report item to add.
-    :type body: dict | bytes
+    :param report_request: report item to add.
+    :type report_request: dict | bytes
 
-    :rtype: Report
+    :rtype: Union[Report, Tuple[Report, int], Tuple[Report, int, Dict[str, str]]
     """
     logging.info(f"create_report():")
 
@@ -28,6 +35,8 @@ def create_report(body=None):  # noqa: E501
     if connexion.request.is_json:
         reportBody = ReportRequest.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"create_report(): reportBody={reportBody}")
+
+    client_id = util.getClientId(request)
 
     # object must refer to an existing event
     events = objStore.search_all("EVENT")
@@ -44,6 +53,7 @@ def create_report(body=None):  # noqa: E501
         created_date_time=current_time,
         modification_date_time=None,
         object_type='REPORT',
+        client_id=client_id,
         event_id=reportBody.event_id,
         client_name=reportBody.client_name,
         report_name=reportBody.report_name,
@@ -68,10 +78,11 @@ def delete_report(report_id):  # noqa: E501
     Delete the report specified by the reportID in path. # noqa: E501
 
     :param report_id: object ID of a report.
-    :type report_id: dict | bytes
+    :type report_id: str
 
-    :rtype: Report
+    :rtype: Union[Report, Tuple[Report, int], Tuple[Report, int, Dict[str, str]]
     """
+    
     report = objStore.remove("REPORT", report_id)
     if type(report) is not Report:
         status = report
@@ -91,9 +102,9 @@ def search_all_reports(program_id=None, event_id=None, client_name=None, skip=No
     List all reports known to the server. May filter results by programID, eventID,  and clientName as query param. Use skip and pagination query params to limit response size.  # noqa: E501
 
     :param program_id: filter results to reports with programID.
-    :type program_id: dict | bytes
+    :type program_id: str
     :param event_id: filter results to reports with eventID.
-    :type event_id: dict | bytes
+    :type event_id: str
     :param client_name: filter results to reports with clientName.
     :type client_name: str
     :param skip: number of records to skip for pagination.
@@ -101,7 +112,7 @@ def search_all_reports(program_id=None, event_id=None, client_name=None, skip=No
     :param limit: maximum number of records to return.
     :type limit: int
 
-    :rtype: List[Report]
+    :rtype: Union[List[Report], Tuple[List[Report], int], Tuple[List[Report], int, Dict[str, str]]
     """
     logging.info(f"search_all_reports(): program_id={program_id} client_name={client_name} skip={skip} limit={limit}")
 
@@ -111,6 +122,11 @@ def search_all_reports(program_id=None, event_id=None, client_name=None, skip=No
         problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"search_all_reports(): problem={problem}")
         return problem, status
+
+    # if request from VEN filter on reports created by this VEN
+    if util.getClientRole(request) in 'VEN':
+        client_id = util.getClientId(request)
+        reports = [report for report in reports if report.client_id == client_id]
 
     if program_id != None:
         reports_filtered = []
@@ -149,17 +165,23 @@ def search_reports_by_report_id(report_id):  # noqa: E501
     Fetch the report specified by the reportID in path.  # noqa: E501
 
     :param report_id: object ID of a report.
-    :type report_id: dict | bytes
+    :type report_id: str
 
-    :rtype: Report
+    :rtype: Union[Report, Tuple[Report, int], Tuple[Report, int, Dict[str, str]]
     """
     logging.info(f"search_reports_by_report_id(): report_id={report_id}")
+
     report = objStore.search("REPORT", report_id)
     if type(report) is not Report:
         status = report
         problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"search_reports_by_report_id(): problem={problem}")
         return problem, status
+
+    client_id = util.getClientId(request)
+    # FS TBD: NOT_FOUND??
+    if report.client_id != client_id:
+        return [], HTTPStatus.OK
 
     logging.debug(f"search_reports_by_report_id(): report={report}")
 
@@ -173,11 +195,11 @@ def update_report(report_id, body=None):  # noqa: E501
     Update the report specified by the reportID in path. # noqa: E501
 
     :param report_id: object ID of a report.
-    :type report_id: dict | bytes
-    :param body: Report item to update.
-    :type body: dict | bytes
+    :type report_id: str
+    :param report_request: Report item to update.
+    :type report_request: dict | bytes
 
-    :rtype: Report
+    :rtype: Union[Report, Tuple[Report, int], Tuple[Report, int, Dict[str, str]]
     """
     logging.info(f"update_report(): report_id={report_id}")
     reportBody = None

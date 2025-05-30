@@ -6,6 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.client_name import ClientName  # noqa: F401,E501
 from swagger_server.models.object_id import ObjectID  # noqa: F401,E501
 from swagger_server.models.report_payload_descriptor import ReportPayloadDescriptor  # noqa: F401,E501
 from swagger_server.models.report_request_resources import ReportRequestResources  # noqa: F401,E501
@@ -18,13 +19,13 @@ class ReportRequest(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, event_id: ObjectID=None, client_name: str=None, report_name: str=None, payload_descriptors: List[ReportPayloadDescriptor]=None, resources: List[ReportRequestResources]=None):  # noqa: E501
+    def __init__(self, event_id: ObjectID=None, client_name: ClientName=None, report_name: str=None, payload_descriptors: List[ReportPayloadDescriptor]=None, resources: List[ReportRequestResources]=None):  # noqa: E501
         """ReportRequest - a model defined in Swagger
 
         :param event_id: The event_id of this ReportRequest.  # noqa: E501
         :type event_id: ObjectID
         :param client_name: The client_name of this ReportRequest.  # noqa: E501
-        :type client_name: str
+        :type client_name: ClientName
         :param report_name: The report_name of this ReportRequest.  # noqa: E501
         :type report_name: str
         :param payload_descriptors: The payload_descriptors of this ReportRequest.  # noqa: E501
@@ -34,7 +35,7 @@ class ReportRequest(Model):
         """
         self.swagger_types = {
             'event_id': ObjectID,
-            'client_name': str,
+            'client_name': ClientName,
             'report_name': str,
             'payload_descriptors': List[ReportPayloadDescriptor],
             'resources': List[ReportRequestResources]
@@ -88,24 +89,22 @@ class ReportRequest(Model):
         self._event_id = event_id
 
     @property
-    def client_name(self) -> str:
+    def client_name(self) -> ClientName:
         """Gets the client_name of this ReportRequest.
 
-        User generated identifier; may be VEN ID provisioned out-of-band.  # noqa: E501
 
         :return: The client_name of this ReportRequest.
-        :rtype: str
+        :rtype: ClientName
         """
         return self._client_name
 
     @client_name.setter
-    def client_name(self, client_name: str):
+    def client_name(self, client_name: ClientName):
         """Sets the client_name of this ReportRequest.
 
-        User generated identifier; may be VEN ID provisioned out-of-band.  # noqa: E501
 
         :param client_name: The client_name of this ReportRequest.
-        :type client_name: str
+        :type client_name: ClientName
         """
         if client_name is None:
             raise ValueError("Invalid value for `client_name`, must not be `None`")  # noqa: E501

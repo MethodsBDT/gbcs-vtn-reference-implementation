@@ -6,6 +6,8 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.reading_type import ReadingType  # noqa: F401,E501
+from swagger_server.models.units import Units  # noqa: F401,E501
 from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
 from swagger_server import util
 
@@ -15,16 +17,15 @@ class ReportDescriptor(Model):
 
     Do not edit the class manually.
     """
-
-    def __init__(self, payload_type=None, reading_type=None, units=None, targets=None, aggregate=False, start_interval=-1, num_intervals=-1, historical=True, frequency=-1, repeat=1, report_intervals=None):  # noqa: E501
-        """ReportDescriptor - a model defined in OpenAPI
+    def __init__(self, payload_type: str=None, reading_type: ReadingType=None, units: Units=None, targets: List[ValuesMap]=None, aggregate: bool=False, start_interval: int=-1, num_intervals: int=-1, historical: bool=True, frequency: int=-1, repeat: int=1, report_intervals: str='INTERVALS'):  # noqa: E501
+        """ReportDescriptor - a model defined in Swagger
 
         :param payload_type: The payload_type of this ReportDescriptor.  # noqa: E501
         :type payload_type: str
         :param reading_type: The reading_type of this ReportDescriptor.  # noqa: E501
-        :type reading_type: str
+        :type reading_type: ReadingType
         :param units: The units of this ReportDescriptor.  # noqa: E501
-        :type units: str
+        :type units: Units
         :param targets: The targets of this ReportDescriptor.  # noqa: E501
         :type targets: List[ValuesMap]
         :param aggregate: The aggregate of this ReportDescriptor.  # noqa: E501
@@ -44,8 +45,8 @@ class ReportDescriptor(Model):
         """
         self.swagger_types = {
             'payload_type': str,
-            'reading_type': str,
-            'units': str,
+            'reading_type': ReadingType,
+            'units': Units,
             'targets': List[ValuesMap],
             'aggregate': bool,
             'start_interval': int,
@@ -114,55 +115,47 @@ class ReportDescriptor(Model):
         """
         if payload_type is None:
             raise ValueError("Invalid value for `payload_type`, must not be `None`")  # noqa: E501
-        if payload_type is not None and len(payload_type) > 128:
-            raise ValueError("Invalid value for `payload_type`, length must be less than or equal to `128`")  # noqa: E501
-        if payload_type is not None and len(payload_type) < 1:
-            raise ValueError("Invalid value for `payload_type`, length must be greater than or equal to `1`")  # noqa: E501
 
         self._payload_type = payload_type
 
     @property
-    def reading_type(self) -> str:
+    def reading_type(self) -> ReadingType:
         """Gets the reading_type of this ReportDescriptor.
 
-        Enumerated or private string signifying the type of reading.  # noqa: E501
 
         :return: The reading_type of this ReportDescriptor.
-        :rtype: str
+        :rtype: ReadingType
         """
         return self._reading_type
 
     @reading_type.setter
-    def reading_type(self, reading_type: str):
+    def reading_type(self, reading_type: ReadingType):
         """Sets the reading_type of this ReportDescriptor.
 
-        Enumerated or private string signifying the type of reading.  # noqa: E501
 
         :param reading_type: The reading_type of this ReportDescriptor.
-        :type reading_type: str
+        :type reading_type: ReadingType
         """
 
         self._reading_type = reading_type
 
     @property
-    def units(self) -> str:
+    def units(self) -> Units:
         """Gets the units of this ReportDescriptor.
 
-        Units of measure.  # noqa: E501
 
         :return: The units of this ReportDescriptor.
-        :rtype: str
+        :rtype: Units
         """
         return self._units
 
     @units.setter
-    def units(self, units: str):
+    def units(self, units: Units):
         """Sets the units of this ReportDescriptor.
 
-        Units of measure.  # noqa: E501
 
         :param units: The units of this ReportDescriptor.
-        :type units: str
+        :type units: Units
         """
 
         self._units = units

@@ -4,11 +4,16 @@ from http import HTTPStatus
 import json
 import logging
 import requests
+from flask import request
+from typing import Dict
+from typing import Tuple
+from typing import Union
 
-from swagger_server.models.notification import Notification  # noqa: E501
+from swagger_server.models.object_types import ObjectTypes  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.subscription import Subscription  # noqa: E501
 from swagger_server.models.subscription_request import SubscriptionRequest  # noqa: E501
+from swagger_server.models.notification import Notification  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
 from swagger_server import util
 from swagger_server import notifiers
@@ -19,10 +24,10 @@ def create_subscription(body):  # noqa: E501
 
     Create a new subscription. # noqa: E501
 
-    :param body:
-    :type body: dict | bytes
+    :param subscription_request:
+    :type subscription_request: dict | bytes
 
-    :rtype: Subscription
+    :rtype: Union[Subscription, Tuple[Subscription, int], Tuple[Subscription, int, Dict[str, str]]
     """
     logging.info(f"create_subscription():")
 
@@ -40,12 +45,15 @@ def create_subscription(body):  # noqa: E501
 
     # Note: there is currently no concept of a duplicated subscription
 
+    client_id = util.getClientId(request)
+
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
 
     subscription = Subscription(
         created_date_time=current_time,
         object_type='SUBSCRIPTION',
+        client_id=client_id,
         client_name=subscriptionBody.client_name,
         program_id=subscriptionBody.program_id,
         object_operations=subscriptionBody.object_operations,
@@ -75,9 +83,9 @@ def delete_subscription(subscription_id):  # noqa: E501
     Delete the subscription specified by subscriptionID specified in path. # noqa: E501
 
     :param subscription_id: object ID of the associated subscription.
-    :type subscription_id: dict | bytes
+    :type subscription_id: str
 
-    :rtype: Subscription
+    :rtype: Union[Subscription, Tuple[Subscription, int], Tuple[Subscription, int, Dict[str, str]]
     """
     logging.info(f"delete_subscription(): subscription_id={subscription_id}")
 
@@ -98,9 +106,9 @@ def search_subscription_by_id(subscription_id):  # noqa: E501
     Return the subscription specified by subscriptionID specified in path. # noqa: E501
 
     :param subscription_id: object ID of the associated subscription.
-    :type subscription_id: dict | bytes
+    :type subscription_id: str
 
-    :rtype: Subscription
+    :rtype: Union[Subscription, Tuple[Subscription, int], Tuple[Subscription, int, Dict[str, str]]
     """
     logging.info(f"search_subscription_by_id(): subscription_id={subscription_id}")
 
@@ -112,6 +120,12 @@ def search_subscription_by_id(subscription_id):  # noqa: E501
         logging.warning(f"search_all_subscriptions(): problem={problem}")
         return problem, status
 
+    # VEN may only view subscriptions its created
+    if util.getClientRole(request) in 'VEN':
+        client_id = util.getClientId(request)
+        if subscription.client_id != client_id:
+            return None, HTTPStatus.NOT_FOUND
+
     subscription_callback("SUBSCRIPTION", "READ", subscription)
 
     return subscription, HTTPStatus.OK
@@ -122,7 +136,7 @@ def search_subscriptions(program_id=None, client_name=None, target_type=None, ta
     List all subscriptions. May filter results by programID and clientName as query params. May filter results by targetType and targetValues as query params. May filter results by objects as query param. See objectTypes schema. Use skip and pagination query params to limit response size.  # noqa: E501
 
     :param program_id: filter results to subscriptions with programID.
-    :type program_id: dict | bytes
+    :type program_id: str
     :param client_name: filter results to subscriptions with clientName.
     :type client_name: str
     :param target_type: Indicates targeting type, e.g. GROUP
@@ -136,8 +150,9 @@ def search_subscriptions(program_id=None, client_name=None, target_type=None, ta
     :param limit: maximum number of records to return.
     :type limit: int
 
-    :rtype: List[Subscription]
+    :rtype: Union[List[Subscription], Tuple[List[Subscription], int], Tuple[List[Subscription], int, Dict[str, str]]
     """
+    # TBD: see genereated server, need ot add fetching params from request?
     logging.info(
         f"search_all_subscriptions(): program_id={program_id} client_name={client_name} target_type={target_type} target_values={target_values} objects={objects} skip={skip} limit={limit}")
 
@@ -148,6 +163,11 @@ def search_subscriptions(program_id=None, client_name=None, target_type=None, ta
         problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"search_all_subscriptions(): problem={problem}")
         return problem, status
+
+    # if request from VEN filter on reports created by this VEN
+    if util.getClientRole(request) in 'VEN':
+        client_id = util.getClientId(request)
+        subscriptions = [subscription for subscription in subscriptions if subscription.client_id == client_id]
 
     if program_id != None:
         # strip leading [' and tailing ']
@@ -182,11 +202,11 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
     Update the subscription specified by subscriptionID specified in path. # noqa: E501
 
     :param subscription_id: object ID of the associated subscription.
-    :type subscription_id: dict | bytes
-    :param body: subscription item to update.
-    :type body: dict | bytes
+    :type subscription_id: str
+    :param subscription_request: subscription item to update.
+    :type subscription_request: dict | bytes
 
-    :rtype: Subscription
+    :rtype: Union[Subscription, Tuple[Subscription, int], Tuple[Subscription, int, Dict[str, str]]
     """
     logging.info(f"update_subscription(): subscription_id={subscription_id}")
     subscriptionBody = None
@@ -274,6 +294,7 @@ def subscription_callback(resourceName, operation, subscriptionObj):
             logging.info(f"subscription_callback(): notification={notification} callback_url={objOperation.callback_url}")
             headers = { "Authorization": f"Bearer {objOperation.bearer_token}"}
 
+            # FS TBD: address timeout error
             response = requests.post(objOperation.callback_url, json=json.dumps(notification.to_dict()), headers=headers)
             if response.status_code != HTTPStatus.OK:
                 logging.warning(f"subscription_callback: callback response.status_code={response.status_code}")

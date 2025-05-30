@@ -13,7 +13,7 @@ from swagger_server.models.object_metadata import ObjectMetadata  # noqa: F401,E
 from swagger_server.models.object_types import ObjectTypes  # noqa: F401,E501
 from swagger_server.models.program_request import ProgramRequest  # noqa: F401,E501
 from swagger_server.models.program_request_program_descriptions import ProgramRequestProgramDescriptions  # noqa: F401,E501
-from swagger_server.models.any_ofprogram_request_payload_descriptors_items import AnyOfprogramRequestPayloadDescriptorsItems  # noqa: F401,E501
+from swagger_server.models.any_ofprogram_request_payload_descriptors_items import AnyOfprogramRequestPayloadDescriptorsItems
 from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
 import re  # noqa: F401,E501
 from swagger_server import util
@@ -50,7 +50,7 @@ class Program(Model):
         :param local_price: The local_price of this Program.  # noqa: E501
         :type local_price: bool
         :param payload_descriptors: The payload_descriptors of this Program.  # noqa: E501
-        :type payload_descriptors: List[Object]
+        :type payload_descriptors: List[AnyOfprogramRequestPayloadDescriptorsItems]
         :param targets: The targets of this Program.  # noqa: E501
         :type targets: List[ValuesMap]
         :param id: The id of this Program.  # noqa: E501
@@ -390,7 +390,7 @@ class Program(Model):
         A list of payloadDescriptors.  # noqa: E501
 
         :return: The payload_descriptors of this Program.
-        :rtype: List[Object]
+        :rtype: List[AnyOfprogramRequestPayloadDescriptorsItems]
         """
         return self._payload_descriptors
 
@@ -401,7 +401,7 @@ class Program(Model):
         A list of payloadDescriptors.  # noqa: E501
 
         :param payload_descriptors: The payload_descriptors of this Program.
-        :type payload_descriptors: List[Object]
+        :type payload_descriptors: List[AnyOfprogramRequestPayloadDescriptorsItems]
         """
 
         self._payload_descriptors = payload_descriptors

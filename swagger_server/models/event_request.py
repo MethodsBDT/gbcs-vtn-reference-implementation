@@ -6,6 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.duration import Duration  # noqa: F401,E501
 from swagger_server.models.event_payload_descriptor import EventPayloadDescriptor  # noqa: F401,E501
 from swagger_server.models.interval import Interval  # noqa: F401,E501
 from swagger_server.models.interval_period import IntervalPeriod  # noqa: F401,E501
@@ -21,16 +22,15 @@ class EventRequest(Model):
 
     Do not edit the class manually.
     """
-
-    def __init__(self, program_id=None, event_name=None, duration=None, priority=None, targets=None, report_descriptors=None, payload_descriptors=None, interval_period=None, intervals=None):  # noqa: E501
-        """EventRequest - a model defined in OpenAPI
+    def __init__(self, program_id: ObjectID=None, event_name: str=None, duration: Duration=None, priority: int=None, targets: List[ValuesMap]=None, report_descriptors: List[ReportDescriptor]=None, payload_descriptors: List[EventPayloadDescriptor]=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None):  # noqa: E501
+        """EventRequest - a model defined in Swagger
 
         :param program_id: The program_id of this EventRequest.  # noqa: E501
         :type program_id: ObjectID
         :param event_name: The event_name of this EventRequest.  # noqa: E501
         :type event_name: str
         :param duration: The duration of this EventRequest.  # noqa: E501
-        :type duration: str
+        :type duration: Duration
         :param priority: The priority of this EventRequest.  # noqa: E501
         :type priority: int
         :param targets: The targets of this EventRequest.  # noqa: E501
@@ -47,7 +47,7 @@ class EventRequest(Model):
         self.swagger_types = {
             'program_id': ObjectID,
             'event_name': str,
-            'duration': str,
+            'duration': Duration,
             'priority': int,
             'targets': List[ValuesMap],
             'report_descriptors': List[ReportDescriptor],
@@ -92,7 +92,6 @@ class EventRequest(Model):
     def program_id(self) -> ObjectID:
         """Gets the program_id of this EventRequest.
 
-        URL safe VTN assigned object ID.  # noqa: E501
 
         :return: The program_id of this EventRequest.
         :rtype: ObjectID
@@ -103,19 +102,12 @@ class EventRequest(Model):
     def program_id(self, program_id: ObjectID):
         """Sets the program_id of this EventRequest.
 
-        URL safe VTN assigned object ID.  # noqa: E501
 
         :param program_id: The program_id of this EventRequest.
         :type program_id: ObjectID
         """
         if program_id is None:
             raise ValueError("Invalid value for `program_id`, must not be `None`")  # noqa: E501
-        if program_id is not None and len(program_id) > 128:
-            raise ValueError("Invalid value for `program_id`, length must be less than or equal to `128`")  # noqa: E501
-        if program_id is not None and len(program_id) < 1:
-            raise ValueError("Invalid value for `program_id`, length must be greater than or equal to `1`")  # noqa: E501
-        if program_id is not None and not re.search(r'^[a-zA-Z0-9_-]*$', program_id):  # noqa: E501
-            raise ValueError(r"Invalid value for `program_id`, must be a follow pattern or equal to `/^[a-zA-Z0-9_-]*$/`")  # noqa: E501
 
         self._program_id = program_id
 
@@ -143,27 +135,23 @@ class EventRequest(Model):
         self._event_name = event_name
 
     @property
-    def duration(self) -> str:
+    def duration(self) -> Duration:
         """Gets the duration of this EventRequest.
 
-        duration in ISO 8601 format  # noqa: E501
 
         :return: The duration of this EventRequest.
-        :rtype: str
+        :rtype: Duration
         """
         return self._duration
 
     @duration.setter
-    def duration(self, duration: str):
+    def duration(self, duration: Duration):
         """Sets the duration of this EventRequest.
 
-        duration in ISO 8601 format  # noqa: E501
 
         :param duration: The duration of this EventRequest.
-        :type duration: str
+        :type duration: Duration
         """
-        if duration is not None and not re.search(r'^(-?)P(?=\d|T\d)(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)([DW]))?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$', duration):  # noqa: E501
-            raise ValueError(r"Invalid value for `duration`, must be a follow pattern or equal to `/^(-?)P(?=\d|T\d)(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)([DW]))?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$/`")  # noqa: E501
 
         self._duration = duration
 
@@ -187,8 +175,6 @@ class EventRequest(Model):
         :param priority: The priority of this EventRequest.
         :type priority: int
         """
-        if priority is not None and priority < 0:  # noqa: E501
-            raise ValueError("Invalid value for `priority`, must be a value greater than or equal to `0`")  # noqa: E501
 
         self._priority = priority
 

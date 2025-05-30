@@ -8,8 +8,8 @@ https://connexion.readthedocs.io/en/latest/security.html
 
 auth_provider = AuthServiceProvider()
 scopes = {
-    'test/VEN': ['read_all', 'write_reports', 'write_subscriptions', 'write_vens'],
-    'test/BL': ['read_all', 'read_bl', 'write_programs', 'write_events', 'write_subscriptions', 'write_vens'],
+    'test/VEN': ['read_ven_objects', 'read_targets', 'write_reports', 'write_subscriptions', 'write_vens'],
+    'test/BL': ['bl_scope', 'read_ven_objects', 'read_all', 'read_targets', 'write_programs', 'write_events', 'write_subscriptions', 'write_vens'],
     'certification/VEN': ['read_all', 'write_reports', 'write_subscriptions', 'write_vens'],
     'certification/BL': ['read_all', 'read_bl', 'write_programs', 'write_events', 'write_subscriptions', 'write_vens']
 }

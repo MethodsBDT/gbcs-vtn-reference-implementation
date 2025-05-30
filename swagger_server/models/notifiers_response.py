@@ -15,7 +15,7 @@ class NotifiersResponse(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, webhook: bool=True, mqtt: MqttNotifierBindingObject=None):  # noqa: E501
+    def __init__(self, webhook: bool=None, mqtt: MqttNotifierBindingObject=None):  # noqa: E501
         """NotifiersResponse - a model defined in Swagger
 
         :param webhook: The webhook of this NotifiersResponse.  # noqa: E501

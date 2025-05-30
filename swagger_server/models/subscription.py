@@ -6,6 +6,8 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.client_id import ClientID  # noqa: F401,E501
+from swagger_server.models.client_name import ClientName  # noqa: F401,E501
 from swagger_server.models.model_date_time import ModelDateTime  # noqa: F401,E501
 from swagger_server.models.object_id import ObjectID  # noqa: F401,E501
 from swagger_server.models.object_metadata import ObjectMetadata  # noqa: F401,E501
@@ -22,17 +24,19 @@ class Subscription(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, client_name: str=None, program_id: ObjectID=None, object_operations: List[SubscriptionRequestObjectOperations]=None, targets: List[ValuesMap]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
+    def __init__(self, client_name: ClientName=None, program_id: ObjectID=None, object_operations: List[SubscriptionRequestObjectOperations]=None, targets: List[ValuesMap]=None, client_id: ClientID=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
         """Subscription - a model defined in Swagger
 
         :param client_name: The client_name of this Subscription.  # noqa: E501
-        :type client_name: str
+        :type client_name: ClientName
         :param program_id: The program_id of this Subscription.  # noqa: E501
         :type program_id: ObjectID
         :param object_operations: The object_operations of this Subscription.  # noqa: E501
         :type object_operations: List[SubscriptionRequestObjectOperations]
         :param targets: The targets of this Subscription.  # noqa: E501
         :type targets: List[ValuesMap]
+        :param client_id: The client_id of this Subscription.  # noqa: E501
+        :type client_id: ClientID
         :param id: The id of this Subscription.  # noqa: E501
         :type id: ObjectID
         :param created_date_time: The created_date_time of this Subscription.  # noqa: E501
@@ -43,10 +47,11 @@ class Subscription(Model):
         :type object_type: ObjectTypes
         """
         self.swagger_types = {
-            'client_name': str,
+            'client_name': ClientName,
             'program_id': ObjectID,
             'object_operations': List[SubscriptionRequestObjectOperations],
             'targets': List[ValuesMap],
+            'client_id': ClientID,
             'id': ObjectID,
             'created_date_time': ModelDateTime,
             'modification_date_time': ModelDateTime,
@@ -58,6 +63,7 @@ class Subscription(Model):
             'program_id': 'programID',
             'object_operations': 'objectOperations',
             'targets': 'targets',
+            'client_id': 'clientID',
             'id': 'id',
             'created_date_time': 'createdDateTime',
             'modification_date_time': 'modificationDateTime',
@@ -67,6 +73,7 @@ class Subscription(Model):
         self._program_id = program_id
         self._object_operations = object_operations
         self._targets = targets
+        self._client_id = client_id
         self._id = id
         self._created_date_time = created_date_time
         self._modification_date_time = modification_date_time
@@ -84,24 +91,22 @@ class Subscription(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def client_name(self) -> str:
+    def client_name(self) -> ClientName:
         """Gets the client_name of this Subscription.
 
-        User generated identifier, may be VEN identifier provisioned out-of-band.  # noqa: E501
 
         :return: The client_name of this Subscription.
-        :rtype: str
+        :rtype: ClientName
         """
         return self._client_name
 
     @client_name.setter
-    def client_name(self, client_name: str):
+    def client_name(self, client_name: ClientName):
         """Sets the client_name of this Subscription.
 
-        User generated identifier, may be VEN identifier provisioned out-of-band.  # noqa: E501
 
         :param client_name: The client_name of this Subscription.
-        :type client_name: str
+        :type client_name: ClientName
         """
         if client_name is None:
             raise ValueError("Invalid value for `client_name`, must not be `None`")  # noqa: E501
@@ -126,8 +131,6 @@ class Subscription(Model):
         :param program_id: The program_id of this Subscription.
         :type program_id: ObjectID
         """
-        if program_id is None:
-            raise ValueError("Invalid value for `program_id`, must not be `None`")  # noqa: E501
 
         self._program_id = program_id
 
@@ -178,6 +181,29 @@ class Subscription(Model):
         """
 
         self._targets = targets
+
+    @property
+    def client_id(self) -> ClientID:
+        """Gets the client_id of this Subscription.
+
+
+        :return: The client_id of this Subscription.
+        :rtype: ClientID
+        """
+        return self._client_id
+
+    @client_id.setter
+    def client_id(self, client_id: ClientID):
+        """Sets the client_id of this Subscription.
+
+
+        :param client_id: The client_id of this Subscription.
+        :type client_id: ClientID
+        """
+        if client_id is None:
+            raise ValueError("Invalid value for `client_id`, must not be `None`")  # noqa: E501
+
+        self._client_id = client_id
 
     @property
     def id(self) -> ObjectID:
