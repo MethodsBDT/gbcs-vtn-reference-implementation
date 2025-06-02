@@ -144,7 +144,7 @@ def search_all_events(program_id=None, target_type=None, target_values=None, ski
         # A VEN client will fetch: programs with no targets, and programs whose targets are 'allowed' by associated ven that also
         # match target in query
         eventsNoTargets = util.getObjectsNoTargets(events)
-        allowed_targets = vens_controller.getAllowedTargets(request)
+        allowed_targets = getAllowedTargets(request)
         eventsWithTargets = util.getObjectsWithTargets(events, allowed_targets)
         eventList = eventsNoTargets + eventsWithTargets
         eventList = util.getObjectsWithTarget(eventList, target_type, target_values)

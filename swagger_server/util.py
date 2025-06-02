@@ -235,7 +235,7 @@ def getMatchedTargets(targets, target_type, target_values):
     return matched_targets
 
 def getObjects(objects, objectTypes):
-    # find objects of a given type within subscriotions
+    # find objects of a given type within subscriptions
     logging.debug(f"getObjects(): objects={objects} objectTypes={objectTypes}")
     if objectTypes != None:
         objectList=[]

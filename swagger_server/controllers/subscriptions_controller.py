@@ -181,8 +181,8 @@ def search_subscriptions(program_id=None, client_name=None, target_type=None, ta
         subscriptions = [subscription for subscription in subscriptions if subscription.client_name == client_name]
         if len(subscriptions) == 0:
             return subscriptions, HTTPStatus.OK
-    subscriptions = util.getTargets(subscriptions, target_type, target_values)
-    subscriptions = util.getObjects(subscriptions, objects)
+    subscriptions = util.getObjectsWithTarget(subscriptions, target_type, target_values)
+    # subscriptions = util.getObjects(subscriptions, objects)
     if skip != None:
         if len(subscriptions) < skip:
             return [], HTTPStatus.OK

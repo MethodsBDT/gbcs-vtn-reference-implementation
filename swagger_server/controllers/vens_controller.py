@@ -422,7 +422,7 @@ def search_ven_resources(ven_id, resource_name=None, target_type=None, target_va
         if len(resourceList) == 0:
             return resourceList, HTTPStatus.OK
     logging.info(f"search_ven_resources(): resourceList={resourceList}")
-    resourceList = util.getTargets(resourceList, target_type, target_values)
+    resourceList = util.getObjectsWithTarget(resourceList, target_type, target_values)
     if skip != None:
         if len(resourceList) < skip:
             return [], HTTPStatus.OK
@@ -561,7 +561,7 @@ def getUnionOfTargets(request, target_type, target_values):
     vens = objStore.search_all("VEN")
     venList = [ven for ven in vens if ven.client_id == client_id]
     if 0 == len(venList) < 2:
-        logging.warning(f"vens_controller.allowedTargets(): none or multiple vens with client_id {client_id} venList={venList}")
+        logging.warning(f"vens_controller.getUnionOfTargets(): none or multiple vens with client_id {client_id} venList={venList}")
         return []
     ven = venList[0]
     logging.debug(f"getUnionOfTargets(): ven={ven}")
@@ -576,8 +576,16 @@ def getAllowedTargets(request):
     vens = objStore.search_all("VEN")
     venList = [ven for ven in vens if ven.client_id == client_id]
     if 0 == len(venList) < 2:
-        logging.warning(f"vens_controller.allowedTargets(): none or multiple vens with client_id {client_id} venList={venList}")
+        logging.warning(f"vens_controller.getAllowedTargets(): none or multiple vens with client_id {client_id} venList={venList}")
         return []
     ven = venList[0]
     logging.debug(f"getAllowedTargets(): ven={ven}")
     return ven.targets
+
+
+def getVensWithTargets(targets):
+    # get all vens with targets matching targets argument
+    vens = objStore.search_all("VEN")
+    venList = util.getObjectsWithTargets(vens, targets)
+    logging.debug(f"getVensWithTargets(): venList = {venList}")
+    return venList
