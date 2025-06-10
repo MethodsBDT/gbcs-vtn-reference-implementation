@@ -49,6 +49,7 @@ class MqttNotifierAuthenticationOauth2BearerToken(Model):
     def method(self) -> str:
         """Gets the method of this MqttNotifierAuthenticationOauth2BearerToken.
 
+        Specifies OAuth2 bearer token authentication  # noqa: E501
 
         :return: The method of this MqttNotifierAuthenticationOauth2BearerToken.
         :rtype: str
@@ -59,6 +60,7 @@ class MqttNotifierAuthenticationOauth2BearerToken(Model):
     def method(self, method: str):
         """Sets the method of this MqttNotifierAuthenticationOauth2BearerToken.
 
+        Specifies OAuth2 bearer token authentication  # noqa: E501
 
         :param method: The method of this MqttNotifierAuthenticationOauth2BearerToken.
         :type method: str

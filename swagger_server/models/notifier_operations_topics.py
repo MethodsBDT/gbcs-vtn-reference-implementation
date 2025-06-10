@@ -59,7 +59,7 @@ class NotifierOperationsTopics(Model):
     def create(self) -> str:
         """Gets the create of this NotifierOperationsTopics.
 
-        'Topic path for CREATE operations,  not provided for notifications for a specific object ID,  e.g. until programID foo is created, clients unable to  request notifications of its creation!'   # noqa: E501
+        'Topic path for CREATE operations,  not provided for notifications for a specific object ID,  e.g. until programID foo is created, clients unable to  request notifications of its creation'   # noqa: E501
 
         :return: The create of this NotifierOperationsTopics.
         :rtype: str
@@ -70,7 +70,7 @@ class NotifierOperationsTopics(Model):
     def create(self, create: str):
         """Sets the create of this NotifierOperationsTopics.
 
-        'Topic path for CREATE operations,  not provided for notifications for a specific object ID,  e.g. until programID foo is created, clients unable to  request notifications of its creation!'   # noqa: E501
+        'Topic path for CREATE operations,  not provided for notifications for a specific object ID,  e.g. until programID foo is created, clients unable to  request notifications of its creation'   # noqa: E501
 
         :param create: The create of this NotifierOperationsTopics.
         :type create: str

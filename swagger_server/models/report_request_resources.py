@@ -8,6 +8,7 @@ from typing import List, Dict  # noqa: F401
 from swagger_server.models.base_model_ import Model
 from swagger_server.models.interval import Interval  # noqa: F401,E501
 from swagger_server.models.interval_period import IntervalPeriod  # noqa: F401,E501
+from swagger_server.models.resource_name import ResourceName  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -16,18 +17,18 @@ class ReportRequestResources(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, resource_name: str=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None):  # noqa: E501
+    def __init__(self, resource_name: ResourceName=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None):  # noqa: E501
         """ReportRequestResources - a model defined in Swagger
 
         :param resource_name: The resource_name of this ReportRequestResources.  # noqa: E501
-        :type resource_name: str
+        :type resource_name: ResourceName
         :param interval_period: The interval_period of this ReportRequestResources.  # noqa: E501
         :type interval_period: IntervalPeriod
         :param intervals: The intervals of this ReportRequestResources.  # noqa: E501
         :type intervals: List[Interval]
         """
         self.swagger_types = {
-            'resource_name': str,
+            'resource_name': ResourceName,
             'interval_period': IntervalPeriod,
             'intervals': List[Interval]
         }
@@ -53,24 +54,22 @@ class ReportRequestResources(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def resource_name(self) -> str:
+    def resource_name(self) -> ResourceName:
         """Gets the resource_name of this ReportRequestResources.
 
-        User generated identifier. A value of AGGREGATED_REPORT indicates an aggregation of more that one resource's data  # noqa: E501
 
         :return: The resource_name of this ReportRequestResources.
-        :rtype: str
+        :rtype: ResourceName
         """
         return self._resource_name
 
     @resource_name.setter
-    def resource_name(self, resource_name: str):
+    def resource_name(self, resource_name: ResourceName):
         """Sets the resource_name of this ReportRequestResources.
 
-        User generated identifier. A value of AGGREGATED_REPORT indicates an aggregation of more that one resource's data  # noqa: E501
 
         :param resource_name: The resource_name of this ReportRequestResources.
-        :type resource_name: str
+        :type resource_name: ResourceName
         """
         if resource_name is None:
             raise ValueError("Invalid value for `resource_name`, must not be `None`")  # noqa: E501

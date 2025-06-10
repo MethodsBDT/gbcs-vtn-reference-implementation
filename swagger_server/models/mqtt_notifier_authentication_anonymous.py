@@ -44,6 +44,7 @@ class MqttNotifierAuthenticationAnonymous(Model):
     def method(self) -> str:
         """Gets the method of this MqttNotifierAuthenticationAnonymous.
 
+        Specifies anonymous authentication  # noqa: E501
 
         :return: The method of this MqttNotifierAuthenticationAnonymous.
         :rtype: str
@@ -54,6 +55,7 @@ class MqttNotifierAuthenticationAnonymous(Model):
     def method(self, method: str):
         """Sets the method of this MqttNotifierAuthenticationAnonymous.
 
+        Specifies anonymous authentication  # noqa: E501
 
         :param method: The method of this MqttNotifierAuthenticationAnonymous.
         :type method: str

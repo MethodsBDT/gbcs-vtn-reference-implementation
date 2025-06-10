@@ -1,14 +1,20 @@
 import connexion
 from datetime import datetime
+import six
 from http import HTTPStatus
 import logging
+from flask import request
+
 
 from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.program import Program  # noqa: E501
 from swagger_server.models.program_request import ProgramRequest  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
+from swagger_server.controllers import vens_controller  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
+from swagger_server.models.target_type import TargetType  # noqa: E501
+from swagger_server.models.target_value import TargetValue  # noqa: E501
 from swagger_server import util
 
 
@@ -26,6 +32,7 @@ def create_program(body=None):  # noqa: E501
 
     programBody = None
     if connexion.request.is_json:
+        json = connexion.request.get_json()
         programBody = ProgramRequest.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"create_program(): programBody={programBody}")
 
@@ -96,15 +103,14 @@ def delete_program(program_id):  # noqa: E501
     return program, HTTPStatus.OK
 
 def search_all_programs(target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
-
     """searches all programs
 
     List all programs known to the server. May filter results by targetType and targetValues as query params. Use skip and pagination query params to limit response size.  # noqa: E501
 
     :param target_type: Indicates targeting type, e.g. GROUP
-    :type target_type: str
+    :type target_type: dict | bytes
     :param target_values: List of target values, e.g. group names
-    :type target_values: List[str]
+    :type target_values: list | bytes
     :param skip: number of records to skip for pagination.
     :type skip: int
     :param limit: maximum number of records to return.
@@ -122,11 +128,23 @@ def search_all_programs(target_type=None, target_values=None, skip=None, limit=N
         return problem, status
     
     logging.debug(f"search_all_programs(): programs={programs}")
-    programList = util.getTargets(programs, target_type, target_values)
+
+    programList = []
+    if util.getClientRole(request) in 'BL':
+        # BL will fetch all objects if targets are not specified in query, or objects matching targets if present in query
+        programList = util.getObjectsWithTarget(programs, target_type, target_values)
+    else:
+        # A VEN client will fetch: programs with no targets, and programs whose targets are 'allowed' by associated ven that also 
+        # match target in query 
+        programsNoTargets = util.getObjectsNoTargets(programs)
+        allowed_targets = vens_controller.getAllowedTargets(request)
+        programsWithTargets = util.getObjectsWithTargets(programs, allowed_targets)
+        programList = programsNoTargets + programsWithTargets
+        programList = util.getObjectsWithTarget(programList, target_type, target_values)
     if skip != None:
-        if len(programs) < skip:
+        if len(programList) < skip:
             return [], HTTPStatus.OK
-        programList = programs[skip:]
+        programList = programList[skip:]
     if limit != None:
         programList = programList[:limit]
     logging.debug(f"search_all_programs(): programList={programList}")
@@ -150,6 +168,7 @@ def search_program_by_program_id(program_id):  # noqa: E501
 
     program = objStore.search("PROGRAM", program_id)
     if type(program) is not Program:
+        # FS TBD: shouldn;t status be an HTTPStatus?
         status = program
         problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"search_program_by_program_id(): problem={problem}")

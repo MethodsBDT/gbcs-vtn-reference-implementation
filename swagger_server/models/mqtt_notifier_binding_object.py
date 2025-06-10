@@ -107,6 +107,7 @@ class MqttNotifierBindingObject(Model):
     def authentication(self) -> OneOfmqttNotifierBindingObjectAuthentication:
         """Gets the authentication of this MqttNotifierBindingObject.
 
+        Authentication method supported for connection to MQTT broker  # noqa: E501
 
         :return: The authentication of this MqttNotifierBindingObject.
         :rtype: OneOfmqttNotifierBindingObjectAuthentication
@@ -117,6 +118,7 @@ class MqttNotifierBindingObject(Model):
     def authentication(self, authentication: OneOfmqttNotifierBindingObjectAuthentication):
         """Sets the authentication of this MqttNotifierBindingObject.
 
+        Authentication method supported for connection to MQTT broker  # noqa: E501
 
         :param authentication: The authentication of this MqttNotifierBindingObject.
         :type authentication: OneOfmqttNotifierBindingObjectAuthentication

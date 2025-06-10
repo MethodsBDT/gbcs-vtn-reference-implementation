@@ -6,6 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.duration import Duration  # noqa: F401,E501
 from swagger_server.models.event_payload_descriptor import EventPayloadDescriptor  # noqa: F401,E501
 from swagger_server.models.event_request import EventRequest  # noqa: F401,E501
 from swagger_server.models.interval import Interval  # noqa: F401,E501
@@ -25,13 +26,15 @@ class Event(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, program_id: ObjectID=None, event_name: str=None, priority: int=None, targets: List[ValuesMap]=None, report_descriptors: List[ReportDescriptor]=None, payload_descriptors: List[EventPayloadDescriptor]=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
+    def __init__(self, program_id: ObjectID=None, event_name: str=None, duration: Duration=None, priority: int=None, targets: List[ValuesMap]=None, report_descriptors: List[ReportDescriptor]=None, payload_descriptors: List[EventPayloadDescriptor]=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
         """Event - a model defined in Swagger
 
         :param program_id: The program_id of this Event.  # noqa: E501
         :type program_id: ObjectID
         :param event_name: The event_name of this Event.  # noqa: E501
         :type event_name: str
+        :param duration: The duration of this Event.  # noqa: E501
+        :type duration: Duration
         :param priority: The priority of this Event.  # noqa: E501
         :type priority: int
         :param targets: The targets of this Event.  # noqa: E501
@@ -56,6 +59,7 @@ class Event(Model):
         self.swagger_types = {
             'program_id': ObjectID,
             'event_name': str,
+            'duration': Duration,
             'priority': int,
             'targets': List[ValuesMap],
             'report_descriptors': List[ReportDescriptor],
@@ -71,6 +75,7 @@ class Event(Model):
         self.attribute_map = {
             'program_id': 'programID',
             'event_name': 'eventName',
+            'duration': 'duration',
             'priority': 'priority',
             'targets': 'targets',
             'report_descriptors': 'reportDescriptors',
@@ -84,6 +89,7 @@ class Event(Model):
         }
         self._program_id = program_id
         self._event_name = event_name
+        self._duration = duration
         self._priority = priority
         self._targets = targets
         self._report_descriptors = report_descriptors
@@ -151,6 +157,27 @@ class Event(Model):
         """
 
         self._event_name = event_name
+
+    @property
+    def duration(self) -> Duration:
+        """Gets the duration of this Event.
+
+
+        :return: The duration of this Event.
+        :rtype: Duration
+        """
+        return self._duration
+
+    @duration.setter
+    def duration(self, duration: Duration):
+        """Sets the duration of this Event.
+
+
+        :param duration: The duration of this Event.
+        :type duration: Duration
+        """
+
+        self._duration = duration
 
     @property
     def priority(self) -> int:
@@ -285,8 +312,6 @@ class Event(Model):
         :param intervals: The intervals of this Event.
         :type intervals: List[Interval]
         """
-        if intervals is None:
-            raise ValueError("Invalid value for `intervals`, must not be `None`")  # noqa: E501
 
         self._intervals = intervals
 
