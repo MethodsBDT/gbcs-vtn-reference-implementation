@@ -129,6 +129,8 @@ class VenResourceRequest(Model):
         :param ven_id: The ven_id of this VenResourceRequest.
         :type ven_id: ObjectID
         """
+        if ven_id is None:
+            raise ValueError("Invalid value for `ven_id`, must not be `None`")  # noqa: E501
 
         self._ven_id = ven_id
 

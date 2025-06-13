@@ -7,6 +7,7 @@ from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
 from swagger_server.models.bl_resource_request import BlResourceRequest  # noqa: F401,E501
+from swagger_server.models.client_id import ClientID  # noqa: F401,E501
 from swagger_server.models.model_date_time import ModelDateTime  # noqa: F401,E501
 from swagger_server.models.object_id import ObjectID  # noqa: F401,E501
 from swagger_server.models.object_metadata import ObjectMetadata  # noqa: F401,E501
@@ -21,11 +22,13 @@ class Resource(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, object_type: str=None, targets: List[ValuesMap]=None, resource_name: ResourceName=None, ven_id: ObjectID=None, attributes: List[ValuesMap]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None):  # noqa: E501
+    def __init__(self, object_type: str=None, client_id: ClientID=None, targets: List[ValuesMap]=None, resource_name: ResourceName=None, ven_id: ObjectID=None, attributes: List[ValuesMap]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None):  # noqa: E501
         """Resource - a model defined in Swagger
 
         :param object_type: The object_type of this Resource.  # noqa: E501
         :type object_type: str
+        :param client_id: The client_id of this Resource.  # noqa: E501
+        :type client_id: ClientID
         :param targets: The targets of this Resource.  # noqa: E501
         :type targets: List[ValuesMap]
         :param resource_name: The resource_name of this Resource.  # noqa: E501
@@ -43,6 +46,7 @@ class Resource(Model):
         """
         self.swagger_types = {
             'object_type': str,
+            'client_id': ClientID,
             'targets': List[ValuesMap],
             'resource_name': ResourceName,
             'ven_id': ObjectID,
@@ -54,6 +58,7 @@ class Resource(Model):
 
         self.attribute_map = {
             'object_type': 'objectType',
+            'client_id': 'clientID',
             'targets': 'targets',
             'resource_name': 'resourceName',
             'ven_id': 'venID',
@@ -63,6 +68,7 @@ class Resource(Model):
             'modification_date_time': 'modificationDateTime'
         }
         self._object_type = object_type
+        self._client_id = client_id
         self._targets = targets
         self._resource_name = resource_name
         self._ven_id = ven_id
@@ -110,6 +116,29 @@ class Resource(Model):
             )
 
         self._object_type = object_type
+
+    @property
+    def client_id(self) -> ClientID:
+        """Gets the client_id of this Resource.
+
+
+        :return: The client_id of this Resource.
+        :rtype: ClientID
+        """
+        return self._client_id
+
+    @client_id.setter
+    def client_id(self, client_id: ClientID):
+        """Sets the client_id of this Resource.
+
+
+        :param client_id: The client_id of this Resource.
+        :type client_id: ClientID
+        """
+        if client_id is None:
+            raise ValueError("Invalid value for `client_id`, must not be `None`")  # noqa: E501
+
+        self._client_id = client_id
 
     @property
     def targets(self) -> List[ValuesMap]:
@@ -175,6 +204,8 @@ class Resource(Model):
         :param ven_id: The ven_id of this Resource.
         :type ven_id: ObjectID
         """
+        if ven_id is None:
+            raise ValueError("Invalid value for `ven_id`, must not be `None`")  # noqa: E501
 
         self._ven_id = ven_id
 

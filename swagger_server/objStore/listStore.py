@@ -17,10 +17,8 @@ subscriptionID = 0
 vens = []
 venID = 0
 
-resourceIDs = [0]
-# TBD remove as resources are stored in body of ven
 resources = []
-
+resourceID = 0
 
 class ListStore(ObjStore):
     """

@@ -11,7 +11,6 @@ from swagger_server.models.client_id import ClientID  # noqa: F401,E501
 from swagger_server.models.model_date_time import ModelDateTime  # noqa: F401,E501
 from swagger_server.models.object_id import ObjectID  # noqa: F401,E501
 from swagger_server.models.object_metadata import ObjectMetadata  # noqa: F401,E501
-from swagger_server.models.resource import Resource  # noqa: F401,E501
 from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
 from swagger_server.models.ven_name import VenName  # noqa: F401,E501
 import re  # noqa: F401,E501
@@ -23,7 +22,7 @@ class Ven(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, object_type: str=None, client_id: ClientID=None, targets: List[ValuesMap]=None, ven_name: VenName=None, attributes: List[ValuesMap]=None, resources: List[Resource]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None):  # noqa: E501
+    def __init__(self, object_type: str=None, client_id: ClientID=None, targets: List[ValuesMap]=None, ven_name: VenName=None, attributes: List[ValuesMap]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None):  # noqa: E501
         """Ven - a model defined in Swagger
 
         :param object_type: The object_type of this Ven.  # noqa: E501
@@ -36,8 +35,6 @@ class Ven(Model):
         :type ven_name: VenName
         :param attributes: The attributes of this Ven.  # noqa: E501
         :type attributes: List[ValuesMap]
-        :param resources: The resources of this Ven.  # noqa: E501
-        :type resources: List[Resource]
         :param id: The id of this Ven.  # noqa: E501
         :type id: ObjectID
         :param created_date_time: The created_date_time of this Ven.  # noqa: E501
@@ -51,7 +48,6 @@ class Ven(Model):
             'targets': List[ValuesMap],
             'ven_name': VenName,
             'attributes': List[ValuesMap],
-            'resources': List[Resource],
             'id': ObjectID,
             'created_date_time': ModelDateTime,
             'modification_date_time': ModelDateTime
@@ -63,7 +59,6 @@ class Ven(Model):
             'targets': 'targets',
             'ven_name': 'venName',
             'attributes': 'attributes',
-            'resources': 'resources',
             'id': 'id',
             'created_date_time': 'createdDateTime',
             'modification_date_time': 'modificationDateTime'
@@ -73,7 +68,6 @@ class Ven(Model):
         self._targets = targets
         self._ven_name = ven_name
         self._attributes = attributes
-        self._resources = resources
         self._id = id
         self._created_date_time = created_date_time
         self._modification_date_time = modification_date_time
@@ -209,29 +203,6 @@ class Ven(Model):
         """
 
         self._attributes = attributes
-
-    @property
-    def resources(self) -> List[Resource]:
-        """Gets the resources of this Ven.
-
-        A list of resource objects representing end-devices or systems.  # noqa: E501
-
-        :return: The resources of this Ven.
-        :rtype: List[Resource]
-        """
-        return self._resources
-
-    @resources.setter
-    def resources(self, resources: List[Resource]):
-        """Sets the resources of this Ven.
-
-        A list of resource objects representing end-devices or systems.  # noqa: E501
-
-        :param resources: The resources of this Ven.
-        :type resources: List[Resource]
-        """
-
-        self._resources = resources
 
     @property
     def id(self) -> ObjectID:

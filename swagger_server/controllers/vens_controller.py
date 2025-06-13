@@ -7,12 +7,12 @@ from typing import Dict
 from typing import Tuple
 from typing import Union
 
+from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
-from swagger_server.models.resource import Resource  # noqa: E501
-from swagger_server.models.resource_request import ResourceRequest  # noqa: E501
-from swagger_server.models.bl_resource_request import BlResourceRequest  # noqa: E501
-from swagger_server.models.ven_resource_request import VenResourceRequest  # noqa: E501
+from swagger_server.models.target_type import TargetType  # noqa: E501
+from swagger_server.models.target_value import TargetValue  # noqa: E501
 from swagger_server.models.ven import Ven  # noqa: E501
+from swagger_server.models.ven_name import VenName  # noqa: E501
 from swagger_server.models.ven_request import VenRequest  # noqa: E501
 from swagger_server.models.bl_ven_request import BlVenRequest  # noqa: E501
 from swagger_server.models.ven_ven_request import VenVenRequest  # noqa: E501
@@ -20,20 +20,15 @@ from swagger_server.controllers.subscriptions_controller import subscription_cal
 from swagger_server.objStore.storageInterface import objStore
 from swagger_server import util
 
-# recall this is just a toy VTN
-MAX_RESOURCES = 3
-# always incrementing
-resource_id = 0
-
 def create_ven(body):  # noqa: E501
     """create ven
 
     Create a new ven. # noqa: E501
 
-    :param ven_request:
-    :type ven_request: dict | bytes
+    :param body:
+    :type body: dict | bytes
 
-    :rtype: Union[Ven, Tuple[Ven, int], Tuple[Ven, int, Dict[str, str]]
+    :rtype: Ven
     """
     logging.info(f"create_ven(): ")
 
@@ -72,12 +67,6 @@ def create_ven(body):  # noqa: E501
         targets=targets
     )
 
-    # FS TBD: why doesn't this pattern apply to attributes?
-    if venBody.resources is not None:
-        ven.resources = venBody.resources
-    else:
-        ven.resources = []
-
     status = objStore.insert(ven)
     if status != HTTPStatus.CREATED:
         problem = Problem(title="object Storage issue", status=str(status))
@@ -93,9 +82,9 @@ def delete_ven(ven_id):  # noqa: E501
     Delete the ven specified by venID specified in path. # noqa: E501
 
     :param ven_id: object ID of ven.
-    :type ven_id: str
+    :type ven_id: dict | bytes
 
-    :rtype: Union[Ven, Tuple[Ven, int], Tuple[Ven, int, Dict[str, str]]
+    :rtype: Ven
     """
 
     logging.info(f"delete_ven(): ven_id={ven_id}")
@@ -217,24 +206,27 @@ def update_ven(ven_id, body=None):  # noqa: E501
     venBody = None
     if body["objectType"] in "VEN_VEN_REQUEST":
         venBody = VenVenRequest.from_dict(connexion.request.get_json())  # noqa: E501
+        if venBody is None:
+            problem = Problem(title="Bad Request: No request body", status="400")
+            logging.warning(f"update_ven(): problem={problem}")
+            return problem, HTTPStatus.BAD_REQUEST
         client_id = util.getClientId(request)
         targets = []
     else:
         venBody = BlVenRequest.from_dict(connexion.request.get_json())
+        if venBody is None:
+            problem = Problem(title="Bad Request: No request body", status="400")
+            logging.warning(f"update_ven(): problem={problem}")
+            return problem, HTTPStatus.BAD_REQUEST
         client_id = venBody.client_id  # noqa: E501
         if venBody.targets is not None:
             targets = venBody.targets
         else:
             targets = []
 
-    if venBody is None:
-        problem = Problem(title="Bad Request: No request body", status="400")
-        logging.warning(f"update_ven(): problem={problem}")
-        return problem, HTTPStatus.BAD_REQUEST
-
     ven, status = search_ven_by_id(ven_id)
     if ven is None or status == HTTPStatus.NOT_FOUND:
-        problem = Problem(title="Not Found: program_id not found", status="404")
+        problem = Problem(title="Not Found: program_id not found", status=HTTPStatus.NOT_FOUND)
         logging.warning(f"update_ven(): problem={problem}")
         return problem, HTTPStatus.NOT_FOUND
 
@@ -245,8 +237,6 @@ def update_ven(ven_id, body=None):  # noqa: E501
 
     if venBody.ven_name is not None:
         ven.ven_name = venBody.ven_name
-    if venBody.resources is not None:
-        ven.resources = venBody.resources
     if venBody.attributes is not None:
         ven.attributes = venBody.attributes,
     ven.target = targets
@@ -260,300 +250,7 @@ def update_ven(ven_id, body=None):  # noqa: E501
         return problem, status
 
     subscription_callback("VEN", "UPDATE", ven)
-    return ven
-
-def create_resource(body, ven_id):  # noqa: E501
-    """create resource
-
-    Create a new resource. # noqa: E501
-
-    :param body:
-    :type body: dict | bytes
-    :param ven_id: Numeric ID of ven.
-    :type ven_id: dict | bytes
-
-    :rtype: Resource
-     """
-    logging.info(f"create_resource(): ven_id={ven_id}")
-    global resource_id
-
-    ven = objStore.search("VEN", ven_id)
-    if type(ven) is not Ven:
-        status = ven
-        problem = Problem(title="object Storage issue", status=str(status))
-        logging.warning(f"create_resource(): problem={problem}")
-        return problem, status
-
-    targets = []
-    if body["objectType"] in "VEN_RESOURCE_REQUEST":
-        resourceBody = VenResourceRequest.from_dict(connexion.request.get_json())  # noqa: E501
-    else:
-        resourceBody = BlResourceRequest.from_dict(connexion.request.get_json())
-        if resourceBody.targets is not None:
-            targets = resourceBody.targets
-
-    logging.debug(f"search_all_ven_resources(): ven.resources={ven.resources}")
-
-    # object must have unique name
-    resources = ven.resources
-    resourceList = [r for r in resources if r.resource_name == resourceBody.resource_name]
-    if len(resourceList) > 0:
-        return [], HTTPStatus.CONFLICT
-
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-
-    venResource = Resource(
-        id=str(resource_id),
-        created_date_time=current_time,
-        modification_date_time=None,
-        object_type='RESOURCE',
-        resource_name=resourceBody.resource_name,
-        ven_id = ven_id,
-        attributes=resourceBody.attributes,
-        targets=targets
-    )
-
-    resource_id += 1
-
-    ven.resources.append(venResource)
-    ven = objStore.update("VEN", ven)
-    if type(ven) is not Ven:
-        status = ven
-        problem = Problem(title="object Storage issue", status=str(status))
-        logging.warning(f"update_ven(): problem={problem}")
-        return problem, status
-
-    logging.debug(f"create_resource(): venResource={venResource}")
-
-    subscription_callback("RESOURCE", "CREATE", venResource)
-    return venResource, HTTPStatus.CREATED
-
-def delete_ven_resource(ven_id, resource_id):  # noqa: E501
-    """delete  ven resource
-
-    Delete the ven resource specified by venID and resourceID specified in path. # noqa: E501
-
-    :param ven_id: object ID of the associated ven.
-    :type ven_id: dict | bytes
-    :param resource_id: object ID of the resource.
-    :type resource_id: dict | bytes
-
-    :rtype: Resource
-    """
-    logging.info(f"delete_ven_resource(): ven_id={ven_id} resource_id={resource_id}")
-
-    ven = objStore.search("VEN", ven_id)
-    if type(ven) is not Ven:
-        status = ven
-        problem = Problem(title="object Storage issue", status=str(status))
-        logging.warning(f"search_ven_by_id(): problem={problem}")
-        return problem, status
-
-    logging.debug(f"delete_ven_resource(): ven={ven}")
-
-    if len(ven.resources) == 0:
-        problem = Problem(title="Not Found: no resources in system", status="404")
-        logging.warning(f"delete_ven_resource(): problem={problem}")
-        return problem, HTTPStatus.NOT_FOUND
-
-    venResource = next((venResource for venResource in ven.resources if venResource.id == resource_id), None)
-    if venResource is None:
-        problem = Problem(title="Not Found: resource_id not found", status="404")
-        logging.warning(f"delete_ven_resource: problem={problem}")
-        return problem, HTTPStatus.NOT_FOUND
-
-    logging.debug(f"delete_ven_resource(): venResource={venResource}")
-    logging.debug(f"delete_ven_resource(): ven.resources={ven.resources}")
-
-    ven.resources.remove(venResource)
-    subscription_callback("RESOURCE", "DELETE", venResource)
-    return venResource
-
-def search_ven_resources(ven_id, resource_name=None, target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
-    """search ven resources
-
-    Return the ven resources specified by venID specified in path. # noqa: E501
-   :param ven_id: Numeric ID of ven.
-    :type ven_id: dict | bytes
-    :param resource_name: Indicates resource objects with resourceName
-    :type resource_name: dict | bytes
-    :param target_type: Indicates targeting type, e.g. GROUP
-    :type target_type: dict | bytes
-    :param target_values: List of target values, e.g. group names
-    :type target_values: list | bytes
-    :param skip: number of records to skip for pagination.
-    :type skip: int
-    :param limit: maximum number of records to return.
-    :type limit: int
-
-
-    :rtype: Resource
-    """
-    logging.info(
-        f"search_ven_resources(): resource_name={resource_name} target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
-    # TBD: somehow string is received as '[/'name/']' ???
-    if resource_name != None and resource_name[0] == '[':
-        resource_name = resource_name[2: len(resource_name) - 2]
-
-    ven = objStore.search("VEN", ven_id)
-    if type(ven) is not Ven:
-        status = ven
-        problem = Problem(title="object Storage issue", status=str(status))
-        logging.warning(f"search_ven_resources(): problem={problem}")
-        return problem, status
-
-    # A VEN can only fetch a ven with a client_id matching the request token client_id
-    if util.getClientRole(request) in 'VEN':
-        client_id = util.getClientId(request)
-        if ven.client_id != client_id:
-            logging.warning(f"search_ven_resources(): client_id of ven={ven.client_id} does not match requestor's client_id={client_id}")
-            # FS TBD: should return NOT_FOUND?
-            return [], HTTPStatus.OK
-
-    resourceList = ven.resources
-    logging.info(f"search_ven_resources(): resourceList={resourceList}")
-    if resource_name != None:
-        # for resource in resourceList:
-        #     logging.info(f"resource.resource_name={resource.resource_name} resource_name={resource_name}")
-
-        resourceList = [resource for resource in ven.resources if resource.resource_name == resource_name]
-        # logging.info(f"search_ven_resources(): resourceList={resourceList}")
-        if len(resourceList) == 0:
-            return resourceList, HTTPStatus.OK
-    logging.info(f"search_ven_resources(): resourceList={resourceList}")
-    resourceList = util.getObjectsWithTarget(resourceList, target_type, target_values)
-    if skip != None:
-        if len(resourceList) < skip:
-            return [], HTTPStatus.OK
-        resourceList = resourceList[skip:]
-    if limit != None:
-        resourceList = resourceList[:limit]
-    logging.debug(f"search_ven_resources(): resourceList={resourceList}")
-
-    subscription_callback("RESOURCE", "READ", resourceList)
-
-    return resourceList
-
-def search_ven_resource_by_id(ven_id, resource_id):  # noqa: E501
-    """search ven resources by ID
-
-    Return the ven resource specified by venID and resourceID specified in path. # noqa: E501
-
-    :param ven_id: object ID of the associated ven.
-    :type ven_id: dict | bytes
-    :param resource_id: object ID of the resource.
-    :type resource_id: dict | bytes
-
-    :rtype: Resource
-    """
-    # find index in vens of ven_id
-    logging.info(f"search_ven_resource_by_id(): ven_id={ven_id} resource_id={resource_id}")
-
-    ven = objStore.search("VEN", ven_id)
-    if type(ven) is not Ven:
-        status = ven
-        problem = Problem(title="object Storage issue", status=str(status))
-        logging.warning(f"search_ven_by_id(): problem={problem}")
-        return problem, status
-
-    # A VEN can only fetch a ven with a client_id matching the request token client_id
-    if util.getClientRole(request) in 'VEN':
-        client_id = util.getClientId(request)
-        if ven.client_id != client_id:
-            logging.warning(f"search_ven_resources(): client_id of ven={ven.client_id} does not match requestor's client_id={client_id}")
-            # FS TBD: should return NOT_FOUND?
-            return [], HTTPStatus.OK
-
-    logging.debug(f"search_ven_resource_by_id(): ven={ven}")
-
-    if len(ven.resources) == 0:
-        problem = Problem(title="Not Found: no resources in system", status="404")
-        logging.warning(f"search_ven_resource_by_id(): problem={problem}")
-        return problem, HTTPStatus.NOT_FOUND
-
-    resource = next((resource for resource in ven.resources if resource.id == resource_id), None)
-    if resource is None:
-        problem = Problem(title="Not Found: resource_id not found", status="404")
-        logging.warning(f"search_ven_resource_by_id(): problem={problem}")
-        return problem, HTTPStatus.NOT_FOUND
-
-    logging.debug(f"search_ven_resource_by_id(): resource={resource}")
-
-    subscription_callback("RESOURCE", "READ", resource)
-
-    return resource
-
-def update_ven_resource(ven_id, resource_id, body=None):  # noqa: E501
-    """update  ven resource
-
-    Update the ven resource specified by venID and resourceID specified in path. # noqa: E501
-
-    :param ven_id: object ID of the associated ven.
-    :type ven_id: dict | bytes
-    :param resource_id: object ID of the resource.
-    :type resource_id: dict | bytes
-    :param body: resource item to update.
-    :type body: dict | bytes
-
-    :rtype: Resource
-    """
-    logging.info(f"update_ven_resource(): ven_id={ven_id} resource_id={resource_id}")
-    ven = objStore.search("VEN", ven_id)
-    if type(ven) is not Ven:
-        status = ven
-        problem = Problem(title="object Storage issue", status=str(status))
-        logging.warning(f"update_ven_resource(): problem={problem}")
-        return problem, status
-
-    logging.debug(f"update_ven_resource(): ven={ven}")
-
-    if len(ven.resources) == 0:
-        problem = Problem(title="Not Found: no resources in system", status="404")
-        logging.warning(f"update_ven_resource(): problem={problem}")
-        return problem, HTTPStatus.NOT_FOUND
-
-    if body is None:
-        problem = Problem(title="Bad Request: No request body", status="400")
-        logging.warning(f"update_ven_resource(): problem={problem}")
-        return problem, HTTPStatus.BAD_REQUEST
-
-    targets = []
-    if body["objectType"] in "VEN_RESOURCE_REQUEST":
-        resourceBody = VenResourceRequest.from_dict(connexion.request.get_json())  # noqa: E501
-    else:
-        resourceBody = BlResourceRequest.from_dict(connexion.request.get_json())
-        if resourceBody.targets is not None:
-            targets = venBody.targets
-
-    if resourceBody is None:
-        problem = Problem(title="Bad Request: No request body", status="400")
-        logging.warning(f"update_ven_resource(): problem={problem}")
-        return problem, HTTPStatus.BAD_REQUEST
-
-    venResource = next((venResource for venResource in ven.resources if venResource.id == resource_id), None)
-    if venResource is None:
-        problem = Problem(title="Not Found: resource_id not found", status="404")
-        logging.warning(f"update_ven_resource(): problem={problem}")
-        return problem, HTTPStatus.NOT_FOUND
-
-    ven.resources.remove(venResource)
-
-    # set modification date time
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    venResource.modification_date_time = current_time
-
-    if resourceBody.resource_name is not None:
-        venResource.resource_name = resourceBody.resource_name
-    venResource.targets = targets
-    if resourceBody.attributes is not None:
-        venResource.attributes = resourceBody.attributes,
-
-    logging.debug(f"update_ven_resource(): venResource={venResource}")
-    ven.resources.append(venResource)
-    subscription_callback("RESOURCE", "UPDATE", venResource)
-    return (venResource)
+    return ven, HTTPStatus.OK
 
 def getUnionOfTargets(request, target_type, target_values):
     # get targets of ven object with client_id associated with requestor's token

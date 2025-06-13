@@ -6,7 +6,6 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.resource import Resource  # noqa: F401,E501
 from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
 from swagger_server.models.ven_name import VenName  # noqa: F401,E501
 from swagger_server import util
@@ -17,7 +16,7 @@ class VenVenRequest(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, object_type: str=None, ven_name: VenName=None, attributes: List[ValuesMap]=None, resources: List[Resource]=None):  # noqa: E501
+    def __init__(self, object_type: str=None, ven_name: VenName=None, attributes: List[ValuesMap]=None):  # noqa: E501
         """VenVenRequest - a model defined in Swagger
 
         :param object_type: The object_type of this VenVenRequest.  # noqa: E501
@@ -26,26 +25,21 @@ class VenVenRequest(Model):
         :type ven_name: VenName
         :param attributes: The attributes of this VenVenRequest.  # noqa: E501
         :type attributes: List[ValuesMap]
-        :param resources: The resources of this VenVenRequest.  # noqa: E501
-        :type resources: List[Resource]
         """
         self.swagger_types = {
             'object_type': str,
             'ven_name': VenName,
-            'attributes': List[ValuesMap],
-            'resources': List[Resource]
+            'attributes': List[ValuesMap]
         }
 
         self.attribute_map = {
             'object_type': 'objectType',
             'ven_name': 'venName',
-            'attributes': 'attributes',
-            'resources': 'resources'
+            'attributes': 'attributes'
         }
         self._object_type = object_type
         self._ven_name = ven_name
         self._attributes = attributes
-        self._resources = resources
 
     @classmethod
     def from_dict(cls, dikt) -> 'VenVenRequest':
@@ -132,26 +126,3 @@ class VenVenRequest(Model):
         """
 
         self._attributes = attributes
-
-    @property
-    def resources(self) -> List[Resource]:
-        """Gets the resources of this VenVenRequest.
-
-        A list of resource objects representing end-devices or systems.  # noqa: E501
-
-        :return: The resources of this VenVenRequest.
-        :rtype: List[Resource]
-        """
-        return self._resources
-
-    @resources.setter
-    def resources(self, resources: List[Resource]):
-        """Sets the resources of this VenVenRequest.
-
-        A list of resource objects representing end-devices or systems.  # noqa: E501
-
-        :param resources: The resources of this VenVenRequest.
-        :type resources: List[Resource]
-        """
-
-        self._resources = resources
