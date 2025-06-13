@@ -1770,10 +1770,10 @@ paths:
         - write_vens
       - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.vens_controller
-  /vens/{venID}/resources:
+  /resources:
     get:
       tags:
-      - vens
+      - resources
       summary: search ven resources
       description: |
         List all ven resources associated with ven with specified venID.
@@ -1782,14 +1782,6 @@ paths:
         Use skip and pagination query params to limit response size.
       operationId: search_ven_resources
       parameters:
-      - name: venID
-        in: path
-        description: Numeric ID of ven.
-        required: true
-        style: simple
-        explode: false
-        schema:
-          $ref: "#/components/schemas/objectID"
       - name: resourceName
         in: query
         description: Indicates resource objects with resourceName
@@ -1798,6 +1790,14 @@ paths:
         explode: true
         schema:
           $ref: "#/components/schemas/resourceName"
+      - name: venID
+        in: query
+        description: Indicates resource objects with venID
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: "#/components/schemas/objectID"
       - name: targetType
         in: query
         description: "Indicates targeting type, e.g. GROUP"
@@ -1881,22 +1881,13 @@ paths:
       - oAuth2ClientCredentials:
         - read_ven_objects
       - bearerAuth: []
-      x-openapi-router-controller: swagger_server.controllers.vens_controller
+      x-openapi-router-controller: swagger_server.controllers.resources_controller
     post:
       tags:
-      - vens
+      - resources
       summary: create resource
       description: Create a new resource.
       operationId: create_resource
-      parameters:
-      - name: venID
-        in: path
-        description: Numeric ID of ven.
-        required: true
-        style: simple
-        explode: false
-        schema:
-          $ref: "#/components/schemas/objectID"
       requestBody:
         content:
           application/json:
@@ -1951,24 +1942,16 @@ paths:
       - oAuth2ClientCredentials:
         - write_vens
       - bearerAuth: []
-      x-openapi-router-controller: swagger_server.controllers.vens_controller
-  /vens/{venID}/resources/{resourceID}:
+      x-openapi-router-controller: swagger_server.controllers.resources_controller
+  /resources/{resourceID}:
     get:
       tags:
-      - vens
+      - resources
       summary: search ven resources by ID
       description: Return the ven resource specified by venID and resourceID specified
         in path.
       operationId: search_ven_resource_by_id
       parameters:
-      - name: venID
-        in: path
-        description: object ID of the associated ven.
-        required: true
-        style: simple
-        explode: false
-        schema:
-          $ref: "#/components/schemas/objectID"
       - name: resourceID
         in: path
         description: object ID of the resource.
@@ -2018,23 +2001,15 @@ paths:
       - oAuth2ClientCredentials:
         - read_ven_objects
       - bearerAuth: []
-      x-openapi-router-controller: swagger_server.controllers.vens_controller
+      x-openapi-router-controller: swagger_server.controllers.resources_controller
     put:
       tags:
-      - vens
+      - resources
       summary: update  ven resource
       description: Update the ven resource specified by venID and resourceID specified
         in path.
       operationId: update_ven_resource
       parameters:
-      - name: venID
-        in: path
-        description: object ID of the associated ven.
-        required: true
-        style: simple
-        explode: false
-        schema:
-          $ref: "#/components/schemas/objectID"
       - name: resourceID
         in: path
         description: object ID of the resource.
@@ -2097,23 +2072,15 @@ paths:
       - oAuth2ClientCredentials:
         - write_vens
       - bearerAuth: []
-      x-openapi-router-controller: swagger_server.controllers.vens_controller
+      x-openapi-router-controller: swagger_server.controllers.resources_controller
     delete:
       tags:
-      - vens
+      - resources
       summary: delete  ven resource
       description: Delete the ven resource specified by venID and resourceID specified
         in path.
       operationId: delete_ven_resource
       parameters:
-      - name: venID
-        in: path
-        description: object ID of the associated ven.
-        required: true
-        style: simple
-        explode: false
-        schema:
-          $ref: "#/components/schemas/objectID"
       - name: resourceID
         in: path
         description: object ID of the resource.
@@ -2163,7 +2130,7 @@ paths:
       - oAuth2ClientCredentials:
         - write_vens
       - bearerAuth: []
-      x-openapi-router-controller: swagger_server.controllers.vens_controller
+      x-openapi-router-controller: swagger_server.controllers.resources_controller
   /auth/server:
     get:
       tags:
@@ -3001,8 +2968,6 @@ components:
       - $ref: "#/components/schemas/objectMetadata"
       - $ref: "#/components/schemas/BlVenRequest"
     venRequest:
-      discriminator:
-        propertyName: objectType
       oneOf:
       - $ref: "#/components/schemas/VenVenRequest"
       - $ref: "#/components/schemas/BlVenRequest"
@@ -3034,12 +2999,6 @@ components:
           nullable: true
           items:
             $ref: "#/components/schemas/valuesMap"
-        resources:
-          type: array
-          description: A list of resource objects representing end-devices or systems.
-          nullable: true
-          items:
-            $ref: "#/components/schemas/resource"
       description: Business Logic provided representation of ven.
     VenVenRequest:
       required:
@@ -3060,32 +3019,6 @@ components:
           nullable: true
           items:
             $ref: "#/components/schemas/valuesMap"
-        resources:
-          type: array
-          description: A list of resource objects representing end-devices or systems.
-          nullable: true
-          items:
-            $ref: "#/components/schemas/resource"
-      description: VEN provided representation of ven.
-    BaseVenRequest:
-      required:
-      - venName
-      type: object
-      properties:
-        venName:
-          $ref: "#/components/schemas/venName"
-        attributes:
-          type: array
-          description: A list of valuesMap objects describing attributes.
-          nullable: true
-          items:
-            $ref: "#/components/schemas/valuesMap"
-        resources:
-          type: array
-          description: A list of resource objects representing end-devices or systems.
-          nullable: true
-          items:
-            $ref: "#/components/schemas/resource"
       description: VEN provided representation of ven.
     resource:
       type: object
@@ -3094,15 +3027,15 @@ components:
       - $ref: "#/components/schemas/objectMetadata"
       - $ref: "#/components/schemas/BlResourceRequest"
     resourceRequest:
-      discriminator:
-        propertyName: objectType
       oneOf:
       - $ref: "#/components/schemas/BlResourceRequest"
       - $ref: "#/components/schemas/VenResourceRequest"
     BlResourceRequest:
       required:
+      - clientID
       - objectType
       - resourceName
+      - venID
       type: object
       properties:
         objectType:
@@ -3110,6 +3043,8 @@ components:
           description: Used as discriminator.
           enum:
           - BL_RESOURCE_REQUEST
+        clientID:
+          $ref: "#/components/schemas/clientID"
         targets:
           type: array
           description: A list of valuesMap objects describing target criteria.
@@ -3132,6 +3067,7 @@ components:
       required:
       - objectType
       - resourceName
+      - venID
       type: object
       properties:
         objectType:
@@ -3151,23 +3087,6 @@ components:
             $ref: "#/components/schemas/valuesMap"
       description: |
         Business Logic provided representation of ven resource.
-    BaseResourceRequest:
-      required:
-      - resourceName
-      type: object
-      properties:
-        resourceName:
-          $ref: "#/components/schemas/resourceName"
-        venID:
-          $ref: "#/components/schemas/objectID"
-        attributes:
-          type: array
-          description: A list of valuesMap objects describing attributes.
-          nullable: true
-          items:
-            $ref: "#/components/schemas/valuesMap"
-      description: |
-        A resource is an energy device or system subject to control by a VEN.
     objectMetadata:
       required:
       - createdDateTime

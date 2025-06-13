@@ -7,7 +7,6 @@ from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
 from swagger_server.models.client_id import ClientID  # noqa: F401,E501
-from swagger_server.models.resource import Resource  # noqa: F401,E501
 from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
 from swagger_server.models.ven_name import VenName  # noqa: F401,E501
 from swagger_server import util
@@ -18,7 +17,7 @@ class BlVenRequest(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, object_type: str=None, client_id: ClientID=None, targets: List[ValuesMap]=None, ven_name: VenName=None, attributes: List[ValuesMap]=None, resources: List[Resource]=None):  # noqa: E501
+    def __init__(self, object_type: str=None, client_id: ClientID=None, targets: List[ValuesMap]=None, ven_name: VenName=None, attributes: List[ValuesMap]=None):  # noqa: E501
         """BlVenRequest - a model defined in Swagger
 
         :param object_type: The object_type of this BlVenRequest.  # noqa: E501
@@ -31,16 +30,13 @@ class BlVenRequest(Model):
         :type ven_name: VenName
         :param attributes: The attributes of this BlVenRequest.  # noqa: E501
         :type attributes: List[ValuesMap]
-        :param resources: The resources of this BlVenRequest.  # noqa: E501
-        :type resources: List[Resource]
         """
         self.swagger_types = {
             'object_type': str,
             'client_id': ClientID,
             'targets': List[ValuesMap],
             'ven_name': VenName,
-            'attributes': List[ValuesMap],
-            'resources': List[Resource]
+            'attributes': List[ValuesMap]
         }
 
         self.attribute_map = {
@@ -48,15 +44,13 @@ class BlVenRequest(Model):
             'client_id': 'clientID',
             'targets': 'targets',
             'ven_name': 'venName',
-            'attributes': 'attributes',
-            'resources': 'resources'
+            'attributes': 'attributes'
         }
         self._object_type = object_type
         self._client_id = client_id
         self._targets = targets
         self._ven_name = ven_name
         self._attributes = attributes
-        self._resources = resources
 
     @classmethod
     def from_dict(cls, dikt) -> 'BlVenRequest':
@@ -189,26 +183,3 @@ class BlVenRequest(Model):
         """
 
         self._attributes = attributes
-
-    @property
-    def resources(self) -> List[Resource]:
-        """Gets the resources of this BlVenRequest.
-
-        A list of resource objects representing end-devices or systems.  # noqa: E501
-
-        :return: The resources of this BlVenRequest.
-        :rtype: List[Resource]
-        """
-        return self._resources
-
-    @resources.setter
-    def resources(self, resources: List[Resource]):
-        """Sets the resources of this BlVenRequest.
-
-        A list of resource objects representing end-devices or systems.  # noqa: E501
-
-        :param resources: The resources of this BlVenRequest.
-        :type resources: List[Resource]
-        """
-
-        self._resources = resources

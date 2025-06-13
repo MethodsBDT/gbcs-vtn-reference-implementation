@@ -6,6 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.client_id import ClientID  # noqa: F401,E501
 from swagger_server.models.object_id import ObjectID  # noqa: F401,E501
 from swagger_server.models.resource_name import ResourceName  # noqa: F401,E501
 from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
@@ -18,11 +19,13 @@ class BlResourceRequest(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, object_type: str=None, targets: List[ValuesMap]=None, resource_name: ResourceName=None, ven_id: ObjectID=None, attributes: List[ValuesMap]=None):  # noqa: E501
+    def __init__(self, object_type: str=None, client_id: ClientID=None, targets: List[ValuesMap]=None, resource_name: ResourceName=None, ven_id: ObjectID=None, attributes: List[ValuesMap]=None):  # noqa: E501
         """BlResourceRequest - a model defined in Swagger
 
         :param object_type: The object_type of this BlResourceRequest.  # noqa: E501
         :type object_type: str
+        :param client_id: The client_id of this BlResourceRequest.  # noqa: E501
+        :type client_id: ClientID
         :param targets: The targets of this BlResourceRequest.  # noqa: E501
         :type targets: List[ValuesMap]
         :param resource_name: The resource_name of this BlResourceRequest.  # noqa: E501
@@ -34,6 +37,7 @@ class BlResourceRequest(Model):
         """
         self.swagger_types = {
             'object_type': str,
+            'client_id': ClientID,
             'targets': List[ValuesMap],
             'resource_name': ResourceName,
             'ven_id': ObjectID,
@@ -42,12 +46,14 @@ class BlResourceRequest(Model):
 
         self.attribute_map = {
             'object_type': 'objectType',
+            'client_id': 'clientID',
             'targets': 'targets',
             'resource_name': 'resourceName',
             'ven_id': 'venID',
             'attributes': 'attributes'
         }
         self._object_type = object_type
+        self._client_id = client_id
         self._targets = targets
         self._resource_name = resource_name
         self._ven_id = ven_id
@@ -92,6 +98,29 @@ class BlResourceRequest(Model):
             )
 
         self._object_type = object_type
+
+    @property
+    def client_id(self) -> ClientID:
+        """Gets the client_id of this BlResourceRequest.
+
+
+        :return: The client_id of this BlResourceRequest.
+        :rtype: ClientID
+        """
+        return self._client_id
+
+    @client_id.setter
+    def client_id(self, client_id: ClientID):
+        """Sets the client_id of this BlResourceRequest.
+
+
+        :param client_id: The client_id of this BlResourceRequest.
+        :type client_id: ClientID
+        """
+        if client_id is None:
+            raise ValueError("Invalid value for `client_id`, must not be `None`")  # noqa: E501
+
+        self._client_id = client_id
 
     @property
     def targets(self) -> List[ValuesMap]:
@@ -157,6 +186,8 @@ class BlResourceRequest(Model):
         :param ven_id: The ven_id of this BlResourceRequest.
         :type ven_id: ObjectID
         """
+        if ven_id is None:
+            raise ValueError("Invalid value for `ven_id`, must not be `None`")  # noqa: E501
 
         self._ven_id = ven_id
 
