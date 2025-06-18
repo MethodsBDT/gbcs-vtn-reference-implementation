@@ -9,13 +9,12 @@ from flask import request
 
 
 from swagger_server import util
+from swagger_server import objectUtils
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
-from swagger_server.controllers.vens_controller import getAllowedTargets  # noqa: E501
 from swagger_server.models.event import Event  # noqa: E501
 from swagger_server.models.event_request import EventRequest  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
-from swagger_server import util
 
 
 def create_event(body=None):  # noqa: E501
@@ -23,10 +22,10 @@ def create_event(body=None):  # noqa: E501
 
     Create a new event in the server. # noqa: E501
 
-    :param event_request: Event item to add.
-    :type event_request: dict | bytes
+    :param body: Event item to add.
+    :type body: dict | bytes
 
-    :rtype: Union[Event, Tuple[Event, int], Tuple[Event, int, Dict[str, str]]
+    :rtype: Event
     """
     logging.info(f"create_event():")
 
@@ -78,7 +77,7 @@ def delete_event(event_id):  # noqa: E501
     Delete the event specified by the eventID in path.  # noqa: E501
 
     :param event_id: object ID of event.
-    :type event_id: str
+    :type event_id: dict | bytes
 
     :rtype: Union[Event, Tuple[Event, int], Tuple[Event, int, Dict[str, str]]
     """
@@ -95,18 +94,15 @@ def delete_event(event_id):  # noqa: E501
 
     return event, HTTPStatus.OK
 
-
-def search_all_events(program_id=None, target_type=None, target_values=None, skip=None, limit=None, active=None):  # noqa: E501
+def search_all_events(program_id=None, targets=None, skip=None, limit=None, active=None):  # noqa: E501
     """searches all events
 
-    List all events known to the server. May filter results by programID query param. May filter results by targetType and targetValues as query params. Use skip and pagination query params to limit response size.  # noqa: E501
+    List all events known to the server. May filter results by programID query param. May filter results by targets params. Use skip and pagination query params to limit response size.  # noqa: E501
 
     :param program_id: filter results to events with programID.
-    :type program_id: str
-    :param target_type: Indicates targeting type, e.g. GROUP
-    :type target_type: str
-    :param target_values: List of target values, e.g. group names
-    :type target_values: List[str]
+    :type program_id: dict | bytes
+    :param targets: Indicates targets
+    :type targets: list | bytes
     :param skip: number of records to skip for pagination.
     :type skip: int
     :param limit: maximum number of records to return.
@@ -114,10 +110,10 @@ def search_all_events(program_id=None, target_type=None, target_values=None, ski
     :param active: ignore events that have transpired.
     :type active: bool
 
-    :rtype: Union[List[Event], Tuple[List[Event], int], Tuple[List[Event], int, Dict[str, str]]
+    :rtype: List[Event]
     """
     logging.info(
-        f"search_all_events(): program_id={program_id} target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
+        f"search_all_events(): program_id={program_id} targets={targets} skip={skip} limit={limit}")
 
     events = objStore.search_all("EVENT")
     logging.debug(f"search_all_events(): events={events}")
@@ -136,29 +132,39 @@ def search_all_events(program_id=None, target_type=None, target_values=None, ski
         if len(eventList) == 0:
             return eventList, HTTPStatus.OK
 
-    eventList = []
-    if util.getClientRole(request) in 'BL':
+    objectList = []
+    objects = events
+    if objectUtils.getClientRole(request) in 'BL':
         # BL will fetch all objects if targets are not specified in query, or objects matching targets if present in query
-        eventList = util.getObjectsWithTarget(events, target_type, target_values)
+        if targets is None:
+            objectList = objects
+        else:
+            objectList = objectUtils.getObjectsWithTargets(objects, targets)
     else:
-        # A VEN client will fetch: programs with no targets, and programs whose targets are 'allowed' by associated ven that also
-        # match target in query
-        eventsNoTargets = util.getObjectsNoTargets(events)
-        allowed_targets = getAllowedTargets(request)
-        eventsWithTargets = util.getObjectsWithTargets(events, allowed_targets)
-        eventList = eventsNoTargets + eventsWithTargets
-        eventList = util.getObjectsWithTarget(eventList, target_type, target_values)
+        # A VEN client will fetch objects with no targets and objects whose targets are 'allowed' by associated ven,
+        # or if targets present in query, objects matching targets iin query objects and whose targets are 'allowed' by associated ven
+        client_id = objectUtils.getClientId(request)
+        if targets is None:
+            objectsNoTargets = objectUtils.getObjectsNoTargets(objects)
+            allowed_targets = objectUtils.getAllowedTargets(client_id)
+            objectsWithTargets = objectUtils.getObjectsWithTargets(objects, allowed_targets)
+            objectList = objectsNoTargets + objectsWithTargets
+        else:
+            allowed_targets = objectUtils.getAllowedTargets(client_id)
+            # get intersection of allowed targets and targets in query
+            targets = [t for t in allowed_targets if t in targets]
+            objectList = objectUtils.getObjectsWithTargets(objects, targets)
     if skip != None:
-        if len(eventList) < skip:
+        if len(objectList) < skip:
             return [], HTTPStatus.OK
-        eventList = eventList[skip:]
+        objectList = objectList[skip:]
     if limit != None:
-        eventList = eventList[:limit]
-    logging.debug(f"search_all_programs(): programList={eventList}")
+        objectList = objectList[:limit]
+    logging.debug(f"search_all_events(): objectList={objectList}")
 
-    subscription_callback("EVENT", "READ", eventList)
+    subscription_callback("EVENT", "READ", objectList)
 
-    return eventList
+    return objectList, HTTPStatus.OK
 
 
 def search_events_by_id(event_id):  # noqa: E501
@@ -167,9 +173,9 @@ def search_events_by_id(event_id):  # noqa: E501
     Fetch event associated with the eventID in path.  # noqa: E501
 
     :param event_id: object ID of event.
-    :type event_id: str
+    :type event_id: dict | bytes
 
-    :rtype: Union[Event, Tuple[Event, int], Tuple[Event, int, Dict[str, str]]
+    :rtype: Event
     """
     logging.info(f"search_events_by_id(): event_id={event_id}")
     event = objStore.search("EVENT", event_id)
@@ -191,11 +197,11 @@ def update_event(event_id, body=None):  # noqa: E501
     Update the event specified by the eventID in path. # noqa: E501
 
     :param event_id: object ID of event.
-    :type event_id: str
-    :param event_request: event item to update.
-    :type event_request: dict | bytes
+    :type event_id: dict | bytes
+    :param body: event item to update.
+    :type body: dict | bytes
 
-    :rtype: Union[Event, Tuple[Event, int], Tuple[Event, int, Dict[str, str]]
+    :rtype: Event
     """
     logging.info(f"update_event(): event_id={event_id}")
 
@@ -210,7 +216,7 @@ def update_event(event_id, body=None):  # noqa: E501
 
     event, status = search_events_by_id(event_id)
     if event is None or status == HTTPStatus.NOT_FOUND:
-        problem = Problem(title="Not Found: program_id not found", status="404")
+        problem = Problem(title="Not Found: event_id not found", status="404")
         logging.warning(f"update_event(): problem={problem}")
         return problem, HTTPStatus.NOT_FOUND
 

@@ -14,12 +14,11 @@ from swagger_server.models.resource_name import ResourceName  # noqa: E501
 from swagger_server.models.resource_request import ResourceRequest  # noqa: E501
 from swagger_server.models.bl_resource_request import BlResourceRequest  # noqa: E501
 from swagger_server.models.ven_resource_request import VenResourceRequest  # noqa: E501
-from swagger_server.models.target_type import TargetType  # noqa: E501
-from swagger_server.models.target_value import TargetValue  # noqa: E501
+from swagger_server.models.target import Target  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
 from swagger_server import util
-
+from swagger_server import objectUtils
 
 def create_resource(body):  # noqa: E501
     """create resource
@@ -35,7 +34,7 @@ def create_resource(body):  # noqa: E501
     targets = []
     if body["objectType"] in "VEN_RESOURCE_REQUEST":
         resourceBody = VenResourceRequest.from_dict(connexion.request.get_json())  # noqa: E501
-        client_id = util.getClientId(request)
+        client_id = objectUtils.getClientId(request)
     else:
         resourceBody = BlResourceRequest.from_dict(connexion.request.get_json())
         client_id = resourceBody.client_id # noqa: E501
@@ -115,8 +114,8 @@ def search_ven_resource_by_id(resource_id):  # noqa: E501
         return problem, status
 
     # VEN can only read ven objects with client_id matching client_id associated with it's token
-    if util.getClientRole(request) in 'VEN':
-        client_id = util.getClientId(request)
+    if objectUtils.getClientRole(request) in 'VEN':
+        client_id = objectUtils.getClientId(request)
         if resource.client_id != client_id:
             return [], HTTPStatus.OK
 
@@ -126,19 +125,17 @@ def search_ven_resource_by_id(resource_id):  # noqa: E501
 
 
 
-def search_ven_resources(resource_name=None, target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
+def search_ven_resources(resource_name=None, ven_id=None, targets=None, skip=None, limit=None):  # noqa: E501
     """search ven resources
 
-    List all ven resources associated with ven with specified venID. May filter results by resourceName as query params. May filter results by targets as query params. Use skip and pagination query params to limit response size.  # noqa: E501
+    List all ven resources associated with ven with specified venID. May filter results by resourceName as query params. May filter results by targets params. Use skip and pagination query params to limit response size.  # noqa: E501
 
     :param resource_name: Indicates resource objects with resourceName
     :type resource_name: dict | bytes
     :param ven_id: Indicates resource objects with venID
     :type ven_id: dict | bytes
-    :param target_type: Indicates targeting type, e.g. GROUP
-    :type target_type: dict | bytes
-    :param target_values: List of target values, e.g. group names
-    :type target_values: list | bytes
+    :param targets: Indicates targets
+    :type targets: list | bytes
     :param skip: number of records to skip for pagination.
     :type skip: int
     :param limit: maximum number of records to return.
@@ -147,7 +144,7 @@ def search_ven_resources(resource_name=None, target_type=None, target_values=Non
     :rtype: List[Resource]
     """
     logging.info(
-        f"search_ven_resources(): resource_name={resource_name} target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
+        f"search_ven_resources(): resource_name={resource_name} targets={targets} skip={skip} limit={limit}")
     # TBD: somehow string is received as '[/'name/']' ???
     if resource_name != None and resource_name[0] == '[':
         resource_name = resource_name[2: len(resource_name) - 2]
@@ -162,30 +159,31 @@ def search_ven_resources(resource_name=None, target_type=None, target_values=Non
 
     logging.info(f"search_ven_resourcess(): resources={resources}")
 
-    resourceList = resources
+    objectList = resources
     # A VEN can only fetch a resource with a client_id matching the request token client_id
-    if util.getClientRole(request) in 'VEN':
-        client_id = util.getClientId(request)
-        # There can ony be one ven with a given client_id
-        resourceList = [r for r in resources if r.client_id == client_id]
+    if objectUtils.getClientRole(request) in 'VEN':
+        client_id = objectUtils.getClientId(request)
+        objectList = [r for r in objectList if r.client_id == client_id]
 
-    logging.info(f"search_ven_resources(): resourceList={resourceList}")
+    logging.info(f"search_ven_resources(): objectList={objectList}")
     if resource_name != None:
-        resourceList = [r for r in resources if r.resource_name == resource_name]
-        if len(resourceList) == 0:
+        objectList = [r for r in objectList if r.resource_name == resource_name]
+        if len(objectList) == 0:
             return [], HTTPStatus.OK
+        else:
+            return objectList, HTTPStatus.OK
 
-    resourceList = util.getObjectsWithTarget(resourceList, target_type, target_values)
+    objectList = objectUtils.getObjectsWithTargets(objectList, targets)
     if skip != None:
-        if len(resources) < skip:
+        if len(objectList) < skip:
             return [], HTTPStatus.OK
-        resourceList = resources[skip:]
+        objectList = objectList[skip:]
     if limit != None:
-        resourceList = resourceList[:limit]
+        objectList = objectList[:limit]
 
-    subscription_callback("RESOURCE", "READ", resourceList)
+    subscription_callback("RESOURCE", "READ", objectList)
 
-    return resourceList, HTTPStatus.OK
+    return objectList, HTTPStatus.OK
 
 
 def update_ven_resource(resource_id, body=None):  # noqa: E501
@@ -207,7 +205,7 @@ def update_ven_resource(resource_id, body=None):  # noqa: E501
             problem = Problem(title="Bad Request: No request body", status="400")
             logging.warning(f"update_resource(): problem={problem}")
             return problem, HTTPStatus.BAD_REQUEST
-        client_id = util.getClientId(request)
+        client_id = objectUtils.getClientId(request)
         targets = []
     else:
         resourceBody = BlResourceRequest.from_dict(connexion.request.get_json())

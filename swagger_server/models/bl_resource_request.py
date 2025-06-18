@@ -9,6 +9,7 @@ from swagger_server.models.base_model_ import Model
 from swagger_server.models.client_id import ClientID  # noqa: F401,E501
 from swagger_server.models.object_id import ObjectID  # noqa: F401,E501
 from swagger_server.models.resource_name import ResourceName  # noqa: F401,E501
+from swagger_server.models.target import Target  # noqa: F401,E501
 from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
 import re  # noqa: F401,E501
 from swagger_server import util
@@ -19,7 +20,7 @@ class BlResourceRequest(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, object_type: str=None, client_id: ClientID=None, targets: List[ValuesMap]=None, resource_name: ResourceName=None, ven_id: ObjectID=None, attributes: List[ValuesMap]=None):  # noqa: E501
+    def __init__(self, object_type: str=None, client_id: ClientID=None, targets: List[Target]=None, resource_name: ResourceName=None, ven_id: ObjectID=None, attributes: List[ValuesMap]=None):  # noqa: E501
         """BlResourceRequest - a model defined in Swagger
 
         :param object_type: The object_type of this BlResourceRequest.  # noqa: E501
@@ -27,7 +28,7 @@ class BlResourceRequest(Model):
         :param client_id: The client_id of this BlResourceRequest.  # noqa: E501
         :type client_id: ClientID
         :param targets: The targets of this BlResourceRequest.  # noqa: E501
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         :param resource_name: The resource_name of this BlResourceRequest.  # noqa: E501
         :type resource_name: ResourceName
         :param ven_id: The ven_id of this BlResourceRequest.  # noqa: E501
@@ -38,7 +39,7 @@ class BlResourceRequest(Model):
         self.swagger_types = {
             'object_type': str,
             'client_id': ClientID,
-            'targets': List[ValuesMap],
+            'targets': List[Target],
             'resource_name': ResourceName,
             'ven_id': ObjectID,
             'attributes': List[ValuesMap]
@@ -123,24 +124,24 @@ class BlResourceRequest(Model):
         self._client_id = client_id
 
     @property
-    def targets(self) -> List[ValuesMap]:
+    def targets(self) -> List[Target]:
         """Gets the targets of this BlResourceRequest.
 
-        A list of valuesMap objects describing target criteria.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :return: The targets of this BlResourceRequest.
-        :rtype: List[ValuesMap]
+        :rtype: List[Target]
         """
         return self._targets
 
     @targets.setter
-    def targets(self, targets: List[ValuesMap]):
+    def targets(self, targets: List[Target]):
         """Sets the targets of this BlResourceRequest.
 
-        A list of valuesMap objects describing target criteria.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :param targets: The targets of this BlResourceRequest.
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         """
 
         self._targets = targets

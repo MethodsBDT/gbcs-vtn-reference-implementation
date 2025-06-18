@@ -7,8 +7,8 @@ from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
 from swagger_server.models.reading_type import ReadingType  # noqa: F401,E501
+from swagger_server.models.target import Target  # noqa: F401,E501
 from swagger_server.models.units import Units  # noqa: F401,E501
-from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -17,7 +17,7 @@ class ReportDescriptor(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, payload_type: str=None, reading_type: ReadingType=None, units: Units=None, targets: List[ValuesMap]=None, aggregate: bool=False, start_interval: int=-1, num_intervals: int=-1, historical: bool=True, frequency: int=-1, repeat: int=1, report_intervals: str='INTERVALS'):  # noqa: E501
+    def __init__(self, payload_type: str=None, reading_type: ReadingType=None, units: Units=None, targets: List[Target]=None, aggregate: bool=False, start_interval: int=-1, num_intervals: int=-1, historical: bool=True, frequency: int=-1, repeat: int=1, report_intervals: str='INTERVALS'):  # noqa: E501
         """ReportDescriptor - a model defined in Swagger
 
         :param payload_type: The payload_type of this ReportDescriptor.  # noqa: E501
@@ -27,7 +27,7 @@ class ReportDescriptor(Model):
         :param units: The units of this ReportDescriptor.  # noqa: E501
         :type units: Units
         :param targets: The targets of this ReportDescriptor.  # noqa: E501
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         :param aggregate: The aggregate of this ReportDescriptor.  # noqa: E501
         :type aggregate: bool
         :param start_interval: The start_interval of this ReportDescriptor.  # noqa: E501
@@ -47,7 +47,7 @@ class ReportDescriptor(Model):
             'payload_type': str,
             'reading_type': ReadingType,
             'units': Units,
-            'targets': List[ValuesMap],
+            'targets': List[Target],
             'aggregate': bool,
             'start_interval': int,
             'num_intervals': int,
@@ -161,24 +161,24 @@ class ReportDescriptor(Model):
         self._units = units
 
     @property
-    def targets(self) -> List[ValuesMap]:
+    def targets(self) -> List[Target]:
         """Gets the targets of this ReportDescriptor.
 
-        A list of valuesMap objects.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :return: The targets of this ReportDescriptor.
-        :rtype: List[ValuesMap]
+        :rtype: List[Target]
         """
         return self._targets
 
     @targets.setter
-    def targets(self, targets: List[ValuesMap]):
+    def targets(self, targets: List[Target]):
         """Sets the targets of this ReportDescriptor.
 
-        A list of valuesMap objects.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :param targets: The targets of this ReportDescriptor.
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         """
 
         self._targets = targets
