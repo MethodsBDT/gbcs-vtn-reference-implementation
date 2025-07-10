@@ -8,7 +8,7 @@ from typing import List, Dict  # noqa: F401
 from swagger_server.models.base_model_ import Model
 from swagger_server.models.interval_period import IntervalPeriod  # noqa: F401,E501
 from swagger_server.models.program_request_program_descriptions import ProgramRequestProgramDescriptions  # noqa: F401,E501
-from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
+from swagger_server.models.target import Target  # noqa: F401,E501
 from swagger_server.models.any_ofprogram_request_payload_descriptors_items import AnyOfprogramRequestPayloadDescriptorsItems  # noqa: F401,E501
 from swagger_server import util
 
@@ -18,7 +18,7 @@ class ProgramRequest(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, program_name: str=None, program_long_name: str=None, retailer_name: str=None, retailer_long_name: str=None, program_type: str=None, country: str=None, principal_subdivision: str=None, interval_period: IntervalPeriod=None, program_descriptions: List[ProgramRequestProgramDescriptions]=None, binding_events: bool=None, local_price: bool=None, payload_descriptors: List[AnyOfprogramRequestPayloadDescriptorsItems]=None, targets: List[ValuesMap]=None):  # noqa: E501
+    def __init__(self, program_name: str=None, program_long_name: str=None, retailer_name: str=None, retailer_long_name: str=None, program_type: str=None, country: str=None, principal_subdivision: str=None, interval_period: IntervalPeriod=None, program_descriptions: List[ProgramRequestProgramDescriptions]=None, binding_events: bool=None, local_price: bool=None, payload_descriptors: List[AnyOfprogramRequestPayloadDescriptorsItems]=None, targets: List[Target]=None):  # noqa: E501
         """ProgramRequest - a model defined in Swagger
 
         :param program_name: The program_name of this ProgramRequest.  # noqa: E501
@@ -46,7 +46,7 @@ class ProgramRequest(Model):
         :param payload_descriptors: The payload_descriptors of this ProgramRequest.  # noqa: E501
         :type payload_descriptors: List[AnyOfprogramRequestPayloadDescriptorsItems]
         :param targets: The targets of this ProgramRequest.  # noqa: E501
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         """
         self.swagger_types = {
             'program_name': str,
@@ -61,7 +61,7 @@ class ProgramRequest(Model):
             'binding_events': bool,
             'local_price': bool,
             'payload_descriptors': List[AnyOfprogramRequestPayloadDescriptorsItems],
-            'targets': List[ValuesMap]
+            'targets': List[Target]
         }
 
         self.attribute_map = {
@@ -381,24 +381,24 @@ class ProgramRequest(Model):
         self._payload_descriptors = payload_descriptors
 
     @property
-    def targets(self) -> List[ValuesMap]:
+    def targets(self) -> List[Target]:
         """Gets the targets of this ProgramRequest.
 
-        A list of valuesMap objects.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :return: The targets of this ProgramRequest.
-        :rtype: List[ValuesMap]
+        :rtype: List[Target]
         """
         return self._targets
 
     @targets.setter
-    def targets(self, targets: List[ValuesMap]):
+    def targets(self, targets: List[Target]):
         """Sets the targets of this ProgramRequest.
 
-        A list of valuesMap objects.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :param targets: The targets of this ProgramRequest.
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         """
 
         self._targets = targets

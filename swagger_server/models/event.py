@@ -16,7 +16,7 @@ from swagger_server.models.object_id import ObjectID  # noqa: F401,E501
 from swagger_server.models.object_metadata import ObjectMetadata  # noqa: F401,E501
 from swagger_server.models.object_types import ObjectTypes  # noqa: F401,E501
 from swagger_server.models.report_descriptor import ReportDescriptor  # noqa: F401,E501
-from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
+from swagger_server.models.target import Target  # noqa: F401,E501
 import re  # noqa: F401,E501
 from swagger_server import util
 
@@ -26,7 +26,7 @@ class Event(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, program_id: ObjectID=None, event_name: str=None, duration: Duration=None, priority: int=None, targets: List[ValuesMap]=None, report_descriptors: List[ReportDescriptor]=None, payload_descriptors: List[EventPayloadDescriptor]=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
+    def __init__(self, program_id: ObjectID=None, event_name: str=None, duration: Duration=None, priority: int=None, targets: List[Target]=None, report_descriptors: List[ReportDescriptor]=None, payload_descriptors: List[EventPayloadDescriptor]=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
         """Event - a model defined in Swagger
 
         :param program_id: The program_id of this Event.  # noqa: E501
@@ -38,7 +38,7 @@ class Event(Model):
         :param priority: The priority of this Event.  # noqa: E501
         :type priority: int
         :param targets: The targets of this Event.  # noqa: E501
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         :param report_descriptors: The report_descriptors of this Event.  # noqa: E501
         :type report_descriptors: List[ReportDescriptor]
         :param payload_descriptors: The payload_descriptors of this Event.  # noqa: E501
@@ -61,7 +61,7 @@ class Event(Model):
             'event_name': str,
             'duration': Duration,
             'priority': int,
-            'targets': List[ValuesMap],
+            'targets': List[Target],
             'report_descriptors': List[ReportDescriptor],
             'payload_descriptors': List[EventPayloadDescriptor],
             'interval_period': IntervalPeriod,
@@ -203,24 +203,24 @@ class Event(Model):
         self._priority = priority
 
     @property
-    def targets(self) -> List[ValuesMap]:
+    def targets(self) -> List[Target]:
         """Gets the targets of this Event.
 
-        A list of valuesMap objects.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :return: The targets of this Event.
-        :rtype: List[ValuesMap]
+        :rtype: List[Target]
         """
         return self._targets
 
     @targets.setter
-    def targets(self, targets: List[ValuesMap]):
+    def targets(self, targets: List[Target]):
         """Sets the targets of this Event.
 
-        A list of valuesMap objects.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :param targets: The targets of this Event.
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         """
 
         self._targets = targets

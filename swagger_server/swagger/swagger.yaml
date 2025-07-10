@@ -50,9 +50,10 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 3.1.0
+  version: 1.0.0
 servers:
-- url: /
+- url: https://virtserver.swaggerhub.com/OPENADR3_1/openADR3.1.0/1.0.0
+  description: SwaggerHub API Auto Mocking
 paths:
   /programs:
     get:
@@ -61,28 +62,20 @@ paths:
       summary: searches all programs
       description: |
         List all programs known to the server.
-        May filter results by targetType and targetValues as query params.
+        May filter results by targets params.
         Use skip and pagination query params to limit response size.
       operationId: search_all_programs
       parameters:
-      - name: targetType
+      - name: targets
         in: query
-        description: "Indicates targeting type, e.g. GROUP"
-        required: false
-        style: form
-        explode: true
-        schema:
-          $ref: "#/components/schemas/targetType"
-      - name: targetValues
-        in: query
-        description: "List of target values, e.g. group names"
+        description: Indicates targets
         required: false
         style: form
         explode: true
         schema:
           type: array
           items:
-            $ref: "#/components/schemas/targetValue"
+            $ref: "#/components/schemas/target"
       - name: skip
         in: query
         description: number of records to skip for pagination.
@@ -725,7 +718,7 @@ paths:
       description: |
         List all events known to the server.
         May filter results by programID query param.
-        May filter results by targetType and targetValues as query params.
+        May filter results by targets params.
         Use skip and pagination query params to limit response size.
       operationId: search_all_events
       parameters:
@@ -738,24 +731,16 @@ paths:
         schema:
           $ref: "#/components/schemas/objectID"
         example: program-999
-      - name: targetType
+      - name: targets
         in: query
-        description: "Indicates targeting type, e.g. GROUP"
-        required: false
-        style: form
-        explode: true
-        schema:
-          $ref: "#/components/schemas/targetType"
-      - name: targetValues
-        in: query
-        description: "List of target values, e.g. group names"
+        description: Indicates targets
         required: false
         style: form
         explode: true
         schema:
           type: array
           items:
-            $ref: "#/components/schemas/targetValue"
+            $ref: "#/components/schemas/target"
       - name: skip
         in: query
         description: number of records to skip for pagination.
@@ -1074,7 +1059,7 @@ paths:
       description: |
         List all subscriptions.
         May filter results by programID and clientName as query params.
-        May filter results by targetType and targetValues as query params.
+        May filter results by targets params.
         May filter results by objects as query param. See objectTypes schema.
         Use skip and pagination query params to limit response size.
       operationId: search_subscriptions
@@ -1095,24 +1080,6 @@ paths:
         explode: true
         schema:
           $ref: "#/components/schemas/clientName"
-      - name: targetType
-        in: query
-        description: "Indicates targeting type, e.g. GROUP"
-        required: false
-        style: form
-        explode: true
-        schema:
-          $ref: "#/components/schemas/targetType"
-      - name: targetValues
-        in: query
-        description: "List of target values, e.g. group names"
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: array
-          items:
-            $ref: "#/components/schemas/targetValue"
       - name: objects
         in: query
         description: list of objects to subscribe to.
@@ -1447,7 +1414,7 @@ paths:
       description: |
         List all vens.
         May filter results by venName as query param.
-        May filter results by targetType and targetValues as query params.
+        May filter results by targets params.
         Use skip and pagination query params to limit response size.
       operationId: search_vens
       parameters:
@@ -1459,24 +1426,16 @@ paths:
         explode: true
         schema:
           $ref: "#/components/schemas/venName"
-      - name: targetType
+      - name: targets
         in: query
-        description: "Indicates targeting type, e.g. GROUP"
-        required: false
-        style: form
-        explode: true
-        schema:
-          $ref: "#/components/schemas/targetType"
-      - name: targetValues
-        in: query
-        description: "List of target values, e.g. group names"
+        description: Indicates targets
         required: false
         style: form
         explode: true
         schema:
           type: array
           items:
-            $ref: "#/components/schemas/targetValue"
+            $ref: "#/components/schemas/target"
       - name: skip
         in: query
         description: number of records to skip for pagination.
@@ -1778,7 +1737,7 @@ paths:
       description: |
         List all ven resources associated with ven with specified venID.
         May filter results by resourceName as query params.
-        May filter results by targetType and targetValues as query params.
+        May filter results by targets params.
         Use skip and pagination query params to limit response size.
       operationId: search_ven_resources
       parameters:
@@ -1798,24 +1757,16 @@ paths:
         explode: true
         schema:
           $ref: "#/components/schemas/objectID"
-      - name: targetType
+      - name: targets
         in: query
-        description: "Indicates targeting type, e.g. GROUP"
-        required: false
-        style: form
-        explode: true
-        schema:
-          $ref: "#/components/schemas/targetType"
-      - name: targetValues
-        in: query
-        description: "List of target values, e.g. group names"
+        description: Indicates targets
         required: false
         style: form
         explode: true
         schema:
           type: array
           items:
-            $ref: "#/components/schemas/targetValue"
+            $ref: "#/components/schemas/target"
       - name: skip
         in: query
         description: number of records to skip for pagination.
@@ -2824,10 +2775,10 @@ components:
             - $ref: "#/components/schemas/reportPayloadDescriptor"
         targets:
           type: array
-          description: A list of valuesMap objects.
+          description: A list of targets.
           nullable: true
           items:
-            $ref: "#/components/schemas/valuesMap"
+            $ref: "#/components/schemas/target"
       description: Client provided description of program
     report:
       type: object
@@ -2897,10 +2848,10 @@ components:
           example: 0
         targets:
           type: array
-          description: A list of valuesMap objects.
+          description: A list of targets.
           nullable: true
           items:
-            $ref: "#/components/schemas/valuesMap"
+            $ref: "#/components/schemas/target"
         reportDescriptors:
           type: array
           description: A list of reportDescriptor objects. Used to request reports
@@ -2953,10 +2904,10 @@ components:
             $ref: "#/components/schemas/subscriptionRequest_objectOperations"
         targets:
           type: array
-          description: A list of valuesMap objects. Used by server to filter callbacks.
+          description: A list of target objects. Used by server to filter notifications.
           nullable: true
           items:
-            $ref: "#/components/schemas/valuesMap"
+            $ref: "#/components/schemas/target"
       description: |
         An object created by a client to receive notification of operations on objects.
         Clients may subscribe to be notified when a type of object is created,
@@ -2987,10 +2938,10 @@ components:
           $ref: "#/components/schemas/clientID"
         targets:
           type: array
-          description: A list of valuesMap objects describing target criteria.
+          description: A list of targets.
           nullable: true
           items:
-            $ref: "#/components/schemas/valuesMap"
+            $ref: "#/components/schemas/target"
         venName:
           $ref: "#/components/schemas/venName"
         attributes:
@@ -3047,10 +2998,10 @@ components:
           $ref: "#/components/schemas/clientID"
         targets:
           type: array
-          description: A list of valuesMap objects describing target criteria.
+          description: A list of targets.
           nullable: true
           items:
-            $ref: "#/components/schemas/valuesMap"
+            $ref: "#/components/schemas/target"
         resourceName:
           $ref: "#/components/schemas/resourceName"
         venID:
@@ -3272,10 +3223,10 @@ components:
           $ref: "#/components/schemas/units"
         targets:
           type: array
-          description: A list of valuesMap objects.
+          description: A list of targets.
           nullable: true
           items:
-            $ref: "#/components/schemas/valuesMap"
+            $ref: "#/components/schemas/target"
         aggregate:
           type: boolean
           description: |
@@ -3362,15 +3313,11 @@ components:
       type: string
       description: "User generated identifier, may be VEN identifier provisioned out-of-band."
       example: VEN-999
-    targetType:
+    target:
       maxLength: 128
       minLength: 1
       type: string
-      example: GROUP
-    targetValue:
-      maxLength: 128
-      minLength: 1
-      type: string
+      description: User generated target string.
       example: group-1
     resourceName:
       maxLength: 128
@@ -3426,10 +3373,10 @@ components:
           - $ref: "#/components/schemas/resource"
         targets:
           type: array
-          description: A list of valuesMap objects.
+          description: A list of targets.
           nullable: true
           items:
-            $ref: "#/components/schemas/valuesMap"
+            $ref: "#/components/schemas/target"
       description: |
         VTN generated object included in request to subscription callbackUrl.
     objectTypes:

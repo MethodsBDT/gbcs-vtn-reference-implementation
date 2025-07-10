@@ -9,7 +9,7 @@ from swagger_server.models.base_model_ import Model
 from swagger_server.models.client_name import ClientName  # noqa: F401,E501
 from swagger_server.models.object_id import ObjectID  # noqa: F401,E501
 from swagger_server.models.subscription_request_object_operations import SubscriptionRequestObjectOperations  # noqa: F401,E501
-from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
+from swagger_server.models.target import Target  # noqa: F401,E501
 import re  # noqa: F401,E501
 from swagger_server import util
 
@@ -19,7 +19,7 @@ class SubscriptionRequest(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, client_name: ClientName=None, program_id: ObjectID=None, object_operations: List[SubscriptionRequestObjectOperations]=None, targets: List[ValuesMap]=None):  # noqa: E501
+    def __init__(self, client_name: ClientName=None, program_id: ObjectID=None, object_operations: List[SubscriptionRequestObjectOperations]=None, targets: List[Target]=None):  # noqa: E501
         """SubscriptionRequest - a model defined in Swagger
 
         :param client_name: The client_name of this SubscriptionRequest.  # noqa: E501
@@ -29,13 +29,13 @@ class SubscriptionRequest(Model):
         :param object_operations: The object_operations of this SubscriptionRequest.  # noqa: E501
         :type object_operations: List[SubscriptionRequestObjectOperations]
         :param targets: The targets of this SubscriptionRequest.  # noqa: E501
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         """
         self.swagger_types = {
             'client_name': ClientName,
             'program_id': ObjectID,
             'object_operations': List[SubscriptionRequestObjectOperations],
-            'targets': List[ValuesMap]
+            'targets': List[Target]
         }
 
         self.attribute_map = {
@@ -130,24 +130,24 @@ class SubscriptionRequest(Model):
         self._object_operations = object_operations
 
     @property
-    def targets(self) -> List[ValuesMap]:
+    def targets(self) -> List[Target]:
         """Gets the targets of this SubscriptionRequest.
 
-        A list of valuesMap objects. Used by server to filter callbacks.  # noqa: E501
+        A list of target objects. Used by server to filter notifications.  # noqa: E501
 
         :return: The targets of this SubscriptionRequest.
-        :rtype: List[ValuesMap]
+        :rtype: List[Target]
         """
         return self._targets
 
     @targets.setter
-    def targets(self, targets: List[ValuesMap]):
+    def targets(self, targets: List[Target]):
         """Sets the targets of this SubscriptionRequest.
 
-        A list of valuesMap objects. Used by server to filter callbacks.  # noqa: E501
+        A list of target objects. Used by server to filter notifications.  # noqa: E501
 
         :param targets: The targets of this SubscriptionRequest.
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         """
 
         self._targets = targets

@@ -14,7 +14,7 @@ from swagger_server.models.object_types import ObjectTypes  # noqa: F401,E501
 from swagger_server.models.program_request import ProgramRequest  # noqa: F401,E501
 from swagger_server.models.program_request_program_descriptions import ProgramRequestProgramDescriptions  # noqa: F401,E501
 from swagger_server.models.any_ofprogram_request_payload_descriptors_items import AnyOfprogramRequestPayloadDescriptorsItems
-from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
+from swagger_server.models.target import Target  # noqa: F401,E501
 import re  # noqa: F401,E501
 from swagger_server import util
 
@@ -24,7 +24,7 @@ class Program(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, program_name: str=None, program_long_name: str=None, retailer_name: str=None, retailer_long_name: str=None, program_type: str=None, country: str=None, principal_subdivision: str=None, interval_period: IntervalPeriod=None, program_descriptions: List[ProgramRequestProgramDescriptions]=None, binding_events: bool=None, local_price: bool=None, payload_descriptors: List[AnyOfprogramRequestPayloadDescriptorsItems]=None, targets: List[ValuesMap]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
+    def __init__(self, program_name: str=None, program_long_name: str=None, retailer_name: str=None, retailer_long_name: str=None, program_type: str=None, country: str=None, principal_subdivision: str=None, interval_period: IntervalPeriod=None, program_descriptions: List[ProgramRequestProgramDescriptions]=None, binding_events: bool=None, local_price: bool=None, payload_descriptors: List[AnyOfprogramRequestPayloadDescriptorsItems]=None, targets: List[Target]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
         """Program - a model defined in Swagger
 
         :param program_name: The program_name of this Program.  # noqa: E501
@@ -52,7 +52,7 @@ class Program(Model):
         :param payload_descriptors: The payload_descriptors of this Program.  # noqa: E501
         :type payload_descriptors: List[AnyOfprogramRequestPayloadDescriptorsItems]
         :param targets: The targets of this Program.  # noqa: E501
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         :param id: The id of this Program.  # noqa: E501
         :type id: ObjectID
         :param created_date_time: The created_date_time of this Program.  # noqa: E501
@@ -75,7 +75,7 @@ class Program(Model):
             'binding_events': bool,
             'local_price': bool,
             'payload_descriptors': List[AnyOfprogramRequestPayloadDescriptorsItems],
-            'targets': List[ValuesMap],
+            'targets': List[Target],
             'id': ObjectID,
             'created_date_time': ModelDateTime,
             'modification_date_time': ModelDateTime,
@@ -407,24 +407,24 @@ class Program(Model):
         self._payload_descriptors = payload_descriptors
 
     @property
-    def targets(self) -> List[ValuesMap]:
+    def targets(self) -> List[Target]:
         """Gets the targets of this Program.
 
-        A list of valuesMap objects.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :return: The targets of this Program.
-        :rtype: List[ValuesMap]
+        :rtype: List[Target]
         """
         return self._targets
 
     @targets.setter
-    def targets(self, targets: List[ValuesMap]):
+    def targets(self, targets: List[Target]):
         """Sets the targets of this Program.
 
-        A list of valuesMap objects.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :param targets: The targets of this Program.
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         """
 
         self._targets = targets

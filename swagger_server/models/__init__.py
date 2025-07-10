@@ -50,8 +50,7 @@ from swagger_server.models.resource_request import ResourceRequest
 from swagger_server.models.subscription import Subscription
 from swagger_server.models.subscription_request import SubscriptionRequest
 from swagger_server.models.subscription_request_object_operations import SubscriptionRequestObjectOperations
-from swagger_server.models.target_type import TargetType
-from swagger_server.models.target_value import TargetValue
+from swagger_server.models.target import Target
 from swagger_server.models.units import Units
 from swagger_server.models.values_map import ValuesMap
 from swagger_server.models.ven import Ven

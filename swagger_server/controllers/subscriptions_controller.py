@@ -15,7 +15,9 @@ from swagger_server.models.subscription import Subscription  # noqa: E501
 from swagger_server.models.subscription_request import SubscriptionRequest  # noqa: E501
 from swagger_server.models.notification import Notification  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
+from swagger_server.models.target import Target  # noqa: E501
 from swagger_server import util
+from swagger_server import objectUtils
 from swagger_server import notifiers
 
 
@@ -24,10 +26,10 @@ def create_subscription(body):  # noqa: E501
 
     Create a new subscription. # noqa: E501
 
-    :param subscription_request:
-    :type subscription_request: dict | bytes
+    :param body:
+    :type body: dict | bytes
 
-    :rtype: Union[Subscription, Tuple[Subscription, int], Tuple[Subscription, int, Dict[str, str]]
+    :rtype: Subscription
     """
     logging.info(f"create_subscription():")
 
@@ -45,7 +47,7 @@ def create_subscription(body):  # noqa: E501
 
     # Note: there is currently no concept of a duplicated subscription
 
-    client_id = util.getClientId(request)
+    client_id = objectUtils.getClientId(request)
 
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
@@ -121,8 +123,8 @@ def search_subscription_by_id(subscription_id):  # noqa: E501
         return problem, status
 
     # VEN may only view subscriptions its created
-    if util.getClientRole(request) in 'VEN':
-        client_id = util.getClientId(request)
+    if objectUtils.getClientRole(request) in 'VEN':
+        client_id = objectUtils.getClientId(request)
         if subscription.client_id != client_id:
             return None, HTTPStatus.NOT_FOUND
 
@@ -130,19 +132,15 @@ def search_subscription_by_id(subscription_id):  # noqa: E501
 
     return subscription, HTTPStatus.OK
 
-def search_subscriptions(program_id=None, client_name=None, target_type=None, target_values=None, objects=None, skip=None, limit=None):  # noqa: E501
+def search_subscriptions(program_id=None, client_name=None, objects=None, skip=None, limit=None):  # noqa: E501
     """search subscriptions
 
-    List all subscriptions. May filter results by programID and clientName as query params. May filter results by targetType and targetValues as query params. May filter results by objects as query param. See objectTypes schema. Use skip and pagination query params to limit response size.  # noqa: E501
+    List all subscriptions. May filter results by programID and clientName as query params. May filter results by objects as query param. See objectTypes schema. Use skip and pagination query params to limit response size.  # noqa: E501
 
     :param program_id: filter results to subscriptions with programID.
-    :type program_id: str
+    :type program_id: dict | bytes
     :param client_name: filter results to subscriptions with clientName.
-    :type client_name: str
-    :param target_type: Indicates targeting type, e.g. GROUP
-    :type target_type: str
-    :param target_values: List of target values, e.g. group names
-    :type target_values: List[str]
+    :type client_name: dict | bytes
     :param objects: list of objects to subscribe to.
     :type objects: list | bytes
     :param skip: number of records to skip for pagination.
@@ -150,11 +148,11 @@ def search_subscriptions(program_id=None, client_name=None, target_type=None, ta
     :param limit: maximum number of records to return.
     :type limit: int
 
-    :rtype: Union[List[Subscription], Tuple[List[Subscription], int], Tuple[List[Subscription], int, Dict[str, str]]
+    :rtype: List[Subscription]
     """
     # TBD: see genereated server, need ot add fetching params from request?
     logging.info(
-        f"search_all_subscriptions(): program_id={program_id} client_name={client_name} target_type={target_type} target_values={target_values} objects={objects} skip={skip} limit={limit}")
+        f"search_all_subscriptions(): program_id={program_id} client_name={client_name} objects={objects} skip={skip} limit={limit}")
 
     subscriptions = objStore.search_all("SUBSCRIPTION")
     logging.debug(f"search_all_subscriptions(): subscriptions={subscriptions}")
@@ -165,24 +163,19 @@ def search_subscriptions(program_id=None, client_name=None, target_type=None, ta
         return problem, status
 
     # if request from VEN filter on reports created by this VEN
-    if util.getClientRole(request) in 'VEN':
-        client_id = util.getClientId(request)
+    if objectUtils.getClientRole(request) in 'VEN':
+        client_id = objectUtils.getClientId(request)
         subscriptions = [subscription for subscription in subscriptions if subscription.client_id == client_id]
 
     if program_id != None:
-        # strip leading [' and tailing ']
-        # program_id = program_id[2:-2]
         subscriptions = [subscription for subscription in subscriptions if subscription.program_id == program_id]
         if len(subscriptions) == 0:
             return subscriptions, HTTPStatus.OK
     if client_name != None:
-        # strip leading [' and tailing ']
-        # client_name = client_name[2:-2]
         subscriptions = [subscription for subscription in subscriptions if subscription.client_name == client_name]
         if len(subscriptions) == 0:
             return subscriptions, HTTPStatus.OK
-    subscriptions = util.getObjectsWithTarget(subscriptions, target_type, target_values)
-    # subscriptions = util.getObjects(subscriptions, objects)
+    # TBD: sesrch by objects
     if skip != None:
         if len(subscriptions) < skip:
             return [], HTTPStatus.OK
@@ -253,12 +246,12 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
 
     return (subscription)
 
-def subscription_callback(resourceName, operation, subscriptionObj):
+def subscription_callback(resourceName, operation, object):
     logging.info(f"subscription_callback(): resourceName={resourceName}, operation={operation}")
-    logging.debug(f"subscription_callback(): subscriptionObj={subscriptionObj}")
+    logging.debug(f"subscription_callback(): object={object}")
 
     # Dispatch notifiers for non-WEBHOOK bindings
-    notifiers.dispatch(resourceName, operation, subscriptionObj)
+    notifiers.dispatch(resourceName, operation, object)
 
     subscriptions = objStore.search_all("SUBSCRIPTION")
     logging.debug(f"subscription_callback(): subscriptions={subscriptions}")
@@ -272,33 +265,31 @@ def subscription_callback(resourceName, operation, subscriptionObj):
         objOperation = next((objOperation for objOperation in subscription.object_operations if
                          resourceName in objOperation.objects and operation in objOperation.operations), None)
         if objOperation is not None:
-            if hasattr(object, "targets") and object.targets is not None and hasattr(subscription, "targets") and subscription.targets is not None:
-                for target in object.targets:
-                    targetObj = next((targetObj for targetObj in subscription.targets if
-                                     targetObj.targetType in target.targetType), None)
-                    if targetObj is not None:
-                        if target.values is not None:
-                            for value in target.values:
-                                targetValue = next((targetValue for targetValue in targetObj.values if
-                                       value in targetValue), None)
+            match = True
+            if hasattr(object, "targets") and object.targets is not None and subscription.targets is not None:
+                # If subscription is created by VEN, get associated ven.targets to determine 'allowed' targets
+                # TDB: we currently do not have a way to determine if subscription is associated with a BL or VEN client
+                allowed_targets = objectUtils.getAllowedTargets(subscription.client_id)
+                # get intersection of allowed targets and targets in subscription
+                targets = [t for t in allowed_targets if t in subscription.targets]
+                
+                match = False
+                for t in targets:
+                    # if any target string in subscription matches any target in object, there is a match
+                    if t in object.targets:
+                        match = True
+                        break
 
-                            if targetValue is None:
-                                logging.debug(f"subscription_callback: no matching targetValue")
-                                return None
-                    else:
-                        logging.debug(f"subscription_callback: no matching targetObj")
-                        return None
+            if match is True:
+                notification = Notification(object_type=resourceName, operation=operation, targets=None, object=object)
 
-            notification = Notification(object_type=resourceName, operation=operation, targets=None, object=subscriptionObj)
+                logging.info(f"subscription_callback(): notification={notification} callback_url={objOperation.callback_url}")
+                headers = { "Authorization": f"Bearer {objOperation.bearer_token}"}
 
-            logging.info(f"subscription_callback(): notification={notification} callback_url={objOperation.callback_url}")
-            headers = { "Authorization": f"Bearer {objOperation.bearer_token}"}
-
-            # FS TBD: address timeout error
-            response = requests.post(objOperation.callback_url, json=json.dumps(notification.to_dict()), headers=headers)
-            if response.status_code != HTTPStatus.OK:
-                logging.warning(f"subscription_callback: callback response.status_code={response.status_code}")
-
+                # FS TBD: address timeout error
+                response = requests.post(objOperation.callback_url, json=json.dumps(notification.to_dict()), headers=headers)
+                if response.status_code != HTTPStatus.OK:
+                    logging.warning(f"subscription_callback: callback response.status_code={response.status_code}")
 
 def subscription_callback_echo_test(operations):
     logging.info(f"subscription_callback_echo_test(): operations={operations}")

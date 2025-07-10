@@ -12,7 +12,7 @@ from swagger_server.models.interval import Interval  # noqa: F401,E501
 from swagger_server.models.interval_period import IntervalPeriod  # noqa: F401,E501
 from swagger_server.models.object_id import ObjectID  # noqa: F401,E501
 from swagger_server.models.report_descriptor import ReportDescriptor  # noqa: F401,E501
-from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
+from swagger_server.models.target import Target  # noqa: F401,E501
 import re  # noqa: F401,E501
 from swagger_server import util
 
@@ -22,7 +22,7 @@ class EventRequest(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, program_id: ObjectID=None, event_name: str=None, duration: Duration=None, priority: int=None, targets: List[ValuesMap]=None, report_descriptors: List[ReportDescriptor]=None, payload_descriptors: List[EventPayloadDescriptor]=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None):  # noqa: E501
+    def __init__(self, program_id: ObjectID=None, event_name: str=None, duration: Duration=None, priority: int=None, targets: List[Target]=None, report_descriptors: List[ReportDescriptor]=None, payload_descriptors: List[EventPayloadDescriptor]=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None):  # noqa: E501
         """EventRequest - a model defined in Swagger
 
         :param program_id: The program_id of this EventRequest.  # noqa: E501
@@ -34,7 +34,7 @@ class EventRequest(Model):
         :param priority: The priority of this EventRequest.  # noqa: E501
         :type priority: int
         :param targets: The targets of this EventRequest.  # noqa: E501
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         :param report_descriptors: The report_descriptors of this EventRequest.  # noqa: E501
         :type report_descriptors: List[ReportDescriptor]
         :param payload_descriptors: The payload_descriptors of this EventRequest.  # noqa: E501
@@ -49,7 +49,7 @@ class EventRequest(Model):
             'event_name': str,
             'duration': Duration,
             'priority': int,
-            'targets': List[ValuesMap],
+            'targets': List[Target],
             'report_descriptors': List[ReportDescriptor],
             'payload_descriptors': List[EventPayloadDescriptor],
             'interval_period': IntervalPeriod,
@@ -179,24 +179,24 @@ class EventRequest(Model):
         self._priority = priority
 
     @property
-    def targets(self) -> List[ValuesMap]:
+    def targets(self) -> List[Target]:
         """Gets the targets of this EventRequest.
 
-        A list of valuesMap objects.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :return: The targets of this EventRequest.
-        :rtype: List[ValuesMap]
+        :rtype: List[Target]
         """
         return self._targets
 
     @targets.setter
-    def targets(self, targets: List[ValuesMap]):
+    def targets(self, targets: List[Target]):
         """Sets the targets of this EventRequest.
 
-        A list of valuesMap objects.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :param targets: The targets of this EventRequest.
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         """
 
         self._targets = targets

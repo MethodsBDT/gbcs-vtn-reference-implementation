@@ -9,8 +9,7 @@ from typing import Union
 
 from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
-from swagger_server.models.target_type import TargetType  # noqa: E501
-from swagger_server.models.target_value import TargetValue  # noqa: E501
+from swagger_server.models.target import Target  # noqa: E501
 from swagger_server.models.ven import Ven  # noqa: E501
 from swagger_server.models.ven_name import VenName  # noqa: E501
 from swagger_server.models.ven_request import VenRequest  # noqa: E501
@@ -19,6 +18,7 @@ from swagger_server.models.ven_ven_request import VenVenRequest  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
 from swagger_server import util
+from swagger_server import objectUtils
 
 def create_ven(body):  # noqa: E501
     """create ven
@@ -35,7 +35,7 @@ def create_ven(body):  # noqa: E501
     targets = []
     if body["objectType"] in "VEN_VEN_REQUEST":
         venBody = VenVenRequest.from_dict(connexion.request.get_json())  # noqa: E501
-        client_id = util.getClientId(request)
+        client_id = objectUtils.getClientId(request)
     else:
         venBody = BlVenRequest.from_dict(connexion.request.get_json())
         client_id = venBody.client_id # noqa: E501
@@ -119,8 +119,8 @@ def search_ven_by_id(ven_id):  # noqa: E501
         return problem, status
 
     # VEN can only read ven objects with client_id matching client_id associated with it's token
-    if util.getClientRole(request) in 'VEN':
-        client_id = util.getClientId(request)
+    if objectUtils.getClientRole(request) in 'VEN':
+        client_id = objectUtils.getClientId(request)
         if ven.client_id != client_id:
             return [], HTTPStatus.OK
 
@@ -128,17 +128,15 @@ def search_ven_by_id(ven_id):  # noqa: E501
 
     return ven, HTTPStatus.OK
 
-def search_vens(ven_name=None, target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
+def search_vens(ven_name=None, targets=None, skip=None, limit=None):  # noqa: E501
     """search vens
 
-    List all vens. May filter results by venName as query param. May filter results by targetType and targetValues as query params. Use skip and pagination query params to limit response size.  # noqa: E501
+    List all vens. May filter results by venName as query param. May filter results by targets params. Use skip and pagination query params to limit response size.  # noqa: E501
 
     :param ven_name: Indicates ven objects w venName
     :type ven_name: dict | bytes
-    :param target_type: Indicates targeting type, e.g. GROUP
-    :type target_type: dict | bytes
-    :param target_values: List of target values, e.g. group names
-    :type target_values: list | bytes
+    :param targets: Indicates targets
+    :type targets: list | bytes
     :param skip: number of records to skip for pagination.
     :type skip: int
     :param limit: maximum number of records to return.
@@ -147,7 +145,7 @@ def search_vens(ven_name=None, target_type=None, target_values=None, skip=None, 
     :rtype: List[Ven]
     """
     logging.info(
-        f"search_vens(): ven_name={ven_name} target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
+        f"search_vens(): ven_name={ven_name} targets={targets} skip={skip} limit={limit}")
 
     vens = objStore.search_all("VEN")
     logging.debug(f"search_vens(): vens={vens}")
@@ -158,36 +156,41 @@ def search_vens(ven_name=None, target_type=None, target_values=None, skip=None, 
         return problem, status
 
     logging.info(f"search_vens(): vens={vens}")
-    venList = vens
+    objects = objectList = vens
 
     # A VEN can only fetch a ven with a client_id matching the request token client_id
-    # FS TBD: allow VEN to specify targets? (why?)
-    if util.getClientRole(request) in 'VEN':
-        client_id = util.getClientId(request)
+    if objectUtils.getClientRole(request) in 'VEN':
+        client_id = objectUtils.getClientId(request)
         # There can ony be one ven with a given client_id
-        venList = [ven for ven in vens if ven.client_id == client_id]
-        if len(venList) > 1:
+        objectList = [ven for ven in objectList if ven.client_id == client_id]
+        if len(objectList) > 1:
             logging.warning(f"search_vens(): multiple vens with same client_id={client_id}")
-        return venList, HTTPStatus.OK
+        return objectList, HTTPStatus.OK
 
+    # Request is from BL client
     if ven_name != None:
-        venList = [ven for ven in vens if ven.ven_name == ven_name]
-        if len(venList) == 0:
+        objectList = [ven for ven in vens if ven.ven_name == ven_name]
+        if len(objectList) == 0:
             return [], HTTPStatus.OK
-    
-    venList = util.getObjectsWithTarget(venList, target_type, target_values)
+        else:
+            return objectList, HTTPStatus.OK
+
+    # BL will fetch all objects if targets are not specified in query, or objects matching targets if present in query
+    if targets != None:
+        objectList = objectUtils.getObjectsWithTargets(objects, targets)
+
     if skip != None:
-        if len(vens) < skip:
+        if len(objectList) < skip:
             return [], HTTPStatus.OK
-        venList = vens[skip:]
+        objectList = objectList[skip:]
     if limit != None:
-        venList = venList[:limit]
+        objectList = objectList[:limit]
 
-    logging.debug(f"search_vens(): venList={venList}")
+    logging.debug(f"search_vens(): objectList={objectList}")
 
-    subscription_callback("VEN", "READ", venList)
+    subscription_callback("VEN", "READ", objectList)
 
-    return venList, HTTPStatus.OK
+    return objectList, HTTPStatus.OK
 
 def update_ven(ven_id, body=None):  # noqa: E501
     """update  ven
@@ -210,7 +213,7 @@ def update_ven(ven_id, body=None):  # noqa: E501
             problem = Problem(title="Bad Request: No request body", status="400")
             logging.warning(f"update_ven(): problem={problem}")
             return problem, HTTPStatus.BAD_REQUEST
-        client_id = util.getClientId(request)
+        client_id = objectUtils.getClientId(request)
         targets = []
     else:
         venBody = BlVenRequest.from_dict(connexion.request.get_json())
@@ -252,37 +255,3 @@ def update_ven(ven_id, body=None):  # noqa: E501
     subscription_callback("VEN", "UPDATE", ven)
     return ven, HTTPStatus.OK
 
-def getUnionOfTargets(request, target_type, target_values):
-    # get targets of ven object with client_id associated with requestor's token
-    client_id = util.getClientId(request)
-    vens = objStore.search_all("VEN")
-    venList = [ven for ven in vens if ven.client_id == client_id]
-    if 0 == len(venList) < 2:
-        logging.warning(f"vens_controller.getUnionOfTargets(): none or multiple vens with client_id {client_id} venList={venList}")
-        return []
-    ven = venList[0]
-    logging.debug(f"getUnionOfTargets(): ven={ven}")
-    targets = ven.targets
-    # find union of targets allocated to VEN via ven object and target_type, target_values
-    allowed_targets = util.getMatchedTargets(targets, target_type, target_values)
-    return allowed_targets
-
-def getAllowedTargets(request):
-    # get targets of ven object with client_id associated with requestor's token
-    client_id = util.getClientId(request)
-    vens = objStore.search_all("VEN")
-    venList = [ven for ven in vens if ven.client_id == client_id]
-    if 0 == len(venList) < 2:
-        logging.warning(f"vens_controller.getAllowedTargets(): none or multiple vens with client_id {client_id} venList={venList}")
-        return []
-    ven = venList[0]
-    logging.debug(f"getAllowedTargets(): ven={ven}")
-    return ven.targets
-
-
-def getVensWithTargets(targets):
-    # get all vens with targets matching targets argument
-    vens = objStore.search_all("VEN")
-    venList = util.getObjectsWithTargets(vens, targets)
-    logging.debug(f"getVensWithTargets(): venList = {venList}")
-    return venList

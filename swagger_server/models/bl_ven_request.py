@@ -7,6 +7,7 @@ from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
 from swagger_server.models.client_id import ClientID  # noqa: F401,E501
+from swagger_server.models.target import Target  # noqa: F401,E501
 from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
 from swagger_server.models.ven_name import VenName  # noqa: F401,E501
 from swagger_server import util
@@ -17,7 +18,7 @@ class BlVenRequest(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, object_type: str=None, client_id: ClientID=None, targets: List[ValuesMap]=None, ven_name: VenName=None, attributes: List[ValuesMap]=None):  # noqa: E501
+    def __init__(self, object_type: str=None, client_id: ClientID=None, targets: List[Target]=None, ven_name: VenName=None, attributes: List[ValuesMap]=None):  # noqa: E501
         """BlVenRequest - a model defined in Swagger
 
         :param object_type: The object_type of this BlVenRequest.  # noqa: E501
@@ -25,7 +26,7 @@ class BlVenRequest(Model):
         :param client_id: The client_id of this BlVenRequest.  # noqa: E501
         :type client_id: ClientID
         :param targets: The targets of this BlVenRequest.  # noqa: E501
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         :param ven_name: The ven_name of this BlVenRequest.  # noqa: E501
         :type ven_name: VenName
         :param attributes: The attributes of this BlVenRequest.  # noqa: E501
@@ -34,7 +35,7 @@ class BlVenRequest(Model):
         self.swagger_types = {
             'object_type': str,
             'client_id': ClientID,
-            'targets': List[ValuesMap],
+            'targets': List[Target],
             'ven_name': VenName,
             'attributes': List[ValuesMap]
         }
@@ -116,24 +117,24 @@ class BlVenRequest(Model):
         self._client_id = client_id
 
     @property
-    def targets(self) -> List[ValuesMap]:
+    def targets(self) -> List[Target]:
         """Gets the targets of this BlVenRequest.
 
-        A list of valuesMap objects describing target criteria.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :return: The targets of this BlVenRequest.
-        :rtype: List[ValuesMap]
+        :rtype: List[Target]
         """
         return self._targets
 
     @targets.setter
-    def targets(self, targets: List[ValuesMap]):
+    def targets(self, targets: List[Target]):
         """Sets the targets of this BlVenRequest.
 
-        A list of valuesMap objects describing target criteria.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :param targets: The targets of this BlVenRequest.
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         """
 
         self._targets = targets

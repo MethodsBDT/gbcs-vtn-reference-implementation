@@ -5,18 +5,15 @@ from http import HTTPStatus
 import logging
 from flask import request
 
-
+from swagger_server import util
+from swagger_server import objectUtils
 from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.program import Program  # noqa: E501
 from swagger_server.models.program_request import ProgramRequest  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
-from swagger_server.controllers import vens_controller  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
-from swagger_server.models.target_type import TargetType  # noqa: E501
-from swagger_server.models.target_value import TargetValue  # noqa: E501
-from swagger_server import util
-
+from swagger_server.models.target import Target  # noqa: E501
 
 def create_program(body=None):  # noqa: E501
     """create a program
@@ -99,18 +96,16 @@ def delete_program(program_id):  # noqa: E501
 
     # TBD: need to test if this is not present
     subscription_callback("PROGRAM", "DELETE", program)
-
+    
     return program, HTTPStatus.OK
 
-def search_all_programs(target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
+def search_all_programs(targets=None, skip=None, limit=None):  # noqa: E501
     """searches all programs
 
-    List all programs known to the server. May filter results by targetType and targetValues as query params. Use skip and pagination query params to limit response size.  # noqa: E501
+    List all programs known to the server. May filter results by targets params. Use skip and pagination query params to limit response size.  # noqa: E501
 
-    :param target_type: Indicates targeting type, e.g. GROUP
-    :type target_type: dict | bytes
-    :param target_values: List of target values, e.g. group names
-    :type target_values: list | bytes
+    :param targets: Indicates targets
+    :type targets: list | bytes
     :param skip: number of records to skip for pagination.
     :type skip: int
     :param limit: maximum number of records to return.
@@ -118,7 +113,7 @@ def search_all_programs(target_type=None, target_values=None, skip=None, limit=N
 
     :rtype: List[Program]
     """
-    logging.info(f"search_all_programs(): target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
+    logging.info(f"search_all_programs(): targets={targets} skip={skip} limit={limit}")
 
     programs = objStore.search_all("PROGRAM")
     if type(programs) is not list:
@@ -129,29 +124,39 @@ def search_all_programs(target_type=None, target_values=None, skip=None, limit=N
     
     logging.debug(f"search_all_programs(): programs={programs}")
 
-    programList = []
-    if util.getClientRole(request) in 'BL':
+    objectList = []
+    objects = programs
+    if objectUtils.getClientRole(request) in 'BL':
         # BL will fetch all objects if targets are not specified in query, or objects matching targets if present in query
-        programList = util.getObjectsWithTarget(programs, target_type, target_values)
+        if targets is None:
+            objectList = objects
+        else:
+            objectList = objectUtils.getObjectsWithTargets(objects, targets)
     else:
-        # A VEN client will fetch: programs with no targets, and programs whose targets are 'allowed' by associated ven that also 
-        # match target in query 
-        programsNoTargets = util.getObjectsNoTargets(programs)
-        allowed_targets = vens_controller.getAllowedTargets(request)
-        programsWithTargets = util.getObjectsWithTargets(programs, allowed_targets)
-        programList = programsNoTargets + programsWithTargets
-        programList = util.getObjectsWithTarget(programList, target_type, target_values)
+        # A VEN client will fetch objects with no targets and objects whose targets are 'allowed' by associated ven,
+        # or if targets present in query, objects matching targets iin query objects and whose targets are 'allowed' by associated ven
+        client_id = objectUtils.getClientId(request)
+        if targets is None:
+            objectsNoTargets = objectUtils.getObjectsNoTargets(objects)
+            allowed_targets = objectUtils.getAllowedTargets(client_id)
+            objectsWithTargets = objectUtils.getObjectsWithTargets(objects, allowed_targets)
+            objectList = objectsNoTargets + objectsWithTargets
+        else:
+            allowed_targets = objectUtils.getAllowedTargets(client_id)
+            # get intersection of allowed targets and targets in query
+            targets = [t for t in allowed_targets if t in targets]
+            objectList = objectUtils.getObjectsWithTargets(objects, targets)
     if skip != None:
-        if len(programList) < skip:
+        if len(objectList) < skip:
             return [], HTTPStatus.OK
-        programList = programList[skip:]
+        objectList = objectList[skip:]
     if limit != None:
-        programList = programList[:limit]
-    logging.debug(f"search_all_programs(): programList={programList}")
+        objectList = objectList[:limit]
+    logging.debug(f"search_all_programs(): objectList={objectList}")
 
-    subscription_callback("PROGRAM", "READ", programList)
+    subscription_callback("PROGRAM", "READ", objectList)
 
-    return programList, HTTPStatus.OK
+    return objectList, HTTPStatus.OK
 
 
 def search_program_by_program_id(program_id):  # noqa: E501
