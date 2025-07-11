@@ -49,17 +49,9 @@ def create_program(body=None):  # noqa: E501
         modification_date_time=None,
         object_type='PROGRAM',
         program_name=programBody.program_name,
-        program_long_name=programBody.program_long_name,
-        retailer_name=programBody.retailer_name,
-        retailer_long_name=programBody.retailer_long_name,
-        program_type=programBody.program_type,
-        country=programBody.country,
-        principal_subdivision=programBody.principal_subdivision,
         interval_period=programBody.interval_period,
         program_descriptions=programBody.program_descriptions,
-        binding_events=programBody.binding_events,
-        local_price=programBody.local_price,
-        payload_descriptors=programBody.payload_descriptors,
+        attributes=programBody.attributes,
         targets = programBody.targets
     )
 
@@ -216,28 +208,14 @@ def update_program(program_id, body=None):  # noqa: E501
 
     if programBody.program_name is not None:
         program.program_name = programBody.program_name
-    if programBody.program_long_name is not None:
-        program.program_long_name = programBody.program_long_name
-    if programBody.retailer_name is not None:
-        program.retailer_name = programBody.retailer_name
-    if programBody.retailer_long_name is not None:
-        program.retailer_long_name = programBody.retailer_long_name
-    if programBody.program_type is not None:
-        program.program_type = programBody.program_type
-    if programBody.country is not None:
-        program.country = programBody.country
-    if programBody.principal_subdivision is not None:
-        program.principal_subdivision = programBody.principal_subdivision
     if programBody.interval_period is not None:
         program.active_period = programBody.interval_period
     if programBody.program_descriptions is not None:
         program.program_descriptions = programBody.program_descriptions
-    if programBody.binding_events is not None:
-        program.binding_events = programBody.binding_events
-    if programBody.local_price is not None:
-        program.local_price = programBody.local_price
     if programBody.payload_descriptors is not None:
         program.payload_descriptors = programBody.payload_descriptors
+    if programBody.attributes is not None:
+        program.attributes = programBody.attributes
     if programBody.targets is not None:
         program.targets = programBody.targets
 
