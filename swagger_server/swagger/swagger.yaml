@@ -46,7 +46,7 @@ info:
     * Obtain an access token
     * This endpoint is provided as a convenience and may be neglected in a commercial implementation
   contact:
-    email: frank@pajaritotech.com
+    email: info@openadr.org
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -1059,7 +1059,6 @@ paths:
       description: |
         List all subscriptions.
         May filter results by programID and clientName as query params.
-        May filter results by targets params.
         May filter results by objects as query param. See objectTypes schema.
         Use skip and pagination query params to limit response size.
       operationId: search_subscriptions
@@ -2582,7 +2581,7 @@ paths:
                 $ref: "#/components/schemas/problem"
       security:
       - oAuth2ClientCredentials:
-        - read_bl
+        - read_ven_objects
       - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.mqtt_notifier_controller
   /notifiers/mqtt/topics/resources:
@@ -2634,6 +2633,126 @@ paths:
       security:
       - oAuth2ClientCredentials:
         - read_bl
+      - bearerAuth: []
+      x-openapi-router-controller: swagger_server.controllers.mqtt_notifier_controller
+  /notifiers/mqtt/topics/vens/{venID}/events:
+    get:
+      tags:
+      - MQTT_notifier
+      summary: |
+        List all MQTT binding topic names for operations on events targeted for a ven
+      description: |
+        List all MQTT binding topic names for operations on events targated for a ven
+      operationId: list_all_mqtt_notifier_topics_ven_events
+      parameters:
+      - name: venID
+        in: path
+        description: object ID of the ven object
+        required: true
+        style: simple
+        explode: false
+        schema:
+          $ref: "#/components/schemas/objectID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notifierTopicsResponse"
+        "400":
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/problem"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/problem"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/problem"
+        "404":
+          description: The specified resource was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/problem"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/problem"
+      security:
+      - oAuth2ClientCredentials:
+        - read_ven_objects
+      - bearerAuth: []
+      x-openapi-router-controller: swagger_server.controllers.mqtt_notifier_controller
+  /notifiers/mqtt/topics/vens/{venID}/programs:
+    get:
+      tags:
+      - MQTT_notifier
+      summary: |
+        List all MQTT binding topic names for operations on programs targeted for a ven
+      description: |
+        List all MQTT binding topic names for operations on programs targeted for a ven
+      operationId: list_all_mqtt_notifier_topics_ven_programs
+      parameters:
+      - name: venID
+        in: path
+        description: object ID of the ven object
+        required: true
+        style: simple
+        explode: false
+        schema:
+          $ref: "#/components/schemas/objectID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notifierTopicsResponse"
+        "400":
+          description: The request is malformed or invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/problem"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/problem"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/problem"
+        "404":
+          description: The specified resource was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/problem"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/problem"
+      security:
+      - oAuth2ClientCredentials:
+        - read_ven_objects
       - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.mqtt_notifier_controller
   /notifiers/mqtt/topics/vens/{venID}/resources:
@@ -2693,7 +2812,7 @@ paths:
                 $ref: "#/components/schemas/problem"
       security:
       - oAuth2ClientCredentials:
-        - read_bl
+        - read_ven_objects
       - bearerAuth: []
       x-openapi-router-controller: swagger_server.controllers.mqtt_notifier_controller
 components:
@@ -2715,36 +2834,6 @@ components:
           type: string
           description: Short name to uniquely identify program.
           example: ResTOU
-        programLongName:
-          type: string
-          description: Long name of program for human readability.
-          nullable: true
-          example: Residential Time of Use-A
-        retailerName:
-          type: string
-          description: Short name of energy retailer providing the program.
-          nullable: true
-          example: ACME
-        retailerLongName:
-          type: string
-          description: Long name of energy retailer for human readability.
-          nullable: true
-          example: ACME Electric Inc.
-        programType:
-          type: string
-          description: A program defined categorization.
-          nullable: true
-          example: PRICING_TARIFF
-        country:
-          type: string
-          description: Alpha-2 code per ISO 3166-1.
-          nullable: true
-          example: US
-        principalSubdivision:
-          type: string
-          description: Coding per ISO 3166-2. E.g. state in US.
-          nullable: true
-          example: CO
         intervalPeriod:
           $ref: "#/components/schemas/intervalPeriod"
         programDescriptions:
@@ -2753,16 +2842,6 @@ components:
           nullable: true
           items:
             $ref: "#/components/schemas/programRequest_programDescriptions"
-        bindingEvents:
-          type: boolean
-          description: True if events are fixed once transmitted.
-          nullable: true
-          example: false
-        localPrice:
-          type: boolean
-          description: True if events have been adapted from a grid event.
-          nullable: true
-          example: false
         payloadDescriptors:
           type: array
           description: A list of payloadDescriptors.
@@ -2773,6 +2852,12 @@ components:
             anyOf:
             - $ref: "#/components/schemas/eventPayloadDescriptor"
             - $ref: "#/components/schemas/reportPayloadDescriptor"
+        attributes:
+          type: array
+          description: A list of valuesMap objects describing attributes.
+          nullable: true
+          items:
+            $ref: "#/components/schemas/valuesMap"
         targets:
           type: array
           description: A list of targets.
@@ -3103,8 +3188,9 @@ components:
           minLength: 1
           type: string
           description: |
-            Enumerated or private string signifying the nature of values.
-            E.G. "PRICE" indicates value is to be interpreted as a currency.
+            Represents the nature of values.
+
+            See enumerations in Definitions for defined string values, or use privately defined strings
           example: PRICE
         values:
           type: array
@@ -3121,7 +3207,8 @@ components:
             - $ref: "#/components/schemas/point"
       description: |
         Represents one or more values associated with a type.
-        E.g. a type of PRICE contains a single float value.
+
+        See enumerations in Definitions for defined string values, or use privately defined strings
     point:
       required:
       - x
@@ -3154,7 +3241,10 @@ components:
           maxLength: 128
           minLength: 1
           type: string
-          description: Enumerated or private string signifying the nature of values.
+          description: |
+            Represents the nature of values.
+
+            See enumerations in Definitions for defined string values, or use privately defined strings
           example: PRICE
         units:
           $ref: "#/components/schemas/units"
@@ -3182,7 +3272,10 @@ components:
           maxLength: 128
           minLength: 1
           type: string
-          description: Enumerated or private string signifying the nature of values.
+          description: |
+            Represents the nature of values.
+
+            See enumerations in Definitions for defined string values, or use privately defined strings
           example: USAGE
         readingType:
           $ref: "#/components/schemas/readingType"
@@ -3215,7 +3308,10 @@ components:
           maxLength: 128
           minLength: 1
           type: string
-          description: Enumerated or private string signifying the nature of values.
+          description: |
+            Represents the nature of values.
+
+            See enumerations in Definitions for defined string values, or use privately defined strings
           example: USAGE
         readingType:
           $ref: "#/components/schemas/readingType"
@@ -3337,7 +3433,10 @@ components:
       maxLength: 128
       minLength: 1
       type: string
-      description: Enumerated or private string signifying the type of reading.
+      description: |
+        Represents the type of reading.
+
+        See enumerations in Definitions for defined string values, or use privately defined strings
       nullable: true
       example: DIRECT_READ
     notification:

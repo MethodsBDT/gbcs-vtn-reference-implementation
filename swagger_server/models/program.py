@@ -15,6 +15,7 @@ from swagger_server.models.program_request import ProgramRequest  # noqa: F401,E
 from swagger_server.models.program_request_program_descriptions import ProgramRequestProgramDescriptions  # noqa: F401,E501
 from swagger_server.models.any_ofprogram_request_payload_descriptors_items import AnyOfprogramRequestPayloadDescriptorsItems
 from swagger_server.models.target import Target  # noqa: F401,E501
+from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
 import re  # noqa: F401,E501
 from swagger_server import util
 
@@ -24,33 +25,19 @@ class Program(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, program_name: str=None, program_long_name: str=None, retailer_name: str=None, retailer_long_name: str=None, program_type: str=None, country: str=None, principal_subdivision: str=None, interval_period: IntervalPeriod=None, program_descriptions: List[ProgramRequestProgramDescriptions]=None, binding_events: bool=None, local_price: bool=None, payload_descriptors: List[AnyOfprogramRequestPayloadDescriptorsItems]=None, targets: List[Target]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
+    def __init__(self, program_name: str=None, interval_period: IntervalPeriod=None, program_descriptions: List[ProgramRequestProgramDescriptions]=None, payload_descriptors: List[AnyOfprogramRequestPayloadDescriptorsItems]=None, attributes: List[ValuesMap]=None, targets: List[Target]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
         """Program - a model defined in Swagger
 
         :param program_name: The program_name of this Program.  # noqa: E501
         :type program_name: str
-        :param program_long_name: The program_long_name of this Program.  # noqa: E501
-        :type program_long_name: str
-        :param retailer_name: The retailer_name of this Program.  # noqa: E501
-        :type retailer_name: str
-        :param retailer_long_name: The retailer_long_name of this Program.  # noqa: E501
-        :type retailer_long_name: str
-        :param program_type: The program_type of this Program.  # noqa: E501
-        :type program_type: str
-        :param country: The country of this Program.  # noqa: E501
-        :type country: str
-        :param principal_subdivision: The principal_subdivision of this Program.  # noqa: E501
-        :type principal_subdivision: str
         :param interval_period: The interval_period of this Program.  # noqa: E501
         :type interval_period: IntervalPeriod
         :param program_descriptions: The program_descriptions of this Program.  # noqa: E501
         :type program_descriptions: List[ProgramRequestProgramDescriptions]
-        :param binding_events: The binding_events of this Program.  # noqa: E501
-        :type binding_events: bool
-        :param local_price: The local_price of this Program.  # noqa: E501
-        :type local_price: bool
         :param payload_descriptors: The payload_descriptors of this Program.  # noqa: E501
-        :type payload_descriptors: List[AnyOfprogramRequestPayloadDescriptorsItems]
+        :type payload_descriptors: List[Object]
+        :param attributes: The attributes of this Program.  # noqa: E501
+        :type attributes: List[ValuesMap]
         :param targets: The targets of this Program.  # noqa: E501
         :type targets: List[Target]
         :param id: The id of this Program.  # noqa: E501
@@ -64,17 +51,10 @@ class Program(Model):
         """
         self.swagger_types = {
             'program_name': str,
-            'program_long_name': str,
-            'retailer_name': str,
-            'retailer_long_name': str,
-            'program_type': str,
-            'country': str,
-            'principal_subdivision': str,
             'interval_period': IntervalPeriod,
             'program_descriptions': List[ProgramRequestProgramDescriptions],
-            'binding_events': bool,
-            'local_price': bool,
             'payload_descriptors': List[AnyOfprogramRequestPayloadDescriptorsItems],
+            'attributes': List[ValuesMap],
             'targets': List[Target],
             'id': ObjectID,
             'created_date_time': ModelDateTime,
@@ -84,17 +64,10 @@ class Program(Model):
 
         self.attribute_map = {
             'program_name': 'programName',
-            'program_long_name': 'programLongName',
-            'retailer_name': 'retailerName',
-            'retailer_long_name': 'retailerLongName',
-            'program_type': 'programType',
-            'country': 'country',
-            'principal_subdivision': 'principalSubdivision',
             'interval_period': 'intervalPeriod',
             'program_descriptions': 'programDescriptions',
-            'binding_events': 'bindingEvents',
-            'local_price': 'localPrice',
             'payload_descriptors': 'payloadDescriptors',
+            'attributes': 'attributes',
             'targets': 'targets',
             'id': 'id',
             'created_date_time': 'createdDateTime',
@@ -102,17 +75,10 @@ class Program(Model):
             'object_type': 'objectType'
         }
         self._program_name = program_name
-        self._program_long_name = program_long_name
-        self._retailer_name = retailer_name
-        self._retailer_long_name = retailer_long_name
-        self._program_type = program_type
-        self._country = country
-        self._principal_subdivision = principal_subdivision
         self._interval_period = interval_period
         self._program_descriptions = program_descriptions
-        self._binding_events = binding_events
-        self._local_price = local_price
         self._payload_descriptors = payload_descriptors
+        self._attributes = attributes
         self._targets = targets
         self._id = id
         self._created_date_time = created_date_time
@@ -154,144 +120,6 @@ class Program(Model):
             raise ValueError("Invalid value for `program_name`, must not be `None`")  # noqa: E501
 
         self._program_name = program_name
-
-    @property
-    def program_long_name(self) -> str:
-        """Gets the program_long_name of this Program.
-
-        Long name of program for human readability.  # noqa: E501
-
-        :return: The program_long_name of this Program.
-        :rtype: str
-        """
-        return self._program_long_name
-
-    @program_long_name.setter
-    def program_long_name(self, program_long_name: str):
-        """Sets the program_long_name of this Program.
-
-        Long name of program for human readability.  # noqa: E501
-
-        :param program_long_name: The program_long_name of this Program.
-        :type program_long_name: str
-        """
-
-        self._program_long_name = program_long_name
-
-    @property
-    def retailer_name(self) -> str:
-        """Gets the retailer_name of this Program.
-
-        Short name of energy retailer providing the program.  # noqa: E501
-
-        :return: The retailer_name of this Program.
-        :rtype: str
-        """
-        return self._retailer_name
-
-    @retailer_name.setter
-    def retailer_name(self, retailer_name: str):
-        """Sets the retailer_name of this Program.
-
-        Short name of energy retailer providing the program.  # noqa: E501
-
-        :param retailer_name: The retailer_name of this Program.
-        :type retailer_name: str
-        """
-
-        self._retailer_name = retailer_name
-
-    @property
-    def retailer_long_name(self) -> str:
-        """Gets the retailer_long_name of this Program.
-
-        Long name of energy retailer for human readability.  # noqa: E501
-
-        :return: The retailer_long_name of this Program.
-        :rtype: str
-        """
-        return self._retailer_long_name
-
-    @retailer_long_name.setter
-    def retailer_long_name(self, retailer_long_name: str):
-        """Sets the retailer_long_name of this Program.
-
-        Long name of energy retailer for human readability.  # noqa: E501
-
-        :param retailer_long_name: The retailer_long_name of this Program.
-        :type retailer_long_name: str
-        """
-
-        self._retailer_long_name = retailer_long_name
-
-    @property
-    def program_type(self) -> str:
-        """Gets the program_type of this Program.
-
-        A program defined categorization.  # noqa: E501
-
-        :return: The program_type of this Program.
-        :rtype: str
-        """
-        return self._program_type
-
-    @program_type.setter
-    def program_type(self, program_type: str):
-        """Sets the program_type of this Program.
-
-        A program defined categorization.  # noqa: E501
-
-        :param program_type: The program_type of this Program.
-        :type program_type: str
-        """
-
-        self._program_type = program_type
-
-    @property
-    def country(self) -> str:
-        """Gets the country of this Program.
-
-        Alpha-2 code per ISO 3166-1.  # noqa: E501
-
-        :return: The country of this Program.
-        :rtype: str
-        """
-        return self._country
-
-    @country.setter
-    def country(self, country: str):
-        """Sets the country of this Program.
-
-        Alpha-2 code per ISO 3166-1.  # noqa: E501
-
-        :param country: The country of this Program.
-        :type country: str
-        """
-
-        self._country = country
-
-    @property
-    def principal_subdivision(self) -> str:
-        """Gets the principal_subdivision of this Program.
-
-        Coding per ISO 3166-2. E.g. state in US.  # noqa: E501
-
-        :return: The principal_subdivision of this Program.
-        :rtype: str
-        """
-        return self._principal_subdivision
-
-    @principal_subdivision.setter
-    def principal_subdivision(self, principal_subdivision: str):
-        """Sets the principal_subdivision of this Program.
-
-        Coding per ISO 3166-2. E.g. state in US.  # noqa: E501
-
-        :param principal_subdivision: The principal_subdivision of this Program.
-        :type principal_subdivision: str
-        """
-
-        self._principal_subdivision = principal_subdivision
 
     @property
     def interval_period(self) -> IntervalPeriod:
@@ -338,52 +166,6 @@ class Program(Model):
         self._program_descriptions = program_descriptions
 
     @property
-    def binding_events(self) -> bool:
-        """Gets the binding_events of this Program.
-
-        True if events are fixed once transmitted.  # noqa: E501
-
-        :return: The binding_events of this Program.
-        :rtype: bool
-        """
-        return self._binding_events
-
-    @binding_events.setter
-    def binding_events(self, binding_events: bool):
-        """Sets the binding_events of this Program.
-
-        True if events are fixed once transmitted.  # noqa: E501
-
-        :param binding_events: The binding_events of this Program.
-        :type binding_events: bool
-        """
-
-        self._binding_events = binding_events
-
-    @property
-    def local_price(self) -> bool:
-        """Gets the local_price of this Program.
-
-        True if events have been adapted from a grid event.  # noqa: E501
-
-        :return: The local_price of this Program.
-        :rtype: bool
-        """
-        return self._local_price
-
-    @local_price.setter
-    def local_price(self, local_price: bool):
-        """Sets the local_price of this Program.
-
-        True if events have been adapted from a grid event.  # noqa: E501
-
-        :param local_price: The local_price of this Program.
-        :type local_price: bool
-        """
-
-        self._local_price = local_price
-
-    @property
     def payload_descriptors(self) -> List[AnyOfprogramRequestPayloadDescriptorsItems]:
         """Gets the payload_descriptors of this Program.
 
@@ -405,6 +187,29 @@ class Program(Model):
         """
 
         self._payload_descriptors = payload_descriptors
+
+    @property
+    def attributes(self) -> List[ValuesMap]:
+        """Gets the attributes of this Program.
+
+        A list of valuesMap objects describing attributes.  # noqa: E501
+
+        :return: The attributes of this Program.
+        :rtype: List[ValuesMap]
+        """
+        return self._attributes
+
+    @attributes.setter
+    def attributes(self, attributes: List[ValuesMap]):
+        """Sets the attributes of this Program.
+
+        A list of valuesMap objects describing attributes.  # noqa: E501
+
+        :param attributes: The attributes of this Program.
+        :type attributes: List[ValuesMap]
+        """
+
+        self._attributes = attributes
 
     @property
     def targets(self) -> List[Target]:
