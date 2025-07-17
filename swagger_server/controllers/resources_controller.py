@@ -48,7 +48,7 @@ def create_resource(body):  # noqa: E501
         return [], HTTPStatus.CONFLICT
 
     now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
+    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
 
     resource = Resource(
         created_date_time=current_time,
@@ -227,7 +227,7 @@ def update_ven_resource(resource_id, body=None):  # noqa: E501
 
     # set modification date time
     now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
+    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     resource.modification_date_time = current_time
 
     if resourceBody.resource_name is not None:

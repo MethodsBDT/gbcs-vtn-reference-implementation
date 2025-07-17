@@ -55,7 +55,7 @@ def create_ven(body):  # noqa: E501
         return [], HTTPStatus.CONFLICT
 
     now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
+    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
 
     ven = Ven(
         created_date_time=current_time,
@@ -235,7 +235,7 @@ def update_ven(ven_id, body=None):  # noqa: E501
 
     # set modification date time
     now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
+    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     ven.modification_date_time = current_time
 
     if venBody.ven_name is not None:

@@ -50,7 +50,7 @@ def create_subscription(body):  # noqa: E501
     client_id = objectUtils.getClientId(request)
 
     now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
+    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
 
     subscription = Subscription(
         created_date_time=current_time,
@@ -219,7 +219,7 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
 
     # set modification date time
     now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
+    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     subscription.modification_date_time = current_time
 
     if subscriptionBody.program_id != subscription.program_id:

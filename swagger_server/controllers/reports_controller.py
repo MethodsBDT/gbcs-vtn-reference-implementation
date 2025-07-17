@@ -47,7 +47,7 @@ def create_report(body=None):  # noqa: E501
         return problem, HTTPStatus.BAD_REQUEST
 
     now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
+    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
 
     report = Report(
         created_date_time=current_time,
@@ -215,7 +215,7 @@ def update_report(report_id, body=None):  # noqa: E501
 
     # set modification date time
     now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
+    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     report.modification_date_time = current_time
 
     if reportBody.event_id is not None:
