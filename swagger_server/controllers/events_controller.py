@@ -44,7 +44,7 @@ def create_event(body=None):  # noqa: E501
         return problem, HTTPStatus.BAD_REQUEST
 
     now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
+    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
 
     event = Event(
         created_date_time=current_time,
@@ -222,7 +222,7 @@ def update_event(event_id, body=None):  # noqa: E501
 
     # set modification date time
     now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
+    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     event.modification_date_time = current_time
 
     # Do not llow event to be assigned to other program
