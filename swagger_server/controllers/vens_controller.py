@@ -232,18 +232,19 @@ def update_ven(ven_id, body=None):  # noqa: E501
         problem = Problem(title="Not Found: program_id not found", status=HTTPStatus.NOT_FOUND)
         logging.warning(f"update_ven(): problem={problem}")
         return problem, HTTPStatus.NOT_FOUND
+    if client_id != ven.client_id:
+        problem = Problem(title="Forbidden: client_id of request does not match object", status="403")
+        logging.warning(f"update_ven(): problem={problem}")
+        return problem, HTTPStatus.FORBIDDEN
 
     # set modification date time
     now = datetime.now()
     current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     ven.modification_date_time = current_time
 
-    if venBody.ven_name is not None:
-        ven.ven_name = venBody.ven_name
-    if venBody.attributes is not None:
-        ven.attributes = venBody.attributes,
-    ven.target = targets
-    ven.client_id = client_id
+    ven.ven_name = venBody.ven_name
+    ven.attributes = venBody.attributes
+    ven.targets = targets
 
     ven = objStore.update("VEN", ven)
     if type(ven) is not Ven:

@@ -37,16 +37,14 @@ def create_subscription(body):  # noqa: E501
     if connexion.request.is_json:
         subscriptionBody = SubscriptionRequest.from_dict(connexion.request.get_json())  # noqa: E501
 
-    # object must refer to an existing program
+    # object may refer to an existing program
     programs = objStore.search_all("PROGRAM")
     programList = [p for p in programs if p.id == subscriptionBody.program_id]
-    if len(programList) == 0:
-        problem = Problem(title="program_id does not refer to an existing program", status=HTTPStatus.BAD_REQUEST)
-        logging.warning(f"create_subscription(): problem={problem}")
-        return problem, HTTPStatus.BAD_REQUEST
+    if len(programList) == 1:
+        # TBD : add logic to limit callbacks to objects asscociated with this program
+        pass
 
     # Note: there is currently no concept of a duplicated subscription
-
     client_id = objectUtils.getClientId(request)
 
     now = datetime.now()
@@ -213,25 +211,24 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
 
     subscription, status = search_subscription_by_id(subscription_id)
     if subscription is None or status == HTTPStatus.NOT_FOUND:
-        problem = Problem(title="Not Found: program_id not found", status="404")
+        problem = Problem(title="Not Found: subscription not found", status="404")
         logging.warning(f"update_subscription(): problem={problem}")
         return problem, HTTPStatus.NOT_FOUND
-
+    client_id = objectUtils.getClientId(request)
+    if client_id != subscription.client_id:
+        problem = Problem(title="Forbidden: client_id of request does not match object", status="403")
+        logging.warning(f"update_subscription(): problem={problem}")
+        return problem, HTTPStatus.FORBIDDEN
+    
     # set modification date time
     now = datetime.now()
     current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     subscription.modification_date_time = current_time
 
-    if subscriptionBody.program_id != subscription.program_id:
-        problem = Problem(title="Bad Request: program ID cannot be modified", status="400")
-        logging.warning(f"update_subscription(): problem={problem}")
-        return problem, HTTPStatus.BAD_REQUEST
-    if subscriptionBody.client_name is not None:
-        subscription.client_name = subscriptionBody.client_name
-    if subscriptionBody.object_operations is not None:
-        subscription.object_operations = subscriptionBody.object_operations
-    if subscriptionBody.targets is not None:
-        subscription.targets = subscriptionBody.targets
+    subscription.program_id = subscriptionBody.program_id
+    subscription.client_name = subscriptionBody.client_name
+    subscription.object_operations = subscriptionBody.object_operations
+    subscription.targets = subscriptionBody.targets
 
     subscription = objStore.update("SUBSCRIPTION", subscription)
     if type(subscription) is not Subscription:

@@ -224,18 +224,20 @@ def update_ven_resource(resource_id, body=None):  # noqa: E501
         problem = Problem(title="Not Found: program_id not found", status="HTTPStatus.NOT_FOUND")
         logging.warning(f"update_resource(): problem={problem}")
         return problem, HTTPStatus.NOT_FOUND
+    if client_id != resource.client_id and body["objectType"] in "VEN_RESOURCE_REQUEST":
+        problem = Problem(title="Forbidden: client_id of request does not match object", status="403")
+        logging.warning(f"update_resource(): problem={problem}")
+        return problem, HTTPStatus.FORBIDDEN
 
     # set modification date time
     now = datetime.now()
     current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     resource.modification_date_time = current_time
 
-    if resourceBody.resource_name is not None:
-        resource.resource_name = resourceBody.resource_name
-    if resourceBody.attributes is not None:
-        resource.attributes = resourceBody.attributes,
-    resource.target = targets
-    resource.client_id = client_id
+    resource.ven_id = resourceBody.ven_id
+    resource.resource_name = resourceBody.resource_name
+    resource.attributes = resourceBody.attributes
+    resource.targets = targets
 
     resource = objStore.update("RESOURCE", resource)
     if type(resource) is not Resource:

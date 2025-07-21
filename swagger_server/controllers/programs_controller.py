@@ -205,19 +205,12 @@ def update_program(program_id, body=None):  # noqa: E501
     now = datetime.now()
     current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     program.modification_date_time = current_time
-
-    if programBody.program_name is not None:
-        program.program_name = programBody.program_name
-    if programBody.interval_period is not None:
-        program.active_period = programBody.interval_period
-    if programBody.program_descriptions is not None:
-        program.program_descriptions = programBody.program_descriptions
-    if programBody.payload_descriptors is not None:
-        program.payload_descriptors = programBody.payload_descriptors
-    if programBody.attributes is not None:
-        program.attributes = programBody.attributes
-    if programBody.targets is not None:
-        program.targets = programBody.targets
+    program.program_name = programBody.program_name
+    program.interval_period = programBody.interval_period
+    program.program_descriptions = programBody.program_descriptions
+    program.payload_descriptors = programBody.payload_descriptors
+    program.attributes = programBody.attributes
+    program.targets = programBody.targets
 
     program = objStore.update("PROGRAM", program)
     if type(program) is not Program:
