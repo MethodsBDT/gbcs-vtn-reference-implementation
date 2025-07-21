@@ -218,14 +218,11 @@ def update_report(report_id, body=None):  # noqa: E501
     current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     report.modification_date_time = current_time
 
-    if reportBody.event_id is not None:
-        report.event_id = reportBody.event_id
-    if reportBody.client_name is not None:
-        report.client_name = reportBody.client_name
-    if reportBody.report_name is not None:
-        report.report_name = reportBody.report_name
-    if reportBody.resources is not None:
-        report.resources = reportBody.resources
+    report.event_id=reportBody.event_id
+    report.client_name=reportBody.client_name
+    report.report_name=reportBody.report_name
+    report.payload_descriptors=reportBody.payload_descriptors
+    report.resources=reportBody.resources
 
     report = objStore.update("REPORT", report)
     if type(report) is not Report:
