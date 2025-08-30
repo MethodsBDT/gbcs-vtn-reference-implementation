@@ -14,13 +14,13 @@ def fetch_token(**kwargs):  # noqa: E501
 
     Return an access token based on clientID and clientSecret. # noqa: E501
 
-    :param grant_type: 
+    :param grant_type:
     :type grant_type: str
-    :param client_id: 
+    :param client_id:
     :type client_id: str
-    :param client_secret: 
+    :param client_secret:
     :type client_secret: str
-    :param scope: 
+    :param scope:
     :type scope: str
 
     :rtype: ClientCredentialResponse

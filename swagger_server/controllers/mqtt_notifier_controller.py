@@ -13,7 +13,19 @@ from swagger_server.models.program import Program  # noqa: E501
 from swagger_server.models.ven import Ven  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
 from swagger_server.mqtt import path
-from config import NOTIFIER_BINDINGS,MQTT_TOPIC_BASE_PROGRAMS,MQTT_TOPIC_BASE_PROGRAMS,MQTT_TOPIC_BASE_PROGRAM_EVENTS,MQTT_TOPIC_BASE_EVENTS,MQTT_TOPIC_BASE_REPORTS,MQTT_TOPIC_BASE_SUBSCRIPTIONS,MQTT_TOPIC_BASE_VENS,MQTT_TOPIC_BASE_VEN_RESOURCES,MQTT_TOPIC_BASE_RESOURCES
+from config import \
+    NOTIFIER_BINDINGS, \
+    MQTT_TOPIC_BASE_PROGRAMS, \
+    MQTT_TOPIC_BASE_PROGRAM_EVENTS, \
+    MQTT_TOPIC_BASE_EVENTS, \
+    MQTT_TOPIC_BASE_REPORTS, \
+    MQTT_TOPIC_BASE_SUBSCRIPTIONS, \
+    MQTT_TOPIC_BASE_RESOURCES, \
+    MQTT_TOPIC_BASE_VENS, \
+    MQTT_TOPIC_BASE_VEN_RESOURCES, \
+    MQTT_TOPIC_BASE_VEN_PROGRAMS, \
+    MQTT_TOPIC_BASE_VEN_EVENTS
+
 from http import HTTPStatus
 import logging
 
@@ -34,7 +46,7 @@ def topics(basepath: str, id: str = None) -> NotifierTopicsResponse:
             create=path(basepath, 'create', id),
             update=path(basepath, 'update', id),
             delete=path(basepath, 'delete', id),
-            all=path(basepath, 'all', id)))
+            all=path(basepath, '+', id)))
 
 
 def topics_no_create(basepath: str, id: str = None) -> NotifierTopicsResponse:
@@ -42,7 +54,7 @@ def topics_no_create(basepath: str, id: str = None) -> NotifierTopicsResponse:
         topics=NotifierOperationsTopics(
             update=path(basepath, 'update', id),
             delete=path(basepath, 'delete', id),
-            all=path(basepath, 'all', id)))
+            all=path(basepath, '+', id)))
 
 
 def list_all_mqtt_notifier_topics_events():  # noqa: E501
@@ -200,7 +212,19 @@ def list_all_mqtt_notifier_topics_ven(ven_id):  # noqa: E501
 
     :rtype: NotifierTopicsResponse
     """
-    return 'do some magic!'
+    if not 'MQTT' in NOTIFIER_BINDINGS:
+        problem = Problem(title="MQTT binding not enabled", status=HTTPStatus.NOT_FOUND)
+        logging.warning(f"list_all_mqtt_notifier_topics_ven({ven_id}): problem={problem}")
+        return problem, HTTPStatus.NOT_FOUND
+    elif invalid_ven_id(ven_id):
+        problem = Problem(title=f"venID={ven_id} not found", status=HTTPStatus.NOT_FOUND)
+        logging.warning(f"list_all_mqtt_notifier_topics_ven({ven_id}): problem={problem}")
+        return problem, HTTPStatus.NOT_FOUND
+
+    logging.info(f"list_all_mqtt_notifier_topics_ven({ven_id})")
+
+    response = topics_no_create(MQTT_TOPIC_BASE_VENS, ven_id)
+    return response, HTTPStatus.OK
 
 
 def list_all_mqtt_notifier_topics_ven_events(ven_id):  # noqa: E501
@@ -213,9 +237,19 @@ def list_all_mqtt_notifier_topics_ven_events(ven_id):  # noqa: E501
 
     :rtype: NotifierTopicsResponse
     """
-    if connexion.request.is_json:
-        ven_id = ObjectID.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+    if not 'MQTT' in NOTIFIER_BINDINGS:
+        problem = Problem(title="MQTT binding not enabled", status=HTTPStatus.NOT_FOUND)
+        logging.warning(f"list_all_mqtt_notifier_topics_ven_events({ven_id}): problem={problem}")
+        return problem, HTTPStatus.NOT_FOUND
+    elif invalid_ven_id(ven_id):
+        problem = Problem(title=f"venID={ven_id} not found", status=HTTPStatus.NOT_FOUND)
+        logging.warning(f"list_all_mqtt_notifier_topics_ven_events({ven_id}): problem={problem}")
+        return problem, HTTPStatus.NOT_FOUND
+
+    logging.info(f"list_all_mqtt_notifier_topics_ven_events({ven_id})")
+
+    response = topics(MQTT_TOPIC_BASE_VEN_EVENTS, ven_id)
+    return response, HTTPStatus.OK
 
 
 def list_all_mqtt_notifier_topics_ven_programs(ven_id):  # noqa: E501
@@ -228,9 +262,19 @@ def list_all_mqtt_notifier_topics_ven_programs(ven_id):  # noqa: E501
 
     :rtype: NotifierTopicsResponse
     """
-    if connexion.request.is_json:
-        ven_id = ObjectID.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+    if not 'MQTT' in NOTIFIER_BINDINGS:
+        problem = Problem(title="MQTT binding not enabled", status=HTTPStatus.NOT_FOUND)
+        logging.warning(f"list_all_mqtt_notifier_topics_ven_programs({ven_id}): problem={problem}")
+        return problem, HTTPStatus.NOT_FOUND
+    elif invalid_ven_id(ven_id):
+        problem = Problem(title=f"venID={ven_id} not found", status=HTTPStatus.NOT_FOUND)
+        logging.warning(f"list_all_mqtt_notifier_topics_ven_programs({ven_id}): problem={problem}")
+        return problem, HTTPStatus.NOT_FOUND
+
+    logging.info(f"list_all_mqtt_notifier_topics_ven_programs({ven_id})")
+
+    response = topics(MQTT_TOPIC_BASE_VEN_PROGRAMS, ven_id)
+    return response, HTTPStatus.OK
 
 
 def list_all_mqtt_notifier_topics_ven_resources(ven_id):  # noqa: E501

@@ -30,8 +30,8 @@ STORAGE_FILE_PATH = os.getenv('STORAGE_FILE_PATH', "./tmp/fileStorage.json")
 # Notifier Support and Implementation
 #
 # Only reququred Notifier bindings is WEBHOOK, this is the minimum
-NOTIFIER_BINDINGS = ['WEBHOOK']
-# NOTIFIER_BINDINGS = ['MQTT', 'WEBHOOK']
+# NOTIFIER_BINDINGS = ['WEBHOOK']
+NOTIFIER_BINDINGS = ['MQTT', 'WEBHOOK']
 #
 # MQTT Notifier binding configuration
 #

@@ -17,13 +17,13 @@ class NotifierOperationsTopics(Model):
     def __init__(self, create: str=None, update: str=None, delete: str=None, all: str=None):  # noqa: E501
         """NotifierOperationsTopics - a model defined in Swagger
 
-        :param create: The create of this NotifierOperationsTopics.  # noqa: E501
+        :param create: The create topic of this NotifierOperationsTopics.  # noqa: E501
         :type create: str
-        :param update: The update of this NotifierOperationsTopics.  # noqa: E501
+        :param update: The update topic of this NotifierOperationsTopics.  # noqa: E501
         :type update: str
-        :param delete: The delete of this NotifierOperationsTopics.  # noqa: E501
+        :param delete: The delete topic of this NotifierOperationsTopics.  # noqa: E501
         :type delete: str
-        :param all: The all of this NotifierOperationsTopics.  # noqa: E501
+        :param all: The all operations topic of this NotifierOperationsTopics.  # noqa: E501
         :type all: str
         """
         self.swagger_types = {
@@ -59,7 +59,7 @@ class NotifierOperationsTopics(Model):
     def create(self) -> str:
         """Gets the create of this NotifierOperationsTopics.
 
-        'Topic path for CREATE operations,  not provided for notifications for a specific object ID,  e.g. until programID foo is created, clients unable to  request notifications of its creation'   # noqa: E501
+        Topic path for CREATE operations, not provided for notifications for a specific object ID, e.g. until programID foo is created, clients unable to request notifications of its creation  # noqa: E501
 
         :return: The create of this NotifierOperationsTopics.
         :rtype: str
@@ -70,12 +70,11 @@ class NotifierOperationsTopics(Model):
     def create(self, create: str):
         """Sets the create of this NotifierOperationsTopics.
 
-        'Topic path for CREATE operations,  not provided for notifications for a specific object ID,  e.g. until programID foo is created, clients unable to  request notifications of its creation'   # noqa: E501
+        Topic path for CREATE operations, not provided for notifications for a specific object ID, e.g. until programID foo is created, clients unable to request notifications of its creation  # noqa: E501
 
         :param create: The create of this NotifierOperationsTopics.
         :type create: str
         """
-
         self._create = create
 
     @property
@@ -148,5 +147,4 @@ class NotifierOperationsTopics(Model):
         :param all: The all of this NotifierOperationsTopics.
         :type all: str
         """
-
         self._all = all
