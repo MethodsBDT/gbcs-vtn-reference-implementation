@@ -4,3 +4,7 @@
 #  This is set in main(), and used in mqtt.notification()
 
 global MQTTC
+
+# VENS contains a dict of ven objects, keyed by client_id
+
+VENS = {}

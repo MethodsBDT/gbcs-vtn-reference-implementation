@@ -3,15 +3,20 @@ import logging
 import paho.mqtt.client as mqtt
 import paho.mqtt.matcher as matcher
 from pprint import pformat
-from typing import Any, Callable, Union, Dict, List
+from typing import Any, Callable, Union, Dict, List, Set
 
 import json
-from swagger_server import globals
 from swagger_server.models.mqtt_notifier_binding_object import MqttNotifierBindingObject
 from swagger_server.models.mqtt_notifier_authentication_anonymous import MqttNotifierAuthenticationAnonymous
 from swagger_server.models.mqtt_notifier_authentication_oauth2_bearer_token import MqttNotifierAuthenticationOauth2BearerToken
 from swagger_server.models.mqtt_notifier_authentication_certificate import MqttNotifierAuthenticationCertificate
-from config import MQTT_SERIALIZATION, MQTT_SERIALIZATION, MQTT_CLIENT_BROKER_FQDN, MQTT_CLIENT_BROKER_PORT, MQTT_BROKER_AUTH, MQTT_BROKER_CLIENT_CERTS,MQTT_TOPIC_BASE_PROGRAMS,MQTT_TOPIC_BASE_PROGRAMS,MQTT_TOPIC_BASE_PROGRAM_EVENTS,MQTT_TOPIC_BASE_EVENTS,MQTT_TOPIC_BASE_REPORTS,MQTT_TOPIC_BASE_SUBSCRIPTIONS,MQTT_TOPIC_BASE_VENS,MQTT_TOPIC_BASE_VEN_RESOURCES,MQTT_TOPIC_BASE_RESOURCES,MQTT_TOPIC_BASE_VEN_EVENTS
+from config import MQTT_SERIALIZATION, \
+    MQTT_CLIENT_BROKER_FQDN, MQTT_CLIENT_BROKER_PORT, MQTT_BROKER_AUTH, MQTT_BROKER_CLIENT_CERTS, \
+    MQTT_TOPIC_BASE_PROGRAMS, MQTT_TOPIC_BASE_PROGRAM_EVENTS, MQTT_TOPIC_BASE_EVENTS, MQTT_TOPIC_BASE_REPORTS, MQTT_TOPIC_BASE_SUBSCRIPTIONS, \
+    MQTT_TOPIC_BASE_VENS, MQTT_TOPIC_BASE_RESOURCES, \
+    MQTT_TOPIC_BASE_VEN_RESOURCES, MQTT_TOPIC_BASE_VEN_PROGRAMS, MQTT_TOPIC_BASE_VEN_EVENTS
+from swagger_server.notifiers import resolve_ven_ids_from_targets
+from swagger_server import globals
 
 
 class MqttClient:
@@ -160,18 +165,6 @@ def path(base_path: str, operation: str, id: str = None) -> str:
         return base_path + '/' + operation
 
 
-def get_in(d: Dict, keys: List) -> Any:
-    """
-    Gets nested keys from dict, returns empty dict if keys don't exist
-        d = {'a': {'b': 23}}
-        get_in(d, ['a', 'b']) -> 23
-    """
-    result = d.copy()
-    for key in keys:
-        result = result.get(key, {})
-    return result
-
-
 def serialize(d: Dict) -> Any:
     """
     Creates the serialized message, only JSON supported for now!
@@ -183,39 +176,93 @@ def serialize(d: Dict) -> Any:
         logging.warning(f"mqtt.serialize(), Unsupported MQTT_SERIALIZATION: {MQTT_SERIALIZATION}")
 
 
-def is_private_event(notification: Dict) -> bool:
+def get_targets(notification_object: Dict) -> Set:
     """
-    This function is a placeholder for potential future use to implement event privacy
-    TODO, FIXME: Implement this!
+    .get(targets) often returns None, so this is a workaround
     """
-    return False
+    targets = notification_object.get('targets', None)
+    if targets:
+        return set(targets)
+    else:
+        return set()
+
+
+def untargeted_object_type_topic_names(object_id: str,
+                                       base_topic_untargeted: str,
+                                       base_topic_untargeted_id: str,
+                                       operation: str,
+                                       notification_object: Dict) -> List:
+    """
+    Returns list of topic names
+    """
+    logging.debug(f"reason=untargetedObjectTypeTopicNames,id={object_id},object={notification_object}")
+    return [path(base_topic_untargeted, operation),
+            path(base_topic_untargeted_id, operation, notification_object.get(object_id))]
+
+
+def targetable_object_type_topic_names(object_id: str,
+                                       base_topic_untargeted: str,
+                                       base_topic_untargeted_id: str,
+                                       base_topic_targeted: str,
+                                       operation: str,
+                                       notification_object: Dict) -> List:
+    """
+    Returns list of topic names
+    """
+    targets = get_targets(notification_object)
+    if targets:
+        resolved_targets_ven_ids = resolve_ven_ids_from_targets(targets)
+        logging.debug(f"reason=resolvedTargetsVenIds,value={resolved_targets_ven_ids}")
+        topics = []
+        for ven_id in resolved_targets_ven_ids:
+            topics.append(path(base_topic_targeted, operation, ven_id))
+        return topics
+    else:
+        return untargeted_object_type_topic_names(object_id,
+                                                  base_topic_untargeted,
+                                                  base_topic_untargeted_id,
+                                                  operation,
+                                                  notification_object)
 
 
 def topic_names(resourceName: str, operation: str, notification: Dict) -> List:
     """
     Returns list of topic names for which to publish the notification
-    FIXME, TODO: when the object within notifications has the correct key syntax (camelCase),
-    remove the or get_in()s below that are working around that...
     """
+    notification_object = notification.get('object', None)
+    if notification_object is None:
+        # This should not happen
+        return []
     if resourceName == 'PROGRAM':
-        return [path(MQTT_TOPIC_BASE_PROGRAMS, operation),
-                path(MQTT_TOPIC_BASE_PROGRAMS, operation, get_in(notification, ['object', 'id']))]
+        return targetable_object_type_topic_names('id',
+                                                  MQTT_TOPIC_BASE_PROGRAMS,
+                                                  MQTT_TOPIC_BASE_PROGRAMS,
+                                                  MQTT_TOPIC_BASE_VEN_PROGRAMS,
+                                                  operation,
+                                                  notification_object)
+    elif resourceName == 'EVENT':
+        return targetable_object_type_topic_names('program_id',
+                                                  MQTT_TOPIC_BASE_EVENTS,
+                                                  MQTT_TOPIC_BASE_PROGRAM_EVENTS,
+                                                  MQTT_TOPIC_BASE_VEN_PROGRAMS,
+                                                  operation,
+                                                  notification_object)
     elif resourceName == 'VEN':
-        return [path(MQTT_TOPIC_BASE_VENS, operation),
-                path(MQTT_TOPIC_BASE_VENS, operation, get_in(notification, ['object', 'id']))]
+        return untargeted_object_type_topic_names('id',
+                                                  MQTT_TOPIC_BASE_VENS,
+                                                  MQTT_TOPIC_BASE_VENS,
+                                                  operation,
+                                                  notification_object)
     elif resourceName == 'RESOURCE':
-        return [path(MQTT_TOPIC_BASE_RESOURCES, operation),
-                path(MQTT_TOPIC_BASE_VEN_RESOURCES, operation, (get_in(notification, ['object', 'venID']) or
-                                                                get_in(notification, ['object', 'ven_id'])))]
+        return untargeted_object_type_topic_names('ven_id',
+                                                  MQTT_TOPIC_BASE_RESOURCES,
+                                                  MQTT_TOPIC_BASE_VEN_RESOURCES,
+                                                  operation,
+                                                  notification_object)
     elif resourceName == 'REPORT':
         return [path(MQTT_TOPIC_BASE_REPORTS, operation)]
     elif resourceName == 'SUBSCRIPTION':
         return [path(MQTT_TOPIC_BASE_SUBSCRIPTIONS, operation)]
-    elif resourceName == 'EVENT':
-        if not is_private_event(notification):
-            return [path(MQTT_TOPIC_BASE_EVENTS, operation),
-                    path(MQTT_TOPIC_BASE_PROGRAM_EVENTS, operation, (get_in(notification, ['object', 'programID']) or
-                                                                     get_in(notification, ['object', 'program_id'])))]
     else:
         logging.warning(f"mqtt.topic_names(), Unsupported resource: {resourceName}, operation: {operation}")
         return []
@@ -232,8 +279,9 @@ def notification(resourceName: str, operationUpper: str, notification: Dict):
         return
     # We have a connection, so proceed
     operation = operationUpper.lower()
-    # TODO: make this a debug later
-    logging.info(f"mqtt.notification(), object_type: {resourceName}, id: {id}, \nnotification: {pformat(notification)}")
+    notification_object = notification.get('object', {})
+    notification_object_id = notification_object.get('id', None)
+    logging.debug(f"reason=mqttNotification,object_type={resourceName},id={notification_object_id},operation={operation},notification=\n{pformat(notification)}")
     # Publish the notification
     serialized_notification = serialize(notification)
     # Publish objects with an associated ID

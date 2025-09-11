@@ -18,11 +18,11 @@ def main():
                                             endpoint=MQTT_VTN_BROKER_IP,
                                             port=MQTT_VTN_BROKER_PORT)
             globals.MQTTC.start()
-            logging.debug(f"main(), Instantiated MqttClient, client_id={MQTT_BROKER_CLIENT_ID}, endpoint={MQTT_VTN_BROKER_IP}, port={MQTT_VTN_BROKER_PORT}")
+            logging.info(f"main(), Instantiated MqttClient, client_id={MQTT_BROKER_CLIENT_ID}, endpoint={MQTT_VTN_BROKER_IP}, port={MQTT_VTN_BROKER_PORT}")
         except:
             logging.warning(f"main(), exception instantiating MqttClient", exc_info=True)
     else:
-        logging.debug(f"main(), no MQTT broker instantiated, client_id={MQTT_BROKER_CLIENT_ID}, endpoint={MQTT_VTN_BROKER_IP}, port={MQTT_VTN_BROKER_PORT}")
+        logging.info(f"main(), no MQTT broker instantiated, client_id={MQTT_BROKER_CLIENT_ID}, endpoint={MQTT_VTN_BROKER_IP}, port={MQTT_VTN_BROKER_PORT}")
 
     app = connexion.App(__name__, specification_dir='./swagger/')
     app.app.json_encoder = encoder.JSONEncoder
