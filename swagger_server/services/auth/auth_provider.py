@@ -1,14 +1,14 @@
-from connexion.exceptions import OAuthProblem, OAuthScopeProblem, ProblemException
+from connexion.exceptions import ProblemException
 
 from config import OIDC_AUTH_ENABLED
-from swagger_server.services.auth.AuthException import AuthException
-from swagger_server.services.auth.oidc_auth_provider import OIDCAuthProvider
-from swagger_server.services.auth.mock_auth_provider import MockAuthProvider
-
+from swagger_server.services.auth.auth_exception import AuthException
+from swagger_server.services.auth.oadr_auth_provider import OadrAuthProvider
+from swagger_server.services.auth.oadr_auth_provider_basic import BasicAuthProvider
+from swagger_server.services.auth.oadr_auth_provider_oidc import OIDCAuthProvider
 
 class AuthServiceProvider:
     def __init__(self):
-        self.auth_provider = OIDCAuthProvider() if OIDC_AUTH_ENABLED else MockAuthProvider()
+        self.auth_provider: OadrAuthProvider = OIDCAuthProvider() if OIDC_AUTH_ENABLED else BasicAuthProvider()
 
     def get_token(self, client_id: str, secret_id: str) -> str:
         try:
