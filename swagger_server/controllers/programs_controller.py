@@ -1,13 +1,19 @@
 import connexion
 from datetime import datetime
+import six
 from http import HTTPStatus
 import logging
+from flask import request
 
+from swagger_server import util
+from swagger_server import objectUtils
+from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
 from swagger_server.models.program import Program  # noqa: E501
+from swagger_server.models.program_request import ProgramRequest  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
-from swagger_server import util
+from swagger_server.models.target import Target  # noqa: E501
 
 def create_program(body=None):  # noqa: E501
     """create a program
@@ -23,7 +29,8 @@ def create_program(body=None):  # noqa: E501
 
     programBody = None
     if connexion.request.is_json:
-        programBody = Program.from_dict(connexion.request.get_json())  # noqa: E501
+        json = connexion.request.get_json()
+        programBody = ProgramRequest.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"create_program(): programBody={programBody}")
 
     # object must have unique name
@@ -35,25 +42,16 @@ def create_program(body=None):  # noqa: E501
         return problem, HTTPStatus.CONFLICT
 
     now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
+    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
 
     program = Program(
         created_date_time=current_time,
         modification_date_time=None,
         object_type='PROGRAM',
         program_name=programBody.program_name,
-        program_long_name=programBody.program_long_name,
-        retailer_name=programBody.retailer_name,
-        retailer_long_name=programBody.retailer_long_name,
-        program_type=programBody.program_type,
-        country=programBody.country,
-        principal_subdivision=programBody.principal_subdivision,
-        time_zone_offset=programBody.time_zone_offset,
         interval_period=programBody.interval_period,
         program_descriptions=programBody.program_descriptions,
-        binding_events=programBody.binding_events,
-        local_price=programBody.local_price,
-        payload_descriptors=programBody.payload_descriptors,
+        attributes=programBody.attributes,
         targets = programBody.targets
     )
 
@@ -65,7 +63,7 @@ def create_program(body=None):  # noqa: E501
 
     logging.debug(f"create_program(): program={program}")
 
-    subscription_callback("PROGRAM", "POST", program)
+    subscription_callback("PROGRAM", "CREATE", program)
 
     return program, status
 
@@ -90,19 +88,16 @@ def delete_program(program_id):  # noqa: E501
 
     # TBD: need to test if this is not present
     subscription_callback("PROGRAM", "DELETE", program)
-
+    
     return program, HTTPStatus.OK
 
-def search_all_programs(target_type=None, target_values=None, skip=None, limit=None):  # noqa: E501
-
+def search_all_programs(targets=None, skip=None, limit=None):  # noqa: E501
     """searches all programs
 
-    List all programs known to the server. Use skip and pagination query params to limit response size.  # noqa: E501
+    List all programs known to the server. May filter results by targets params. Use skip and pagination query params to limit response size.  # noqa: E501
 
-    :param target_type: Indicates targeting type, e.g. GROUP
-    :type target_type: str
-    :param target_values: List of target values, e.g. group names
-    :type target_values: List[str]
+    :param targets: Indicates targets
+    :type targets: list | bytes
     :param skip: number of records to skip for pagination.
     :type skip: int
     :param limit: maximum number of records to return.
@@ -110,7 +105,7 @@ def search_all_programs(target_type=None, target_values=None, skip=None, limit=N
 
     :rtype: List[Program]
     """
-    logging.info(f"search_all_programs(): target_type={target_type} target_values={target_values} skip={skip} limit={limit}")
+    logging.info(f"search_all_programs(): targets={targets} skip={skip} limit={limit}")
 
     programs = objStore.search_all("PROGRAM")
     if type(programs) is not list:
@@ -120,18 +115,40 @@ def search_all_programs(target_type=None, target_values=None, skip=None, limit=N
         return problem, status
     
     logging.debug(f"search_all_programs(): programs={programs}")
-    programList = util.getTargets(programs, target_type, target_values)
+
+    objectList = []
+    objects = programs
+    if objectUtils.getClientRole(request) in 'BL':
+        # BL will fetch all objects if targets are not specified in query, or objects matching targets if present in query
+        if targets is None:
+            objectList = objects
+        else:
+            objectList = objectUtils.getObjectsWithTargets(objects, targets)
+    else:
+        # A VEN client will fetch objects with no targets and objects whose targets are 'allowed' by associated ven,
+        # or if targets present in query, objects matching targets iin query objects and whose targets are 'allowed' by associated ven
+        client_id = objectUtils.getClientId(request)
+        if targets is None:
+            objectsNoTargets = objectUtils.getObjectsNoTargets(objects)
+            allowed_targets = objectUtils.getAllowedTargets(client_id)
+            objectsWithTargets = objectUtils.getObjectsWithTargets(objects, allowed_targets)
+            objectList = objectsNoTargets + objectsWithTargets
+        else:
+            allowed_targets = objectUtils.getAllowedTargets(client_id)
+            # get intersection of allowed targets and targets in query
+            targets = [t for t in allowed_targets if t in targets]
+            objectList = objectUtils.getObjectsWithTargets(objects, targets)
     if skip != None:
-        if len(programs) < skip:
+        if len(objectList) < skip:
             return [], HTTPStatus.OK
-        programList = programs[skip:]
+        objectList = objectList[skip:]
     if limit != None:
-        programList = programList[:limit]
-    logging.debug(f"search_all_programs(): programList={programList}")
+        objectList = objectList[:limit]
+    logging.debug(f"search_all_programs(): objectList={objectList}")
 
-    subscription_callback("PROGRAM", "GET", programList)
+    subscription_callback("PROGRAM", "READ", objectList)
 
-    return programList, HTTPStatus.OK
+    return objectList, HTTPStatus.OK
 
 
 def search_program_by_program_id(program_id):  # noqa: E501
@@ -148,6 +165,7 @@ def search_program_by_program_id(program_id):  # noqa: E501
 
     program = objStore.search("PROGRAM", program_id)
     if type(program) is not Program:
+        # FS TBD: shouldn;t status be an HTTPStatus?
         status = program
         problem = Problem(title="object Storage issue", status=str(status))
         logging.warning(f"search_program_by_program_id(): problem={problem}")
@@ -155,7 +173,7 @@ def search_program_by_program_id(program_id):  # noqa: E501
 
     logging.debug(f"search_program_by_program_id(): program={program}")
 
-    subscription_callback("PROGRAM", "GET", program)
+    subscription_callback("PROGRAM", "READ", program)
 
     return program, HTTPStatus.OK
 
@@ -174,12 +192,8 @@ def update_program(program_id, body=None):  # noqa: E501
     logging.info(f"update_program(): program_id={program_id}")
     programBody = None
     if connexion.request.is_json:
-        programBody = Program.from_dict(connexion.request.get_json())  # noqa: E501
+        programBody = ProgramRequest.from_dict(connexion.request.get_json())  # noqa: E501
         logging.debug(f"update_program(): programBody={programBody}")
-    # if programBody is None:
-    #     problem = Problem(title="Bad Request: No request body", status="400")
-    #     logging.warning(f"update_program(): problem={problem}")
-    #     return problem, 400
 
     program, status = search_program_by_program_id(program_id)
     if program is None or status == HTTPStatus.NOT_FOUND:
@@ -189,37 +203,14 @@ def update_program(program_id, body=None):  # noqa: E501
 
     # set modification date time
     now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
+    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     program.modification_date_time = current_time
-
-    if programBody.program_name is not None:
-        program.program_name = programBody.program_name
-    if programBody.program_long_name is not None:
-        program.program_long_name = programBody.program_long_name
-    if programBody.retailer_name is not None:
-        program.retailer_name = programBody.retailer_name
-    if programBody.retailer_long_name is not None:
-        program.retailer_long_name = programBody.retailer_long_name
-    if programBody.program_type is not None:
-        program.program_type = programBody.program_type
-    if programBody.country is not None:
-        program.country = programBody.country
-    if programBody.principal_subdivision is not None:
-        program.principal_subdivision = programBody.principal_subdivision
-    if programBody.time_zone_offset is not None:
-        program.time_zone_offset = programBody.time_zone_offset
-    if programBody.interval_period is not None:
-        program.active_period = programBody.interval_period
-    if programBody.program_descriptions is not None:
-        program.program_descriptions = programBody.program_descriptions
-    if programBody.binding_events is not None:
-        program.binding_events = programBody.binding_events
-    if programBody.local_price is not None:
-        program.local_price = programBody.local_price
-    if programBody.payload_descriptors is not None:
-        program.payload_descriptors = programBody.payload_descriptors
-    if programBody.targets is not None:
-        program.targets = programBody.targets
+    program.program_name = programBody.program_name
+    program.interval_period = programBody.interval_period
+    program.program_descriptions = programBody.program_descriptions
+    program.payload_descriptors = programBody.payload_descriptors
+    program.attributes = programBody.attributes
+    program.targets = programBody.targets
 
     program = objStore.update("PROGRAM", program)
     if type(program) is not Program:
@@ -230,7 +221,7 @@ def update_program(program_id, body=None):  # noqa: E501
 
     logging.debug(f"update_program: program={program}")
 
-    subscription_callback("PROGRAM", "PUT", program)
+    subscription_callback("PROGRAM", "UPDATE", program)
 
     return program, HTTPStatus.OK
 

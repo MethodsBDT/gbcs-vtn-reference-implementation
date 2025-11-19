@@ -6,10 +6,15 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.client_id import ClientID  # noqa: F401,E501
+from swagger_server.models.client_name import ClientName  # noqa: F401,E501
 from swagger_server.models.model_date_time import ModelDateTime  # noqa: F401,E501
 from swagger_server.models.object_id import ObjectID  # noqa: F401,E501
+from swagger_server.models.object_metadata import ObjectMetadata  # noqa: F401,E501
+from swagger_server.models.object_types import ObjectTypes  # noqa: F401,E501
 from swagger_server.models.report_payload_descriptor import ReportPayloadDescriptor  # noqa: F401,E501
-from swagger_server.models.report_resources import ReportResources  # noqa: F401,E501
+from swagger_server.models.report_request import ReportRequest  # noqa: F401,E501
+from swagger_server.models.report_request_resources import ReportRequestResources  # noqa: F401,E501
 import re  # noqa: F401,E501
 from swagger_server import util
 
@@ -19,9 +24,21 @@ class Report(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, program_id: ObjectID=None, event_id: ObjectID=None, client_name: str=None, report_name: str=None, payload_descriptors: List[ReportPayloadDescriptor]=None, resources: List[ReportResources]=None):  # noqa: E501
+    def __init__(self, event_id: ObjectID=None, client_name: ClientName=None, report_name: str=None, payload_descriptors: List[ReportPayloadDescriptor]=None, resources: List[ReportRequestResources]=None, client_id: ClientID=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
         """Report - a model defined in Swagger
 
+        :param event_id: The event_id of this Report.  # noqa: E501
+        :type event_id: ObjectID
+        :param client_name: The client_name of this Report.  # noqa: E501
+        :type client_name: ClientName
+        :param report_name: The report_name of this Report.  # noqa: E501
+        :type report_name: str
+        :param payload_descriptors: The payload_descriptors of this Report.  # noqa: E501
+        :type payload_descriptors: List[ReportPayloadDescriptor]
+        :param resources: The resources of this Report.  # noqa: E501
+        :type resources: List[ReportRequestResources]
+        :param client_id: The client_id of this Report.  # noqa: E501
+        :type client_id: ClientID
         :param id: The id of this Report.  # noqa: E501
         :type id: ObjectID
         :param created_date_time: The created_date_time of this Report.  # noqa: E501
@@ -29,55 +46,43 @@ class Report(Model):
         :param modification_date_time: The modification_date_time of this Report.  # noqa: E501
         :type modification_date_time: ModelDateTime
         :param object_type: The object_type of this Report.  # noqa: E501
-        :type object_type: str
-        :param program_id: The program_id of this Report.  # noqa: E501
-        :type program_id: ObjectID
-        :param event_id: The event_id of this Report.  # noqa: E501
-        :type event_id: ObjectID
-        :param client_name: The client_name of this Report.  # noqa: E501
-        :type client_name: str
-        :param report_name: The report_name of this Report.  # noqa: E501
-        :type report_name: str
-        :param payload_descriptors: The payload_descriptors of this Report.  # noqa: E501
-        :type payload_descriptors: List[ReportPayloadDescriptor]
-        :param resources: The resources of this Report.  # noqa: E501
-        :type resources: List[ReportResources]
+        :type object_type: ObjectTypes
         """
         self.swagger_types = {
+            'event_id': ObjectID,
+            'client_name': ClientName,
+            'report_name': str,
+            'payload_descriptors': List[ReportPayloadDescriptor],
+            'resources': List[ReportRequestResources],
+            'client_id': ClientID,
             'id': ObjectID,
             'created_date_time': ModelDateTime,
             'modification_date_time': ModelDateTime,
-            'object_type': str,
-            'program_id': ObjectID,
-            'event_id': ObjectID,
-            'client_name': str,
-            'report_name': str,
-            'payload_descriptors': List[ReportPayloadDescriptor],
-            'resources': List[ReportResources]
+            'object_type': ObjectTypes
         }
 
         self.attribute_map = {
-            'id': 'id',
-            'created_date_time': 'createdDateTime',
-            'modification_date_time': 'modificationDateTime',
-            'object_type': 'objectType',
-            'program_id': 'programID',
             'event_id': 'eventID',
             'client_name': 'clientName',
             'report_name': 'reportName',
             'payload_descriptors': 'payloadDescriptors',
-            'resources': 'resources'
+            'resources': 'resources',
+            'client_id': 'clientID',
+            'id': 'id',
+            'created_date_time': 'createdDateTime',
+            'modification_date_time': 'modificationDateTime',
+            'object_type': 'objectType'
         }
-        self._id = id
-        self._created_date_time = created_date_time
-        self._modification_date_time = modification_date_time
-        self._object_type = object_type
-        self._program_id = program_id
         self._event_id = event_id
         self._client_name = client_name
         self._report_name = report_name
         self._payload_descriptors = payload_descriptors
         self._resources = resources
+        self._client_id = client_id
+        self._id = id
+        self._created_date_time = created_date_time
+        self._modification_date_time = modification_date_time
+        self._object_type = object_type
 
     @classmethod
     def from_dict(cls, dikt) -> 'Report':
@@ -89,121 +94,6 @@ class Report(Model):
         :rtype: Report
         """
         return util.deserialize_model(dikt, cls)
-
-    @property
-    def id(self) -> ObjectID:
-        """Gets the id of this Report.
-
-
-        :return: The id of this Report.
-        :rtype: ObjectID
-        """
-        return self._id
-
-    @id.setter
-    def id(self, id: ObjectID):
-        """Sets the id of this Report.
-
-
-        :param id: The id of this Report.
-        :type id: ObjectID
-        """
-
-        self._id = id
-
-    @property
-    def created_date_time(self) -> ModelDateTime:
-        """Gets the created_date_time of this Report.
-
-
-        :return: The created_date_time of this Report.
-        :rtype: ModelDateTime
-        """
-        return self._created_date_time
-
-    @created_date_time.setter
-    def created_date_time(self, created_date_time: ModelDateTime):
-        """Sets the created_date_time of this Report.
-
-
-        :param created_date_time: The created_date_time of this Report.
-        :type created_date_time: ModelDateTime
-        """
-
-        self._created_date_time = created_date_time
-
-    @property
-    def modification_date_time(self) -> ModelDateTime:
-        """Gets the modification_date_time of this Report.
-
-
-        :return: The modification_date_time of this Report.
-        :rtype: ModelDateTime
-        """
-        return self._modification_date_time
-
-    @modification_date_time.setter
-    def modification_date_time(self, modification_date_time: ModelDateTime):
-        """Sets the modification_date_time of this Report.
-
-
-        :param modification_date_time: The modification_date_time of this Report.
-        :type modification_date_time: ModelDateTime
-        """
-
-        self._modification_date_time = modification_date_time
-
-    @property
-    def object_type(self) -> str:
-        """Gets the object_type of this Report.
-
-        Used as discriminator, e.g. notification.object  # noqa: E501
-
-        :return: The object_type of this Report.
-        :rtype: str
-        """
-        return self._object_type
-
-    @object_type.setter
-    def object_type(self, object_type: str):
-        """Sets the object_type of this Report.
-
-        Used as discriminator, e.g. notification.object  # noqa: E501
-
-        :param object_type: The object_type of this Report.
-        :type object_type: str
-        """
-        allowed_values = ["REPORT"]  # noqa: E501
-        if object_type not in allowed_values:
-            raise ValueError(
-                "Invalid value for `object_type` ({0}), must be one of {1}"
-                .format(object_type, allowed_values)
-            )
-
-        self._object_type = object_type
-
-    @property
-    def program_id(self) -> ObjectID:
-        """Gets the program_id of this Report.
-
-
-        :return: The program_id of this Report.
-        :rtype: ObjectID
-        """
-        return self._program_id
-
-    @program_id.setter
-    def program_id(self, program_id: ObjectID):
-        """Sets the program_id of this Report.
-
-
-        :param program_id: The program_id of this Report.
-        :type program_id: ObjectID
-        """
-        if program_id is None:
-            raise ValueError("Invalid value for `program_id`, must not be `None`")  # noqa: E501
-
-        self._program_id = program_id
 
     @property
     def event_id(self) -> ObjectID:
@@ -229,24 +119,22 @@ class Report(Model):
         self._event_id = event_id
 
     @property
-    def client_name(self) -> str:
+    def client_name(self) -> ClientName:
         """Gets the client_name of this Report.
 
-        User generated identifier; may be VEN ID provisioned during program enrollment.  # noqa: E501
 
         :return: The client_name of this Report.
-        :rtype: str
+        :rtype: ClientName
         """
         return self._client_name
 
     @client_name.setter
-    def client_name(self, client_name: str):
+    def client_name(self, client_name: ClientName):
         """Sets the client_name of this Report.
 
-        User generated identifier; may be VEN ID provisioned during program enrollment.  # noqa: E501
 
         :param client_name: The client_name of this Report.
-        :type client_name: str
+        :type client_name: ClientName
         """
         if client_name is None:
             raise ValueError("Invalid value for `client_name`, must not be `None`")  # noqa: E501
@@ -300,26 +188,141 @@ class Report(Model):
         self._payload_descriptors = payload_descriptors
 
     @property
-    def resources(self) -> List[ReportResources]:
+    def resources(self) -> List[ReportRequestResources]:
         """Gets the resources of this Report.
 
         A list of objects containing report data for a set of resources.  # noqa: E501
 
         :return: The resources of this Report.
-        :rtype: List[ReportResources]
+        :rtype: List[ReportRequestResources]
         """
         return self._resources
 
     @resources.setter
-    def resources(self, resources: List[ReportResources]):
+    def resources(self, resources: List[ReportRequestResources]):
         """Sets the resources of this Report.
 
         A list of objects containing report data for a set of resources.  # noqa: E501
 
         :param resources: The resources of this Report.
-        :type resources: List[ReportResources]
+        :type resources: List[ReportRequestResources]
         """
         if resources is None:
             raise ValueError("Invalid value for `resources`, must not be `None`")  # noqa: E501
 
         self._resources = resources
+
+    @property
+    def client_id(self) -> ClientID:
+        """Gets the client_id of this Report.
+
+
+        :return: The client_id of this Report.
+        :rtype: ClientID
+        """
+        return self._client_id
+
+    @client_id.setter
+    def client_id(self, client_id: ClientID):
+        """Sets the client_id of this Report.
+
+
+        :param client_id: The client_id of this Report.
+        :type client_id: ClientID
+        """
+        if client_id is None:
+            raise ValueError("Invalid value for `client_id`, must not be `None`")  # noqa: E501
+
+        self._client_id = client_id
+
+    @property
+    def id(self) -> ObjectID:
+        """Gets the id of this Report.
+
+
+        :return: The id of this Report.
+        :rtype: ObjectID
+        """
+        return self._id
+
+    @id.setter
+    def id(self, id: ObjectID):
+        """Sets the id of this Report.
+
+
+        :param id: The id of this Report.
+        :type id: ObjectID
+        """
+        if id is None:
+            raise ValueError("Invalid value for `id`, must not be `None`")  # noqa: E501
+
+        self._id = id
+
+    @property
+    def created_date_time(self) -> ModelDateTime:
+        """Gets the created_date_time of this Report.
+
+
+        :return: The created_date_time of this Report.
+        :rtype: ModelDateTime
+        """
+        return self._created_date_time
+
+    @created_date_time.setter
+    def created_date_time(self, created_date_time: ModelDateTime):
+        """Sets the created_date_time of this Report.
+
+
+        :param created_date_time: The created_date_time of this Report.
+        :type created_date_time: ModelDateTime
+        """
+        if created_date_time is None:
+            raise ValueError("Invalid value for `created_date_time`, must not be `None`")  # noqa: E501
+
+        self._created_date_time = created_date_time
+
+    @property
+    def modification_date_time(self) -> ModelDateTime:
+        """Gets the modification_date_time of this Report.
+
+
+        :return: The modification_date_time of this Report.
+        :rtype: ModelDateTime
+        """
+        return self._modification_date_time
+
+    @modification_date_time.setter
+    def modification_date_time(self, modification_date_time: ModelDateTime):
+        """Sets the modification_date_time of this Report.
+
+
+        :param modification_date_time: The modification_date_time of this Report.
+        :type modification_date_time: ModelDateTime
+        """
+        if modification_date_time is None:
+            raise ValueError("Invalid value for `modification_date_time`, must not be `None`")  # noqa: E501
+
+        self._modification_date_time = modification_date_time
+
+    @property
+    def object_type(self) -> ObjectTypes:
+        """Gets the object_type of this Report.
+
+
+        :return: The object_type of this Report.
+        :rtype: ObjectTypes
+        """
+        return self._object_type
+
+    @object_type.setter
+    def object_type(self, object_type: ObjectTypes):
+        """Sets the object_type of this Report.
+
+
+        :param object_type: The object_type of this Report.
+        :type object_type: ObjectTypes
+        """
+        if object_type is None:
+            raise ValueError("Invalid value for `object_type`, must not be `None`")  # noqa: E501
+
+        self._object_type = object_type

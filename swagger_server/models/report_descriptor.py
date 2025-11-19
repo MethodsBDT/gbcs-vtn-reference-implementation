@@ -6,7 +6,9 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
+from swagger_server.models.reading_type import ReadingType  # noqa: F401,E501
+from swagger_server.models.target import Target  # noqa: F401,E501
+from swagger_server.models.units import Units  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -15,17 +17,17 @@ class ReportDescriptor(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, payload_type: str=None, reading_type: str=None, units: str=None, targets: List[ValuesMap]=None, aggregate: bool=False, start_interval: int=-1, num_intervals: int=-1, historical: bool=True, frequency: int=-1, repeat: int=1):  # noqa: E501
+    def __init__(self, payload_type: str=None, reading_type: ReadingType=None, units: Units=None, targets: List[Target]=None, aggregate: bool=False, start_interval: int=-1, num_intervals: int=-1, historical: bool=True, frequency: int=-1, repeat: int=1, report_intervals: str='INTERVALS'):  # noqa: E501
         """ReportDescriptor - a model defined in Swagger
 
         :param payload_type: The payload_type of this ReportDescriptor.  # noqa: E501
         :type payload_type: str
         :param reading_type: The reading_type of this ReportDescriptor.  # noqa: E501
-        :type reading_type: str
+        :type reading_type: ReadingType
         :param units: The units of this ReportDescriptor.  # noqa: E501
-        :type units: str
+        :type units: Units
         :param targets: The targets of this ReportDescriptor.  # noqa: E501
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         :param aggregate: The aggregate of this ReportDescriptor.  # noqa: E501
         :type aggregate: bool
         :param start_interval: The start_interval of this ReportDescriptor.  # noqa: E501
@@ -38,18 +40,21 @@ class ReportDescriptor(Model):
         :type frequency: int
         :param repeat: The repeat of this ReportDescriptor.  # noqa: E501
         :type repeat: int
+        :param report_intervals: The report_intervals of this ReportDescriptor.  # noqa: E501
+        :type report_intervals: str
         """
         self.swagger_types = {
             'payload_type': str,
-            'reading_type': str,
-            'units': str,
-            'targets': List[ValuesMap],
+            'reading_type': ReadingType,
+            'units': Units,
+            'targets': List[Target],
             'aggregate': bool,
             'start_interval': int,
             'num_intervals': int,
             'historical': bool,
             'frequency': int,
-            'repeat': int
+            'repeat': int,
+            'report_intervals': str
         }
 
         self.attribute_map = {
@@ -62,7 +67,8 @@ class ReportDescriptor(Model):
             'num_intervals': 'numIntervals',
             'historical': 'historical',
             'frequency': 'frequency',
-            'repeat': 'repeat'
+            'repeat': 'repeat',
+            'report_intervals': 'reportIntervals'
         }
         self._payload_type = payload_type
         self._reading_type = reading_type
@@ -74,6 +80,7 @@ class ReportDescriptor(Model):
         self._historical = historical
         self._frequency = frequency
         self._repeat = repeat
+        self._report_intervals = report_intervals
 
     @classmethod
     def from_dict(cls, dikt) -> 'ReportDescriptor':
@@ -112,70 +119,66 @@ class ReportDescriptor(Model):
         self._payload_type = payload_type
 
     @property
-    def reading_type(self) -> str:
+    def reading_type(self) -> ReadingType:
         """Gets the reading_type of this ReportDescriptor.
 
-        Enumerated or private string signifying the type of reading.  # noqa: E501
 
         :return: The reading_type of this ReportDescriptor.
-        :rtype: str
+        :rtype: ReadingType
         """
         return self._reading_type
 
     @reading_type.setter
-    def reading_type(self, reading_type: str):
+    def reading_type(self, reading_type: ReadingType):
         """Sets the reading_type of this ReportDescriptor.
 
-        Enumerated or private string signifying the type of reading.  # noqa: E501
 
         :param reading_type: The reading_type of this ReportDescriptor.
-        :type reading_type: str
+        :type reading_type: ReadingType
         """
 
         self._reading_type = reading_type
 
     @property
-    def units(self) -> str:
+    def units(self) -> Units:
         """Gets the units of this ReportDescriptor.
 
-        Units of measure.  # noqa: E501
 
         :return: The units of this ReportDescriptor.
-        :rtype: str
+        :rtype: Units
         """
         return self._units
 
     @units.setter
-    def units(self, units: str):
+    def units(self, units: Units):
         """Sets the units of this ReportDescriptor.
 
-        Units of measure.  # noqa: E501
 
         :param units: The units of this ReportDescriptor.
-        :type units: str
+        :type units: Units
         """
 
         self._units = units
 
     @property
-    def targets(self) -> List[ValuesMap]:
+    def targets(self) -> List[Target]:
         """Gets the targets of this ReportDescriptor.
 
-        A list of valuesMap objects.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :return: The targets of this ReportDescriptor.
-        :rtype: List[ValuesMap]
+        :rtype: List[Target]
         """
         return self._targets
 
     @targets.setter
-    def targets(self, targets: List[ValuesMap]):
+    def targets(self, targets: List[Target]):
         """Sets the targets of this ReportDescriptor.
 
-        A list of valuesMap objects.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :param targets: The targets of this ReportDescriptor.
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         """
 
         self._targets = targets
@@ -317,3 +320,32 @@ class ReportDescriptor(Model):
         """
 
         self._repeat = repeat
+
+    @property
+    def report_intervals(self) -> str:
+        """Gets the report_intervals of this ReportDescriptor.
+
+        Indicates VEN report interval options. See User Guide.  # noqa: E501
+
+        :return: The report_intervals of this ReportDescriptor.
+        :rtype: str
+        """
+        return self._report_intervals
+
+    @report_intervals.setter
+    def report_intervals(self, report_intervals: str):
+        """Sets the report_intervals of this ReportDescriptor.
+
+        Indicates VEN report interval options. See User Guide.  # noqa: E501
+
+        :param report_intervals: The report_intervals of this ReportDescriptor.
+        :type report_intervals: str
+        """
+        allowed_values = ["INTERVALS", "SUB_INTERVALS", "OPEN_INTERVALS"]  # noqa: E501
+        if report_intervals not in allowed_values:
+            raise ValueError(
+                "Invalid value for `report_intervals` ({0}), must be one of {1}"
+                .format(report_intervals, allowed_values)
+            )
+
+        self._report_intervals = report_intervals

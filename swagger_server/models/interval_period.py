@@ -8,6 +8,7 @@ from typing import List, Dict  # noqa: F401
 from swagger_server.models.base_model_ import Model
 from swagger_server.models.duration import Duration  # noqa: F401,E501
 from swagger_server.models.model_date_time import ModelDateTime  # noqa: F401,E501
+import re  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -70,8 +71,6 @@ class IntervalPeriod(Model):
         :param start: The start of this IntervalPeriod.
         :type start: ModelDateTime
         """
-        if start is None:
-            raise ValueError("Invalid value for `start`, must not be `None`")  # noqa: E501
 
         self._start = start
 

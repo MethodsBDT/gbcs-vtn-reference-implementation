@@ -64,7 +64,7 @@ class ClientCredentialResponse(Model):
     def access_token(self) -> str:
         """Gets the access_token of this ClientCredentialResponse.
 
-        access token povided by Authorization service  # noqa: E501
+        access token provided by Authorization service  # noqa: E501
 
         :return: The access_token of this ClientCredentialResponse.
         :rtype: str
@@ -75,7 +75,7 @@ class ClientCredentialResponse(Model):
     def access_token(self, access_token: str):
         """Sets the access_token of this ClientCredentialResponse.
 
-        access token povided by Authorization service  # noqa: E501
+        access token provided by Authorization service  # noqa: E501
 
         :param access_token: The access_token of this ClientCredentialResponse.
         :type access_token: str
@@ -141,7 +141,7 @@ class ClientCredentialResponse(Model):
     def refresh_token(self) -> str:
         """Gets the refresh_token of this ClientCredentialResponse.
 
-        refresh token povided by Authorization service  # noqa: E501
+        refresh token provided by Authorization service  # noqa: E501
 
         :return: The refresh_token of this ClientCredentialResponse.
         :rtype: str
@@ -152,7 +152,7 @@ class ClientCredentialResponse(Model):
     def refresh_token(self, refresh_token: str):
         """Sets the refresh_token of this ClientCredentialResponse.
 
-        refresh token povided by Authorization service  # noqa: E501
+        refresh token provided by Authorization service  # noqa: E501
 
         :param refresh_token: The refresh_token of this ClientCredentialResponse.
         :type refresh_token: str

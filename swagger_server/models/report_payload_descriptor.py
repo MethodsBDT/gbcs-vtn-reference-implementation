@@ -6,6 +6,8 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.reading_type import ReadingType  # noqa: F401,E501
+from swagger_server.models.units import Units  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -14,7 +16,7 @@ class ReportPayloadDescriptor(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, object_type: str='REPORT_PAYLOAD_DESCRIPTOR', payload_type: str=None, reading_type: str=None, units: str=None, accuracy: float=None, confidence: int=None):  # noqa: E501
+    def __init__(self, object_type: str=None, payload_type: str=None, reading_type: ReadingType=None, units: Units=None, accuracy: float=None, confidence: int=None):  # noqa: E501
         """ReportPayloadDescriptor - a model defined in Swagger
 
         :param object_type: The object_type of this ReportPayloadDescriptor.  # noqa: E501
@@ -22,9 +24,9 @@ class ReportPayloadDescriptor(Model):
         :param payload_type: The payload_type of this ReportPayloadDescriptor.  # noqa: E501
         :type payload_type: str
         :param reading_type: The reading_type of this ReportPayloadDescriptor.  # noqa: E501
-        :type reading_type: str
+        :type reading_type: ReadingType
         :param units: The units of this ReportPayloadDescriptor.  # noqa: E501
-        :type units: str
+        :type units: Units
         :param accuracy: The accuracy of this ReportPayloadDescriptor.  # noqa: E501
         :type accuracy: float
         :param confidence: The confidence of this ReportPayloadDescriptor.  # noqa: E501
@@ -33,8 +35,8 @@ class ReportPayloadDescriptor(Model):
         self.swagger_types = {
             'object_type': str,
             'payload_type': str,
-            'reading_type': str,
-            'units': str,
+            'reading_type': ReadingType,
+            'units': Units,
             'accuracy': float,
             'confidence': int
         }
@@ -69,7 +71,7 @@ class ReportPayloadDescriptor(Model):
     def object_type(self) -> str:
         """Gets the object_type of this ReportPayloadDescriptor.
 
-        Used as discriminator, e.g. program.payloadDescriptors  # noqa: E501
+        Used as discriminator.  # noqa: E501
 
         :return: The object_type of this ReportPayloadDescriptor.
         :rtype: str
@@ -80,11 +82,17 @@ class ReportPayloadDescriptor(Model):
     def object_type(self, object_type: str):
         """Sets the object_type of this ReportPayloadDescriptor.
 
-        Used as discriminator, e.g. program.payloadDescriptors  # noqa: E501
+        Used as discriminator.  # noqa: E501
 
         :param object_type: The object_type of this ReportPayloadDescriptor.
         :type object_type: str
         """
+        allowed_values = ["REPORT_PAYLOAD_DESCRIPTOR"]  # noqa: E501
+        if object_type not in allowed_values:
+            raise ValueError(
+                "Invalid value for `object_type` ({0}), must be one of {1}"
+                .format(object_type, allowed_values)
+            )
 
         self._object_type = object_type
 
@@ -114,47 +122,43 @@ class ReportPayloadDescriptor(Model):
         self._payload_type = payload_type
 
     @property
-    def reading_type(self) -> str:
+    def reading_type(self) -> ReadingType:
         """Gets the reading_type of this ReportPayloadDescriptor.
 
-        Enumerated or private string signifying the type of reading.  # noqa: E501
 
         :return: The reading_type of this ReportPayloadDescriptor.
-        :rtype: str
+        :rtype: ReadingType
         """
         return self._reading_type
 
     @reading_type.setter
-    def reading_type(self, reading_type: str):
+    def reading_type(self, reading_type: ReadingType):
         """Sets the reading_type of this ReportPayloadDescriptor.
 
-        Enumerated or private string signifying the type of reading.  # noqa: E501
 
         :param reading_type: The reading_type of this ReportPayloadDescriptor.
-        :type reading_type: str
+        :type reading_type: ReadingType
         """
 
         self._reading_type = reading_type
 
     @property
-    def units(self) -> str:
+    def units(self) -> Units:
         """Gets the units of this ReportPayloadDescriptor.
 
-        Units of measure.  # noqa: E501
 
         :return: The units of this ReportPayloadDescriptor.
-        :rtype: str
+        :rtype: Units
         """
         return self._units
 
     @units.setter
-    def units(self, units: str):
+    def units(self, units: Units):
         """Sets the units of this ReportPayloadDescriptor.
 
-        Units of measure.  # noqa: E501
 
         :param units: The units of this ReportPayloadDescriptor.
-        :type units: str
+        :type units: Units
         """
 
         self._units = units

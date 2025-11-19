@@ -6,13 +6,17 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.duration import Duration  # noqa: F401,E501
 from swagger_server.models.event_payload_descriptor import EventPayloadDescriptor  # noqa: F401,E501
+from swagger_server.models.event_request import EventRequest  # noqa: F401,E501
 from swagger_server.models.interval import Interval  # noqa: F401,E501
 from swagger_server.models.interval_period import IntervalPeriod  # noqa: F401,E501
 from swagger_server.models.model_date_time import ModelDateTime  # noqa: F401,E501
 from swagger_server.models.object_id import ObjectID  # noqa: F401,E501
+from swagger_server.models.object_metadata import ObjectMetadata  # noqa: F401,E501
+from swagger_server.models.object_types import ObjectTypes  # noqa: F401,E501
 from swagger_server.models.report_descriptor import ReportDescriptor  # noqa: F401,E501
-from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
+from swagger_server.models.target import Target  # noqa: F401,E501
 import re  # noqa: F401,E501
 from swagger_server import util
 
@@ -22,25 +26,19 @@ class Event(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: str=None, program_id: ObjectID=None, event_name: str=None, priority: int=None, targets: List[ValuesMap]=None, report_descriptors: List[ReportDescriptor]=None, payload_descriptors: List[EventPayloadDescriptor]=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None):  # noqa: E501
+    def __init__(self, program_id: ObjectID=None, event_name: str=None, duration: Duration=None, priority: int=None, targets: List[Target]=None, report_descriptors: List[ReportDescriptor]=None, payload_descriptors: List[EventPayloadDescriptor]=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
         """Event - a model defined in Swagger
 
-        :param id: The id of this Event.  # noqa: E501
-        :type id: ObjectID
-        :param created_date_time: The created_date_time of this Event.  # noqa: E501
-        :type created_date_time: ModelDateTime
-        :param modification_date_time: The modification_date_time of this Event.  # noqa: E501
-        :type modification_date_time: ModelDateTime
-        :param object_type: The object_type of this Event.  # noqa: E501
-        :type object_type: str
         :param program_id: The program_id of this Event.  # noqa: E501
         :type program_id: ObjectID
         :param event_name: The event_name of this Event.  # noqa: E501
         :type event_name: str
+        :param duration: The duration of this Event.  # noqa: E501
+        :type duration: Duration
         :param priority: The priority of this Event.  # noqa: E501
         :type priority: int
         :param targets: The targets of this Event.  # noqa: E501
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         :param report_descriptors: The report_descriptors of this Event.  # noqa: E501
         :type report_descriptors: List[ReportDescriptor]
         :param payload_descriptors: The payload_descriptors of this Event.  # noqa: E501
@@ -49,48 +47,59 @@ class Event(Model):
         :type interval_period: IntervalPeriod
         :param intervals: The intervals of this Event.  # noqa: E501
         :type intervals: List[Interval]
+        :param id: The id of this Event.  # noqa: E501
+        :type id: ObjectID
+        :param created_date_time: The created_date_time of this Event.  # noqa: E501
+        :type created_date_time: ModelDateTime
+        :param modification_date_time: The modification_date_time of this Event.  # noqa: E501
+        :type modification_date_time: ModelDateTime
+        :param object_type: The object_type of this Event.  # noqa: E501
+        :type object_type: ObjectTypes
         """
         self.swagger_types = {
-            'id': ObjectID,
-            'created_date_time': ModelDateTime,
-            'modification_date_time': ModelDateTime,
-            'object_type': str,
             'program_id': ObjectID,
             'event_name': str,
+            'duration': Duration,
             'priority': int,
-            'targets': List[ValuesMap],
+            'targets': List[Target],
             'report_descriptors': List[ReportDescriptor],
             'payload_descriptors': List[EventPayloadDescriptor],
             'interval_period': IntervalPeriod,
-            'intervals': List[Interval]
+            'intervals': List[Interval],
+            'id': ObjectID,
+            'created_date_time': ModelDateTime,
+            'modification_date_time': ModelDateTime,
+            'object_type': ObjectTypes
         }
 
         self.attribute_map = {
-            'id': 'id',
-            'created_date_time': 'createdDateTime',
-            'modification_date_time': 'modificationDateTime',
-            'object_type': 'objectType',
             'program_id': 'programID',
             'event_name': 'eventName',
+            'duration': 'duration',
             'priority': 'priority',
             'targets': 'targets',
             'report_descriptors': 'reportDescriptors',
             'payload_descriptors': 'payloadDescriptors',
             'interval_period': 'intervalPeriod',
-            'intervals': 'intervals'
+            'intervals': 'intervals',
+            'id': 'id',
+            'created_date_time': 'createdDateTime',
+            'modification_date_time': 'modificationDateTime',
+            'object_type': 'objectType'
         }
-        self._id = id
-        self._created_date_time = created_date_time
-        self._modification_date_time = modification_date_time
-        self._object_type = object_type
         self._program_id = program_id
         self._event_name = event_name
+        self._duration = duration
         self._priority = priority
         self._targets = targets
         self._report_descriptors = report_descriptors
         self._payload_descriptors = payload_descriptors
         self._interval_period = interval_period
         self._intervals = intervals
+        self._id = id
+        self._created_date_time = created_date_time
+        self._modification_date_time = modification_date_time
+        self._object_type = object_type
 
     @classmethod
     def from_dict(cls, dikt) -> 'Event':
@@ -102,98 +111,6 @@ class Event(Model):
         :rtype: Event
         """
         return util.deserialize_model(dikt, cls)
-
-    @property
-    def id(self) -> ObjectID:
-        """Gets the id of this Event.
-
-
-        :return: The id of this Event.
-        :rtype: ObjectID
-        """
-        return self._id
-
-    @id.setter
-    def id(self, id: ObjectID):
-        """Sets the id of this Event.
-
-
-        :param id: The id of this Event.
-        :type id: ObjectID
-        """
-
-        self._id = id
-
-    @property
-    def created_date_time(self) -> ModelDateTime:
-        """Gets the created_date_time of this Event.
-
-
-        :return: The created_date_time of this Event.
-        :rtype: ModelDateTime
-        """
-        return self._created_date_time
-
-    @created_date_time.setter
-    def created_date_time(self, created_date_time: ModelDateTime):
-        """Sets the created_date_time of this Event.
-
-
-        :param created_date_time: The created_date_time of this Event.
-        :type created_date_time: ModelDateTime
-        """
-
-        self._created_date_time = created_date_time
-
-    @property
-    def modification_date_time(self) -> ModelDateTime:
-        """Gets the modification_date_time of this Event.
-
-
-        :return: The modification_date_time of this Event.
-        :rtype: ModelDateTime
-        """
-        return self._modification_date_time
-
-    @modification_date_time.setter
-    def modification_date_time(self, modification_date_time: ModelDateTime):
-        """Sets the modification_date_time of this Event.
-
-
-        :param modification_date_time: The modification_date_time of this Event.
-        :type modification_date_time: ModelDateTime
-        """
-
-        self._modification_date_time = modification_date_time
-
-    @property
-    def object_type(self) -> str:
-        """Gets the object_type of this Event.
-
-        Used as discriminator, e.g. notification.object  # noqa: E501
-
-        :return: The object_type of this Event.
-        :rtype: str
-        """
-        return self._object_type
-
-    @object_type.setter
-    def object_type(self, object_type: str):
-        """Sets the object_type of this Event.
-
-        Used as discriminator, e.g. notification.object  # noqa: E501
-
-        :param object_type: The object_type of this Event.
-        :type object_type: str
-        """
-        allowed_values = ["EVENT"]  # noqa: E501
-        if object_type not in allowed_values:
-            raise ValueError(
-                "Invalid value for `object_type` ({0}), must be one of {1}"
-                .format(object_type, allowed_values)
-            )
-
-        self._object_type = object_type
 
     @property
     def program_id(self) -> ObjectID:
@@ -242,6 +159,27 @@ class Event(Model):
         self._event_name = event_name
 
     @property
+    def duration(self) -> Duration:
+        """Gets the duration of this Event.
+
+
+        :return: The duration of this Event.
+        :rtype: Duration
+        """
+        return self._duration
+
+    @duration.setter
+    def duration(self, duration: Duration):
+        """Sets the duration of this Event.
+
+
+        :param duration: The duration of this Event.
+        :type duration: Duration
+        """
+
+        self._duration = duration
+
+    @property
     def priority(self) -> int:
         """Gets the priority of this Event.
 
@@ -265,24 +203,24 @@ class Event(Model):
         self._priority = priority
 
     @property
-    def targets(self) -> List[ValuesMap]:
+    def targets(self) -> List[Target]:
         """Gets the targets of this Event.
 
-        A list of valuesMap objects.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :return: The targets of this Event.
-        :rtype: List[ValuesMap]
+        :rtype: List[Target]
         """
         return self._targets
 
     @targets.setter
-    def targets(self, targets: List[ValuesMap]):
+    def targets(self, targets: List[Target]):
         """Sets the targets of this Event.
 
-        A list of valuesMap objects.  # noqa: E501
+        A list of targets.  # noqa: E501
 
         :param targets: The targets of this Event.
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         """
 
         self._targets = targets
@@ -374,7 +312,97 @@ class Event(Model):
         :param intervals: The intervals of this Event.
         :type intervals: List[Interval]
         """
-        if intervals is None:
-            raise ValueError("Invalid value for `intervals`, must not be `None`")  # noqa: E501
 
         self._intervals = intervals
+
+    @property
+    def id(self) -> ObjectID:
+        """Gets the id of this Event.
+
+
+        :return: The id of this Event.
+        :rtype: ObjectID
+        """
+        return self._id
+
+    @id.setter
+    def id(self, id: ObjectID):
+        """Sets the id of this Event.
+
+
+        :param id: The id of this Event.
+        :type id: ObjectID
+        """
+        if id is None:
+            raise ValueError("Invalid value for `id`, must not be `None`")  # noqa: E501
+
+        self._id = id
+
+    @property
+    def created_date_time(self) -> ModelDateTime:
+        """Gets the created_date_time of this Event.
+
+
+        :return: The created_date_time of this Event.
+        :rtype: ModelDateTime
+        """
+        return self._created_date_time
+
+    @created_date_time.setter
+    def created_date_time(self, created_date_time: ModelDateTime):
+        """Sets the created_date_time of this Event.
+
+
+        :param created_date_time: The created_date_time of this Event.
+        :type created_date_time: ModelDateTime
+        """
+        if created_date_time is None:
+            raise ValueError("Invalid value for `created_date_time`, must not be `None`")  # noqa: E501
+
+        self._created_date_time = created_date_time
+
+    @property
+    def modification_date_time(self) -> ModelDateTime:
+        """Gets the modification_date_time of this Event.
+
+
+        :return: The modification_date_time of this Event.
+        :rtype: ModelDateTime
+        """
+        return self._modification_date_time
+
+    @modification_date_time.setter
+    def modification_date_time(self, modification_date_time: ModelDateTime):
+        """Sets the modification_date_time of this Event.
+
+
+        :param modification_date_time: The modification_date_time of this Event.
+        :type modification_date_time: ModelDateTime
+        """
+        if modification_date_time is None:
+            raise ValueError("Invalid value for `modification_date_time`, must not be `None`")  # noqa: E501
+
+        self._modification_date_time = modification_date_time
+
+    @property
+    def object_type(self) -> ObjectTypes:
+        """Gets the object_type of this Event.
+
+
+        :return: The object_type of this Event.
+        :rtype: ObjectTypes
+        """
+        return self._object_type
+
+    @object_type.setter
+    def object_type(self, object_type: ObjectTypes):
+        """Sets the object_type of this Event.
+
+
+        :param object_type: The object_type of this Event.
+        :type object_type: ObjectTypes
+        """
+        if object_type is None:
+            raise ValueError("Invalid value for `object_type`, must not be `None`")  # noqa: E501
+
+        self._object_type = object_type

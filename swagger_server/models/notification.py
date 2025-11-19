@@ -7,7 +7,7 @@ from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
 from swagger_server.models.object_types import ObjectTypes  # noqa: F401,E501
-from swagger_server.models.values_map import ValuesMap  # noqa: F401,E501
+from swagger_server.models.target import Target  # noqa: F401,E501
 from swagger_server.models.one_ofnotification_object import OneOfnotificationObject  # noqa: F401,E501
 from swagger_server import util
 
@@ -17,7 +17,7 @@ class Notification(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, object_type: ObjectTypes=None, operation: str=None, object: OneOfnotificationObject=None, targets: List[ValuesMap]=None):  # noqa: E501
+    def __init__(self, object_type: ObjectTypes=None, operation: str=None, object: OneOfnotificationObject=None, targets: List[Target]=None):  # noqa: E501
         """Notification - a model defined in Swagger
 
         :param object_type: The object_type of this Notification.  # noqa: E501
@@ -27,25 +27,25 @@ class Notification(Model):
         :param object: The object of this Notification.  # noqa: E501
         :type object: OneOfnotificationObject
         :param targets: The targets of this Notification.  # noqa: E501
-        :type targets: List[ValuesMap]
+        :type targets: List[Target]
         """
         self.swagger_types = {
             'object_type': ObjectTypes,
             'operation': str,
-            'targets': List[ValuesMap],
-            'object': OneOfnotificationObject
+            'object': OneOfnotificationObject,
+            'targets': List[Target]
         }
 
         self.attribute_map = {
             'object_type': 'objectType',
             'operation': 'operation',
-            'targets': 'targets',
-            'object': 'object'
+            'object': 'object',
+            'targets': 'targets'
         }
         self._object_type = object_type
         self._operation = operation
-        self._targets = targets
         self._object = object
+        self._targets = targets
 
     @classmethod
     def from_dict(cls, dikt) -> 'Notification':
@@ -101,7 +101,7 @@ class Notification(Model):
         :param operation: The operation of this Notification.
         :type operation: str
         """
-        allowed_values = ["GET", "POST", "PUT", "DELETE"]  # noqa: E501
+        allowed_values = ["CREATE", "READ", "UPDATE", "DELETE"]  # noqa: E501
         if operation not in allowed_values:
             raise ValueError(
                 "Invalid value for `operation` ({0}), must be one of {1}"
@@ -109,29 +109,6 @@ class Notification(Model):
             )
 
         self._operation = operation
-
-    @property
-    def targets(self) -> List[ValuesMap]:
-        """Gets the targets of this Notification.
-
-        A list of valuesMap objects.  # noqa: E501
-
-        :return: The targets of this Notification.
-        :rtype: List[ValuesMap]
-        """
-        return self._targets
-
-    @targets.setter
-    def targets(self, targets: List[ValuesMap]):
-        """Sets the targets of this Notification.
-
-        A list of valuesMap objects.  # noqa: E501
-
-        :param targets: The targets of this Notification.
-        :type targets: List[ValuesMap]
-        """
-
-        self._targets = targets
 
     @property
     def object(self) -> OneOfnotificationObject:
@@ -157,3 +134,26 @@ class Notification(Model):
             raise ValueError("Invalid value for `object`, must not be `None`")  # noqa: E501
 
         self._object = object
+
+    @property
+    def targets(self) -> List[Target]:
+        """Gets the targets of this Notification.
+
+        A list of targets.  # noqa: E501
+
+        :return: The targets of this Notification.
+        :rtype: List[Target]
+        """
+        return self._targets
+
+    @targets.setter
+    def targets(self, targets: List[Target]):
+        """Sets the targets of this Notification.
+
+        A list of targets.  # noqa: E501
+
+        :param targets: The targets of this Notification.
+        :type targets: List[Target]
+        """
+
+        self._targets = targets

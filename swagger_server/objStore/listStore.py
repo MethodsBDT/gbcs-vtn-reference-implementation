@@ -17,10 +17,8 @@ subscriptionID = 0
 vens = []
 venID = 0
 
-resourceIDs = [0]
-# TBD remove as resources are stored in body of ven
 resources = []
-
+resourceID = 0
 
 class ListStore(ObjStore):
     """
@@ -70,7 +68,7 @@ class ListStore(ObjStore):
             logging.warning(f"ListStore.insert(): unknown obj.object_type={obj.object_type}")
             return HTTPStatus.BAD_REQUEST
 
-        # Insufficient storage
+        #
         logging.debug(f"ListStore.insert(): list={list}")
 
         obj.id = str(id)
