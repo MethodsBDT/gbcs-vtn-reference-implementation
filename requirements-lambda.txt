@@ -4,9 +4,11 @@ jsonschema==3.2.0
 openapi-spec-validator==0.2.9
 python_dateutil == 2.6.0
 requests==2.25.1
-setuptools >= 21.0.0
+setuptools==66.1.1
 swagger-ui-bundle >= 0.0.2
 PyJWT==2.8.0
 cryptography==41.0.5
 aws-wsgi==0.2.7
 jsonpickle==3.0.2
+paho-mqtt==1.6.1
+pytest==8.4.2
