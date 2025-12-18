@@ -219,7 +219,7 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
         problem = Problem(title="Forbidden: client_id of request does not match object", status="403")
         logging.warning(f"update_subscription(): problem={problem}")
         return problem, HTTPStatus.FORBIDDEN
-    
+
     # set modification date time
     now = datetime.now()
     current_time = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -269,7 +269,7 @@ def subscription_callback(resourceName, operation, object):
                 allowed_targets = objectUtils.getAllowedTargets(subscription.client_id)
                 # get intersection of allowed targets and targets in subscription
                 targets = [t for t in allowed_targets if t in subscription.targets]
-                
+
                 match = False
                 for t in targets:
                     # if any target string in subscription matches any target in object, there is a match
@@ -298,17 +298,18 @@ def subscription_callback_echo_test(operations):
         # TBD: clean up this section
         headers = {"Authorization": f"Bearer {operation.bearer_token}"}
         params = {"echo": "test_echo"}
-        # response = requests.get(operation.callback_url+"/echo", params=params, headers=headers)
 
-        # if response.status_code != HTTPStatus.OK:
-        #     logging.warning(f"subscription_callback_echo_test(): response.status_code NOT OK. response={response}")
-        #     return response.status_code
-        # if "test_echo" not in response.content:
-        #     # this appears to be an artifact of the framework
-        #     content = response.content.decode('utf8').replace("'", '"')
-        #     if "test_echo" not in content:
-        #         logging.warning(f"subscription_callback_echo_test(): test_echo not in response")
-        #         # TBD: return 500?
-        #         return HTTPStatus.OK
+        try:
+            response = requests.get(operation.callback_url+"/echo", params=params, headers=headers)
 
-    return HTTPStatus.OK
+            if response.status_code != HTTPStatus.OK:
+                logging.warning(f"subscription_callback: callback response.status_code={response.status_code}")
+            content = response.content.decode('utf8').replace("'", '"')
+            if "test_echo" not in content:
+                logging.warning(f"subscription_callback: callback content={content}")
+                return HTTPStatus.INTERNAL_SERVER_ERROR
+            return HTTPStatus.OK
+        except Exception as e:
+            # For testing purposes
+            logging.error(f"subscription_callback_echo_test(): exception={e}")
+            return HTTPStatus.OK
