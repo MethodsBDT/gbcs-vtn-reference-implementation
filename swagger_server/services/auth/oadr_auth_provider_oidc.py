@@ -6,10 +6,11 @@ import requests
 import jwt
 from jwt.exceptions import PyJWTError
 
-from swagger_server.services.auth.AuthException import AuthException
+from swagger_server.services.auth.auth_exception import AuthException
+from swagger_server.services.auth.oadr_auth_provider import OadrAuthProvider
 
 
-class OIDCAuthProvider:
+class OIDCAuthProvider(OadrAuthProvider):
     def __init__(self):
         self.base_url = OIDC_BASE_URL
         self.know_issuer_client = jwt.PyJWKClient(OIDC_KNOWN_ISSUER + '/.well-known/jwks.json')
@@ -42,3 +43,8 @@ class OIDCAuthProvider:
     def get_scope(self, token: str) -> list[str]:
         claims = jwt.decode(token, options={'verify_signature': False})
         return claims['scope'].split()
+
+
+    # def get_client_id(self, token: str) -> str:
+    #     claims = jwt.decode(token, options={'verify_signature': False})
+    #     return claims['sub']

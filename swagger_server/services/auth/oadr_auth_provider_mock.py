@@ -1,6 +1,7 @@
 import logging
 
-from swagger_server.services.auth.AuthException import AuthException
+from swagger_server.services.auth.auth_exception import AuthException
+from swagger_server.services.auth.oadr_auth_provider import OadrAuthProvider
 
 
 class AuthorityModel:
@@ -11,11 +12,10 @@ class AuthorityModel:
         self.token = token
 
 
-class MockAuthProvider:
+class MockAuthProvider(OadrAuthProvider):
 
     def __init__(self):
         self.allowed_authorities = [
-            #// todo: REPLACE TOKEN VALUES
             AuthorityModel('ven_client', '999', ['test/VEN'], 'ven_token'),
             AuthorityModel('ven_client2', '9999', ['test/VEN'], 'ven_token2'),
             AuthorityModel('bl_client', '1001', ['test/BL'], 'bl_token'),
