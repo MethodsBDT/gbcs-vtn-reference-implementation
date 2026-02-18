@@ -3,7 +3,7 @@ name: Build image in ECR
 on:
   push:
      branches:
-       - "master"
+       - "main"
        - "v3_1_0"
   workflow_dispatch:
 
