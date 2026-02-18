@@ -10,7 +10,7 @@ jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
     env:
-      ECR_REPOSITORY: oadr-ri
+      ECR_REPOSITORY: odr-vtn-3-0-1
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
