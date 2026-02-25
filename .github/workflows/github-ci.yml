@@ -20,10 +20,7 @@ jobs:
       - name: Checkout VTN 3.1.0 repo
         uses: actions/checkout@v6
         with:
-          repository: oadr3-org/openadr3-vtn-reference-implementation
-          token: ${{ secrets.PAT }}
           path: vtn_3_1_0
-          ref: 'main'
       - name: Checkout test-callback-service repo
         uses: actions/checkout@v6
         with:
