@@ -25,7 +25,7 @@ class Program(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, program_name: str=None, interval_period: IntervalPeriod=None, program_descriptions: List[ProgramRequestProgramDescriptions]=None, payload_descriptors: List[AnyOfprogramRequestPayloadDescriptorsItems]=None, attributes: List[ValuesMap]=None, targets: List[Target]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
+    def __init__(self, program_name: str=None, interval_period: IntervalPeriod=None, program_descriptions: List[ProgramRequestProgramDescriptions]=None, payload_descriptors: List[AnyOfprogramRequestPayloadDescriptorsItems]=None, attributes: List[ValuesMap]=None, targets: List[str]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
         """Program - a model defined in Swagger
 
         :param program_name: The program_name of this Program.  # noqa: E501
@@ -55,7 +55,7 @@ class Program(Model):
             'program_descriptions': List[ProgramRequestProgramDescriptions],
             'payload_descriptors': List[AnyOfprogramRequestPayloadDescriptorsItems],
             'attributes': List[ValuesMap],
-            'targets': List[Target],
+            'targets': List[str],
             'id': ObjectID,
             'created_date_time': ModelDateTime,
             'modification_date_time': ModelDateTime,

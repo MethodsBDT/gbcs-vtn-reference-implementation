@@ -1,160 +1,150 @@
-from http import HTTPStatus
+import json
 import logging
 import os
+from http import HTTPStatus
 
-import jsonpickle
-from datetime import datetime
-
-from swagger_server.models import Subscription, Report, Program, Event, Ven, Resource
+from swagger_server.models import Event, Program, Report, Resource, Subscription, Ven
 from swagger_server.objStore.objStore import ObjStore
-from dataclasses import dataclass
 
+_TYPE_MAP = {
+    'PROGRAM': ('programs', Program),
+    'EVENT': ('events', Event),
+    'REPORT': ('reports', Report),
+    'SUBSCRIPTION': ('subscriptions', Subscription),
+    'VEN': ('vens', Ven),
+    'RESOURCE': ('resources', Resource),
 
-def from_dict(dict_data):
-    programs = []
-    events = []
-    reports = []
-    subscriptions = []
-    vens = []
-    resources = []
+    'BL_VEN_REQUEST': ('vens', Ven),
+    'VEN_VEN_REQUEST': ('vens', Ven),
 
-    for program in dict_data['programs']:
-        programs.append(Program.from_dict(program))
-    for event in dict_data['events']:
-        events.append(Event.from_dict(event))
-    for report in dict_data['reports']:
-        reports.append(Report.from_dict(report))
-    for subscription in dict_data['subscriptions']:
-        subscriptions.append(Subscription.from_dict(subscription))
-    for ven in dict_data['vens']:
-        vens.append(Ven.from_dict(ven))
-    for resource in dict_data['resources']:
-        resources.append(Resource.from_dict(resource))
-    return DataModel(programs, events, reports, subscriptions, vens, resources)
+    'BL_RESOURCE_REQUEST': ('resources', Resource),
+    'VEN_RESOURCE_REQUEST': ('resources', Resource),
+}
 
-
-@dataclass
-class DataModel:
-    """Model for data"""
-
-    def __init__(self, programs, events, reports, subscriptions, vens, resources):
-        self.programs = programs
-        self.events = events
-        self.reports = reports
-        self.subscriptions = subscriptions
-        self.vens = vens
-        self.resources = resources
-
-    def to_json(self):
-        return jsonpickle.encode({
-            'programs': self.to_dict(self.programs),
-            'events': self.to_dict(self.events),
-            'reports': self.to_dict(self.reports),
-            'subscriptions': self.to_dict(self.subscriptions),
-            'vens': self.to_dict(self.vens),
-            'resources': self.to_dict(self.resources)
-        })
-
-    def to_dict(self, items: list):
-        result = []
-        for item in items:
-            result.append(item.to_json_dict())
-        return result
+_EMPTY_DATA = {key: [] for key in ('programs', 'events', 'reports', 'subscriptions', 'vens', 'resources')}
 
 
 class FileStore(ObjStore):
     """
-    abstract class defines interface to object storage implementations, such as simple lists
-    or database interfaces like SQLAlchemy
+    ObjStore implementation that persists data to a JSON file.
+    Each write serialises the full in-memory state; each read deserialises it.
     """
 
-    def __init__(self, file_path):
+    def __init__(self, file_path: str):
         self.file_path = file_path
         if not os.path.isfile(file_path):
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
-            self.__write_file(DataModel([], [], [], [], [], []))
-        self.id_counter = 0
+            self._write(dict(_EMPTY_DATA))
+        self.id_counter = self._max_existing_id()
 
-    def __read_file(self) -> DataModel:
-        logging.debug(f"FileStore.__read_file(): datetime={datetime.now().strftime('%Y-%m-%d %H:%M:%S')}" )
-        with open(self.file_path, "r+") as f:
-            read = f.read()
-            logging.debug(f'FileStore.__read_file(): Read: {read}')
-            data = from_dict(jsonpickle.decode(read))
-            logging.debug(f"FileStore.__read_file(): datetime={datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-            return data
-
-    def __write_file(self, data: DataModel):
-        logging.debug(f"FileStore.__write_file(): datetime={datetime.now().strftime('%Y-%m-%d %H:%M:%S')}" )
-        with open(self.file_path, "w+") as f:
-            json_data = data.to_json()
-            logging.debug(f'FileStore.__write_file(): Write: {json_data}')
-            f.write(json_data)
-            logging.debug(f"FileStore.__write_file(): datetime={datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    # ------------------------------------------------------------------
+    # ObjStore interface
+    # ------------------------------------------------------------------
 
     def insert(self, obj):
-        object_type = obj.object_type
         logging.info(f"FileStore.insert(): obj={obj}")
-        logging.debug(f"FileStore.insert(): obj.object_type={object_type}")
-        saved_data = self.__read_file()
-        _list = __get_type__(object_type, saved_data)
-        logging.debug(f"FileStore.insert(): list={_list}")
-        self.id_counter = self.id_counter + 1
-        counter = self.id_counter
-        obj.id = str(counter)
-        _list.append(obj)
-        self.__write_file(saved_data)
+        entry = self._get_list_and_cls(obj.object_type)
+        if entry is None:
+            return HTTPStatus.BAD_REQUEST
+        field, _ = entry
+
+        data = self._read()
+        self.id_counter += 1
+        obj.id = str(self.id_counter)
+        data[field].append(obj.to_json_dict())
+        self._write(data)
+        logging.debug(f"FileStore.insert(): assigned id={obj.id}")
         return HTTPStatus.CREATED
 
     def remove(self, object_type, id):
         logging.info(f"FileStore.remove(): object_type={object_type} id={id}")
-        saved_data = self.__read_file()
-        _list = __get_type__(object_type, saved_data)
-        _object = next((obj for obj in _list if str(obj.id) == str(id)), None)
-        if _object is not None:
-            _list.remove(_object)
-            logging.debug(f"FileStore.remove(): object={_object}")
-            self.__write_file(saved_data)
-            return _object
-        else:
+        entry = self._get_list_and_cls(object_type)
+        if entry is None:
+            return HTTPStatus.BAD_REQUEST
+        field, cls = entry
+
+        data = self._read()
+        items = data[field]
+        match = next((item for item in items if str(item.get('id')) == str(id)), None)
+        if match is None:
             return HTTPStatus.NOT_FOUND
+        items.remove(match)
+        self._write(data)
+        return cls.from_dict(match)
 
     def update(self, object_type, obj):
-        logging.info(f"FileStore.update():: obj={obj}")
-        saved_data = self.__read_file()
-        _list = __get_type__(object_type, saved_data)
+        logging.info(f"FileStore.update(): obj={obj}")
+        entry = self._get_list_and_cls(object_type)
+        if entry is None:
+            return HTTPStatus.BAD_REQUEST
+        field, _ = entry
 
-        _object = next((object for object in _list if str(object.id) == str(obj.id)), None)
-        if _object is not None:
-            logging.debug(f"FileStore.update(): original object={_object}")
-            index = _list.index(_object)
-            _list[index] = obj
-            logging.debug(f"FileStore.update(): list[{index}]={_list[index]}")
-            self.__write_file(saved_data)
-            logging.info(saved_data)
-            return obj
-        else:
+        data = self._read()
+        items = data[field]
+        idx = next((i for i, item in enumerate(items) if str(item.get('id')) == str(obj.id)), None)
+        if idx is None:
             return HTTPStatus.NOT_FOUND
+        items[idx] = obj.to_json_dict()
+        self._write(data)
+        logging.debug(f"FileStore.update(): updated index={idx}")
+        return obj
 
     def search_all(self, object_type) -> list:
         logging.info(f"FileStore.search_all(): object_type={object_type}")
-        saved_data = self.__read_file()
-        return __get_type__(object_type, saved_data)
+        entry = self._get_list_and_cls(object_type)
+        if entry is None:
+            return HTTPStatus.BAD_REQUEST
+        field, cls = entry
+
+        data = self._read()
+        return [cls.from_dict(item) for item in data[field]]
 
     def search(self, object_type, id):
-        logging.info(f"FileStore.search(): object_type={object_type}, id={id}")
-        saved_data = self.__read_file()
-        _list = __get_type__(object_type, saved_data)
-        logging.debug(f"FileStore.search(): list={_list}")
-        return next((obj for obj in _list if str(obj.id) == str(id)), HTTPStatus.NOT_FOUND)
+        logging.info(f"FileStore.search(): object_type={object_type} id={id}")
+        entry = self._get_list_and_cls(object_type)
+        if entry is None:
+            return HTTPStatus.BAD_REQUEST
+        field, cls = entry
 
+        data = self._read()
+        match = next((item for item in data[field] if str(item.get('id')) == str(id)), None)
+        if match is None:
+            return HTTPStatus.NOT_FOUND
+        return cls.from_dict(match)
 
-def __get_type__(object_type, data_model: DataModel) -> list:
-    return {
-        'PROGRAM': data_model.programs,
-        'EVENT': data_model.events,
-        'REPORT': data_model.reports,
-        'SUBSCRIPTION': data_model.subscriptions,
-        'VEN': data_model.vens,
-        'RESOURCE': data_model.resources,
-    }.get(object_type, HTTPStatus.BAD_REQUEST)
+    # ------------------------------------------------------------------
+    # Internal helpers
+    # ------------------------------------------------------------------
+
+    def _read(self) -> dict:
+        logging.debug(f"FileStore._read(): path={self.file_path}")
+        with open(self.file_path, 'r') as f:
+            return json.load(f)
+
+    def _write(self, data: dict):
+        logging.debug(f"FileStore._write(): path={self.file_path}")
+        with open(self.file_path, 'w') as f:
+            json.dump(data, f, indent=2, default=str)
+
+    def _max_existing_id(self) -> int:
+        """Return the highest numeric id already stored, so the counter never collides after a restart."""
+        try:
+            data = self._read()
+        except (json.JSONDecodeError, OSError):
+            return 0
+        max_id = 0
+        for items in data.values():
+            if isinstance(items, list):
+                for item in items:
+                    try:
+                        max_id = max(max_id, int(item.get('id', 0)))
+                    except (TypeError, ValueError):
+                        pass
+        return max_id
+
+    @staticmethod
+    def _get_list_and_cls(object_type):
+        entry = _TYPE_MAP.get(object_type)
+        if entry is None:
+            logging.warning(f"FileStore: unknown object_type={object_type}")
+        return entry

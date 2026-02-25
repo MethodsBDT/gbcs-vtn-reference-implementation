@@ -48,7 +48,7 @@ def create_event(body=None):  # noqa: E501
 
     event = Event(
         created_date_time=current_time,
-        modification_date_time=None,
+        modification_date_time=current_time,
         object_type='EVENT',
         program_id=eventBody.program_id,
         event_name=eventBody.event_name,

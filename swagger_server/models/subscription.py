@@ -24,7 +24,7 @@ class Subscription(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, client_name: ClientName=None, program_id: ObjectID=None, object_operations: List[SubscriptionRequestObjectOperations]=None, targets: List[Target]=None, client_id: ClientID=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
+    def __init__(self, client_name: ClientName=None, program_id: ObjectID=None, object_operations: List[SubscriptionRequestObjectOperations]=None, targets: List[str]=None, client_id: ClientID=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
         """Subscription - a model defined in Swagger
 
         :param client_name: The client_name of this Subscription.  # noqa: E501
@@ -50,7 +50,7 @@ class Subscription(Model):
             'client_name': ClientName,
             'program_id': ObjectID,
             'object_operations': List[SubscriptionRequestObjectOperations],
-            'targets': List[Target],
+            'targets': List[str],
             'client_id': ClientID,
             'id': ObjectID,
             'created_date_time': ModelDateTime,

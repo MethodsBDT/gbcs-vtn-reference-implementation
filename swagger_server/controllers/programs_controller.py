@@ -46,7 +46,7 @@ def create_program(body=None):  # noqa: E501
 
     program = Program(
         created_date_time=current_time,
-        modification_date_time=None,
+        modification_date_time=current_time,
         object_type='PROGRAM',
         program_name=programBody.program_name,
         interval_period=programBody.interval_period,

@@ -52,6 +52,7 @@ def create_subscription(body):  # noqa: E501
 
     subscription = Subscription(
         created_date_time=current_time,
+        modification_date_time=current_time,
         object_type='SUBSCRIPTION',
         client_id=client_id,
         client_name=subscriptionBody.client_name,

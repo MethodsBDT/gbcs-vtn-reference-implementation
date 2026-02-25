@@ -51,7 +51,7 @@ def create_report(body=None):  # noqa: E501
 
     report = Report(
         created_date_time=current_time,
-        modification_date_time=None,
+        modification_date_time=current_time,
         object_type='REPORT',
         client_id=client_id,
         event_id=reportBody.event_id,

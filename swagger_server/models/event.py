@@ -26,7 +26,7 @@ class Event(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, program_id: ObjectID=None, event_name: str=None, duration: Duration=None, priority: int=None, targets: List[Target]=None, report_descriptors: List[ReportDescriptor]=None, payload_descriptors: List[EventPayloadDescriptor]=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
+    def __init__(self, program_id: ObjectID=None, event_name: str=None, duration: Duration=None, priority: int=None, targets: List[str]=None, report_descriptors: List[ReportDescriptor]=None, payload_descriptors: List[EventPayloadDescriptor]=None, interval_period: IntervalPeriod=None, intervals: List[Interval]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None, object_type: ObjectTypes=None):  # noqa: E501
         """Event - a model defined in Swagger
 
         :param program_id: The program_id of this Event.  # noqa: E501
@@ -61,7 +61,7 @@ class Event(Model):
             'event_name': str,
             'duration': Duration,
             'priority': int,
-            'targets': List[Target],
+            'targets': List[str],
             'report_descriptors': List[ReportDescriptor],
             'payload_descriptors': List[EventPayloadDescriptor],
             'interval_period': IntervalPeriod,

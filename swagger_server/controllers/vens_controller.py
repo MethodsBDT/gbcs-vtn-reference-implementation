@@ -3,21 +3,13 @@ from datetime import datetime
 from http import HTTPStatus
 import logging
 from flask import request
-from typing import Dict
-from typing import Tuple
-from typing import Union
 
-from swagger_server.models.object_id import ObjectID  # noqa: E501
 from swagger_server.models.problem import Problem  # noqa: E501
-from swagger_server.models.target import Target  # noqa: E501
 from swagger_server.models.ven import Ven  # noqa: E501
-from swagger_server.models.ven_name import VenName  # noqa: E501
-from swagger_server.models.ven_request import VenRequest  # noqa: E501
 from swagger_server.models.bl_ven_request import BlVenRequest  # noqa: E501
 from swagger_server.models.ven_ven_request import VenVenRequest  # noqa: E501
 from swagger_server.controllers.subscriptions_controller import subscription_callback  # noqa: E501
 from swagger_server.objStore.storageInterface import objStore
-from swagger_server import util
 from swagger_server import objectUtils
 
 def create_ven(body):  # noqa: E501
@@ -59,7 +51,7 @@ def create_ven(body):  # noqa: E501
 
     ven = Ven(
         created_date_time=current_time,
-        modification_date_time=None,
+        modification_date_time=current_time,
         object_type='VEN',
         ven_name=venBody.ven_name,
         attributes=venBody.attributes,

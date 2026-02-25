@@ -54,7 +54,7 @@ class ListStore(ObjStore):
             global subscriptionID
             id = subscriptionID
             subscriptionID += 1
-        elif obj.object_type == 'VEN':
+        elif obj.object_type == 'VEN' or obj.object_type == 'BL_VEN_REQUEST' or obj.object_type == 'VEN_VEN_REQUEST':
             list = vens
             global venID
             id = venID

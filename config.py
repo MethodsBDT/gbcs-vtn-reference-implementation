@@ -13,7 +13,7 @@ OIDC_BASE_URL = os.getenv('OIDC_BASE_URL', 'https://test-tool.auth.us-east-1.ama
 OIDC_KNOWN_ISSUER = os.getenv('OIDC_KNOWN_ISSUER', 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_N5wIYtzuO')
 
 # Storage Implementation
-STORAGE_IMPLEMENTATION = os.getenv('STORAGE_IMPLEMENTATION', 'IN_MEMORY')  # Values: IN_MEMORY, IN_FILE
+STORAGE_IMPLEMENTATION = os.getenv('STORAGE_IMPLEMENTATION', 'IN_FILE')  # Values: IN_MEMORY, IN_FILE
 STORAGE_FILE_PATH = os.getenv('STORAGE_FILE_PATH', "./tmp/fileStorage.json")
 
 AUTH_BASIC_VEN_CLIENT_ID = os.getenv('AUTH_BASIC_VEN_CLIENT_ID', 'ven_client')

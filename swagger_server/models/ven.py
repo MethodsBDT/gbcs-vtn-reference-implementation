@@ -22,7 +22,7 @@ class Ven(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, object_type: str=None, client_id: ClientID=None, targets: List[ValuesMap]=None, ven_name: VenName=None, attributes: List[ValuesMap]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None):  # noqa: E501
+    def __init__(self, object_type: str=None, client_id: ClientID=None, targets: List[str]=None, ven_name: VenName=None, attributes: List[ValuesMap]=None, id: ObjectID=None, created_date_time: ModelDateTime=None, modification_date_time: ModelDateTime=None):  # noqa: E501
         """Ven - a model defined in Swagger
 
         :param object_type: The object_type of this Ven.  # noqa: E501
@@ -45,7 +45,7 @@ class Ven(Model):
         self.swagger_types = {
             'object_type': str,
             'client_id': ClientID,
-            'targets': List[ValuesMap],
+            'targets': List[str],
             'ven_name': VenName,
             'attributes': List[ValuesMap],
             'id': ObjectID,
@@ -103,7 +103,7 @@ class Ven(Model):
         :param object_type: The object_type of this Ven.
         :type object_type: str
         """
-        allowed_values = ["BL_VEN_REQUEST"]  # noqa: E501
+        allowed_values = ["VEN", "VEN_VEN_REQUEST", "BL_VEN_REQUEST"]  # noqa: E501
         if object_type not in allowed_values:
             raise ValueError(
                 "Invalid value for `object_type` ({0}), must be one of {1}"

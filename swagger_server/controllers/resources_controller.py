@@ -52,7 +52,7 @@ def create_resource(body):  # noqa: E501
 
     resource = Resource(
         created_date_time=current_time,
-        modification_date_time=None,
+        modification_date_time=current_time,
         object_type='RESOURCE',
         resource_name=resourceBody.resource_name,
         ven_id=resourceBody.ven_id,
