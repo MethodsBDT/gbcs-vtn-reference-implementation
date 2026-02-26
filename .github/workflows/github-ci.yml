@@ -7,6 +7,50 @@ on:
   workflow_dispatch:
 
 jobs:
+  check-compatibility-vtn-3-0-1:
+    runs-on: ubuntu-latest
+    env:
+      STORAGE_IMPLEMENTATION: IN_FILE
+    steps:
+      - name: Checkout Test-tool
+        uses: actions/checkout@v6
+        with:
+          repository: oadr3-org/openadr3-test-tool
+          token: ${{ secrets.PAT }}
+          path: test-tool
+          ref: 'v3_0_1'
+      - name: Checkout VTN 3.0.1 repo
+        uses: actions/checkout@v6
+        with:
+          path: vtn
+      - name: Checkout test-callback-service repo
+        uses: actions/checkout@v6
+        with:
+          repository: oadr3-org/test-callback-service
+          token: ${{ secrets.PAT }}
+          path: test-callback-service
+          ref: 'main'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          architecture: 'x64'
+      - name: Installs requirements
+        run: |
+          pip install -r test-callback-service/requirements.txt
+          pip install -r vtn/requirements.txt
+          pip install -r test-tool/requirements.txt
+
+      - name: Run Oadr3 tests again VTN 3.1.0 Reference implementation
+        run: |
+          python test-callback-service/run.py > /dev/null &
+          sleep 5s
+          cd vtn
+          python -m swagger_server > /dev/null &
+          cd ..
+          sleep 5s
+          pytest test-tool/OpenADR_tests/v3_0_1/VTN_test --vtn_base_url=http://127.0.0.1:8080/openadr3/3.0.1
+
   build-and-push-image:
     runs-on: ubuntu-latest
     env:
