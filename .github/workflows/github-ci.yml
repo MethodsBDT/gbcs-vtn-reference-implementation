@@ -55,6 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ECR_REPOSITORY: odr-vtn-3-0-1
+    needs: [ check-compatibility-vtn-3-0-1 ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
