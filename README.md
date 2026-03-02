@@ -53,6 +53,21 @@ Note the presence of Dockerfile-lambda. This is used by a CI/CD pipeline to crea
 Docker image which is pushed to a cloud environment to support the online OADR3 Test Tool.
 The details of the CI/CD pipeline are described elsewhere.
 
+## Running locally with AWS SAM CLI
+
+`Dockerfile-lambda` can also be used to run the Lambda function locally via the
+[AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html),
+which emulates the API Gateway and Lambda runtime on your machine without
+deploying anything to AWS.
+
+```bash
+./run-sam-local.sh
+```
+
+The script builds the Docker image and starts a local HTTP API on
+`http://localhost:8080`. See [docs/running-locally-sam.md](docs/running-locally-sam.md)
+for full prerequisites, configuration options, and example requests.
+
 ## Interacting with the running VTN
 
 The VTN listens for requests on

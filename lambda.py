@@ -2,8 +2,10 @@ import logging
 
 import awsgi
 import connexion
+
 from swagger_server import encoder
 
+logging.getLogger().setLevel(logging.INFO)
 app = connexion.App(__name__, specification_dir='swagger_server/swagger/')
 app.app.json_encoder = encoder.JSONEncoder
 app.add_api('swagger.yaml',
@@ -13,11 +15,10 @@ app.add_api('swagger.yaml',
 
 
 def handler(event, context):
-    logging.info(event)
-    print(event)
+    # logging.info(event)
     event['httpMethod'] = event['requestContext']['http']['method']
     event['path'] = event['requestContext']['http']['path']
     event['queryStringParameters'] = event.get('queryStringParameters')
-    print(f"httpMethod: {event['httpMethod']}, path: {event['path']}, "
+    logging.info(f"httpMethod: {event['httpMethod']}, path: {event['path']}, "
           f"queryStringParameters: {event.get('queryStringParameters')}")
     return awsgi.response(app, event, context)
