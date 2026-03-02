@@ -8,7 +8,6 @@ Globals:
       Variables:
         STORAGE_IMPLEMENTATION: IN_FILE
         STORAGE_FILE_PATH: /tmp/fileStorage.json
-        LOG_LEVEL: "20"
 
 Resources:
   VtnFunction:
