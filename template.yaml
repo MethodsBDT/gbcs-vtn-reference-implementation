@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Timeout: 30
+    Environment:
+      Variables:
+        STORAGE_IMPLEMENTATION: IN_FILE
+        STORAGE_FILE_PATH: /tmp/fileStorage.json
+
+Resources:
+  VtnFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      Events:
+        VtnApi:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+    Metadata:
+      DockerTag: local
+      DockerContext: .
+      Dockerfile: Dockerfile-lambda
+
+Outputs:
+  VtnApi:
+    Description: "HTTP API endpoint"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+  VtnFunction:
+    Description: "Lambda function ARN"
+    Value: !GetAtt VtnFunction.Arn

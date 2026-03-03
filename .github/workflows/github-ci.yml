@@ -50,7 +50,7 @@ jobs:
           pytest test-tool/OpenADR_tests/v3_1_0/VTN_test --vtn_base_url=http://127.0.0.1:8080/openadr3/3.1.0
 
   build-and-push-image:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     env:
       ECR_REPOSITORY: odr-vtn-3-1-0
