@@ -158,7 +158,7 @@ def dispatch(resource_name, operation, vtn_object):
         notification_dict = notification.to_json_dict()
     else:
         return
-    logging.debug(f"reason=dispatch,object:\n{pformat(notification_dict)}")
+    logging.debug(f"reason=dispatch,resource_name={resource_name},operation={operation},bindings={AVAILABLE_NOTIFIER_BINDINGS}")
     # Dispatch on each notififer binding
     for binding in AVAILABLE_NOTIFIER_BINDINGS:
         if binding == 'MQTT':
