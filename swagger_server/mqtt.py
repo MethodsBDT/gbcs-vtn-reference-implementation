@@ -213,16 +213,19 @@ def targetable_object_type_topic_names(object_id: str,
     if targets:
         resolved_targets_ven_ids = resolve_ven_ids_from_targets(targets)
         logging.debug(f"reason=resolvedTargetsVenIds,value={resolved_targets_ven_ids}")
-        topics = []
-        for ven_id in resolved_targets_ven_ids:
-            topics.append(path(base_topic_targeted, operation, ven_id))
-        return topics
-    else:
-        return untargeted_object_type_topic_names(object_id,
-                                                  base_topic_untargeted,
-                                                  base_topic_untargeted_id,
-                                                  operation,
-                                                  notification_object)
+        if resolved_targets_ven_ids:
+            topics = []
+            for ven_id in resolved_targets_ven_ids:
+                topics.append(path(base_topic_targeted, operation, ven_id))
+            return topics
+        # Targets present but no VENs resolved — fall back to untargeted delivery
+        logging.debug(f"reason=targetsUnresolved,targets={targets},fallingBackToUntargeted")
+
+    return untargeted_object_type_topic_names(object_id,
+                                              base_topic_untargeted,
+                                              base_topic_untargeted_id,
+                                              operation,
+                                              notification_object)
 
 
 def topic_names(resourceName: str, operation: str, notification: Dict) -> List:
