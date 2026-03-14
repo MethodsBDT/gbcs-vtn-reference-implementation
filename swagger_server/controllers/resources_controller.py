@@ -1,5 +1,5 @@
 import connexion
-from datetime import datetime
+from datetime import datetime, timezone
 from http import HTTPStatus
 import logging
 from flask import request
@@ -47,8 +47,8 @@ def create_resource(body):  # noqa: E501
     if len(resourceList) > 0:
         return [], HTTPStatus.CONFLICT
 
-    now = datetime.now()
-    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now(timezone.utc)
+    current_time = now.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     resource = Resource(
         created_date_time=current_time,
@@ -230,8 +230,8 @@ def update_ven_resource(resource_id, body=None):  # noqa: E501
         return problem, HTTPStatus.FORBIDDEN
 
     # set modification date time
-    now = datetime.now()
-    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now(timezone.utc)
+    current_time = now.strftime("%Y-%m-%dT%H:%M:%SZ")
     resource.modification_date_time = current_time
 
     resource.ven_id = resourceBody.ven_id

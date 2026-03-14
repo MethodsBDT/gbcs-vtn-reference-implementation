@@ -1,5 +1,5 @@
 import connexion
-from datetime import datetime
+from datetime import datetime, timezone
 from http import HTTPStatus
 import logging
 from typing import Dict
@@ -43,8 +43,8 @@ def create_event(body=None):  # noqa: E501
         logging.warning(f"create_subscription(): problem={problem}")
         return problem, HTTPStatus.BAD_REQUEST
 
-    now = datetime.now()
-    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now(timezone.utc)
+    current_time = now.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     event = Event(
         created_date_time=current_time,
@@ -222,8 +222,8 @@ def update_event(event_id, body=None):  # noqa: E501
         return problem, HTTPStatus.NOT_FOUND
 
     # set modification date time
-    now = datetime.now()
-    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now(timezone.utc)
+    current_time = now.strftime("%Y-%m-%dT%H:%M:%SZ")
     event.modification_date_time = current_time
 
     # Do not allow event to be assigned to other program

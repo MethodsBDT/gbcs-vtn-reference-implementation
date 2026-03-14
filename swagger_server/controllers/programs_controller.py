@@ -1,5 +1,5 @@
 import connexion
-from datetime import datetime
+from datetime import datetime, timezone
 import six
 from http import HTTPStatus
 import logging
@@ -41,8 +41,8 @@ def create_program(body=None):  # noqa: E501
         logging.warning(f"create_subscription(): problem={problem}")
         return problem, HTTPStatus.CONFLICT
 
-    now = datetime.now()
-    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now(timezone.utc)
+    current_time = now.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     program = Program(
         created_date_time=current_time,
@@ -202,8 +202,8 @@ def update_program(program_id, body=None):  # noqa: E501
         return problem, HTTPStatus.NOT_FOUND
 
     # set modification date time
-    now = datetime.now()
-    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now(timezone.utc)
+    current_time = now.strftime("%Y-%m-%dT%H:%M:%SZ")
     program.modification_date_time = current_time
     program.program_name = programBody.program_name
     program.interval_period = programBody.interval_period

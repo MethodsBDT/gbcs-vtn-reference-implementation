@@ -1,5 +1,5 @@
 import connexion
-from datetime import datetime
+from datetime import datetime, timezone
 from http import HTTPStatus
 import json
 import logging
@@ -47,8 +47,8 @@ def create_subscription(body):  # noqa: E501
     # Note: there is currently no concept of a duplicated subscription
     client_id = objectUtils.getClientId(request)
 
-    now = datetime.now()
-    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now(timezone.utc)
+    current_time = now.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     subscription = Subscription(
         created_date_time=current_time,
@@ -222,8 +222,8 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
         return problem, HTTPStatus.FORBIDDEN
 
     # set modification date time
-    now = datetime.now()
-    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now(timezone.utc)
+    current_time = now.strftime("%Y-%m-%dT%H:%M:%SZ")
     subscription.modification_date_time = current_time
 
     subscription.program_id = subscriptionBody.program_id

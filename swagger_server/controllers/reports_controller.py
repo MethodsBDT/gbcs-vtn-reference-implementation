@@ -5,7 +5,7 @@ from typing import Tuple
 from typing import Union
 import logging
 from http import HTTPStatus
-from datetime import datetime
+from datetime import datetime, timezone
 from flask import request
 
 from swagger_server.models.client_name import ClientName  # noqa: E501
@@ -46,8 +46,8 @@ def create_report(body=None):  # noqa: E501
         logging.warning(f"create_subscription(): problem={problem}")
         return problem, HTTPStatus.BAD_REQUEST
 
-    now = datetime.now()
-    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now(timezone.utc)
+    current_time = now.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     report = Report(
         created_date_time=current_time,
@@ -214,8 +214,8 @@ def update_report(report_id, body=None):  # noqa: E501
         return problem, HTTPStatus.NOT_FOUND
 
     # set modification date time
-    now = datetime.now()
-    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now(timezone.utc)
+    current_time = now.strftime("%Y-%m-%dT%H:%M:%SZ")
     report.modification_date_time = current_time
 
     report.event_id=reportBody.event_id
