@@ -287,10 +287,12 @@ def subscription_callback(resourceName, operation, object):
                 logging.info(f"subscription_callback(): notification={notification} callback_url={objOperation.callback_url}")
                 headers = { "Authorization": f"Bearer {objOperation.bearer_token}"}
 
-                # FS TBD: address timeout error
-                response = requests.post(objOperation.callback_url, json=notification.to_json_dict(), headers=headers)
-                if response.status_code != HTTPStatus.OK:
-                    logging.warning(f"subscription_callback: callback response.status_code={response.status_code}")
+                try:
+                    response = requests.post(objOperation.callback_url, json=notification.to_json_dict(), headers=headers)
+                    if response.status_code != HTTPStatus.OK:
+                        logging.warning(f"subscription_callback: callback response.status_code={response.status_code}")
+                except Exception as e:
+                    logging.error(f"subscription_callback(): webhook POST failed: {e}")
 
 def subscription_callback_echo_test(operations):
     logging.info(f"subscription_callback_echo_test(): operations={operations}")
