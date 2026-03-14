@@ -241,7 +241,7 @@ def topic_names(resourceName: str, operation: str, notification: Dict) -> List:
                                                   operation,
                                                   notification_object)
     elif resourceName == 'EVENT':
-        return targetable_object_type_topic_names('program_id',
+        return targetable_object_type_topic_names('programID',
                                                   MQTT_TOPIC_BASE_EVENTS,
                                                   MQTT_TOPIC_BASE_PROGRAM_EVENTS,
                                                   MQTT_TOPIC_BASE_VEN_PROGRAMS,
@@ -254,7 +254,7 @@ def topic_names(resourceName: str, operation: str, notification: Dict) -> List:
                                                   operation,
                                                   notification_object)
     elif resourceName == 'RESOURCE':
-        return untargeted_object_type_topic_names('ven_id',
+        return untargeted_object_type_topic_names('venID',
                                                   MQTT_TOPIC_BASE_RESOURCES,
                                                   MQTT_TOPIC_BASE_VEN_RESOURCES,
                                                   operation,

@@ -43,6 +43,7 @@ def get_targets(notification_object: Dict) -> Set:
     """
     .get(targets) often returns None, so this is a workaround
     """
+    logging.info(f"reason=DEBUGTHIS,targets={notification_object.get('targets', None)}")
     targets = clean_targets(notification_object.get('targets', None))
     logging.debug(f"reason=getTargets,targets={targets}")
     if targets:
@@ -64,8 +65,8 @@ def ven_tracker(resource_name: str, operation: str, notification: Dict):
         return
     if resource_name == 'VEN':
         ven_id = notification_object.get('id', None)
-        ven_name = notification_object.get('ven_name', None)
-        client_id = notification_object.get('client_id', None)
+        ven_name = notification_object.get('venName', None)
+        client_id = notification_object.get('clientID', None)
         targets = get_targets(notification_object)
         if ven_id and ((operation == "CREATE") or (operation == "UPDATE")):
             # If this is an UPDATE, we need to preserve any resources
@@ -80,7 +81,7 @@ def ven_tracker(resource_name: str, operation: str, notification: Dict):
             VENS.pop(ven_id, None)
     elif resource_name == 'RESOURCE':
         resource_id = notification_object.get('id', None)
-        ven_id = notification_object.get('ven_id', None)
+        ven_id = notification_object.get('venID', None)
         targets = get_targets(notification_object)
         if (operation == "CREATE") or (operation == "UPDATE"):
             if resource_id and ven_id:
@@ -145,14 +146,14 @@ def dispatch(resource_name, operation, vtn_object):
     if 'WEBHOOK' in AVAILABLE_NOTIFIER_BINDINGS:
         AVAILABLE_NOTIFIER_BINDINGS.remove('WEBHOOK')
 
-    if NOTIFIER_BINDINGS:
+    if AVAILABLE_NOTIFIER_BINDINGS:
         # There is at least one binding, so instantiate the notification
         notification = Notification(object_type=resource_name,
                                     operation=operation,
                                     # TODO TBD if this is correct
                                     targets=getattr(vtn_object, 'targets', None),
                                     object=vtn_object)
-        notification_dict = notification.to_dict()
+        notification_dict = notification.to_json_dict()
     else:
         return
     logging.debug(f"reason=dispatch,object:\n{pformat(notification_dict)}")
