@@ -241,7 +241,7 @@ def update_subscription(subscription_id, body=None):  # noqa: E501
 
     subscription_callback("SUBSCRIPTION", "UPDATE", subscription)
 
-    return (subscription)
+    return subscription, HTTPStatus.OK
 
 def subscription_callback(resourceName, operation, object):
     logging.info(f"subscription_callback(): resourceName={resourceName}, operation={operation}")
