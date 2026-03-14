@@ -4,7 +4,7 @@ from typing import Any
 from swagger_server.services.auth.auth_exception import AuthException
 from swagger_server.services.auth.oadr_auth_provider import OadrAuthProvider
 
-from config import AUTH_BASIC_VEN_CLIENT_ID, AUTH_BASIC_VEN_SECRET, AUTH_BASIC_BL_CLIENT_ID, AUTH_BASIC_BL_SECRET
+from config import AUTH_BASIC_VEN_CLIENT_ID, AUTH_BASIC_VEN_SECRET, AUTH_BASIC_VEN2_CLIENT_ID, AUTH_BASIC_VEN2_SECRET, AUTH_BASIC_BL_CLIENT_ID, AUTH_BASIC_BL_SECRET
 
 def decode_basic(token: str) -> tuple[str, str] | None:
     try:
@@ -37,6 +37,8 @@ class BasicAuthProvider(OadrAuthProvider):
         client_id, client_secret = result
         if client_id == AUTH_BASIC_VEN_CLIENT_ID and client_secret == AUTH_BASIC_VEN_SECRET:
             return True
+        if client_id == AUTH_BASIC_VEN2_CLIENT_ID and client_secret == AUTH_BASIC_VEN2_SECRET:
+            return True
         if client_id == AUTH_BASIC_BL_CLIENT_ID and client_secret == AUTH_BASIC_BL_SECRET:
             return True
         return False
@@ -47,6 +49,8 @@ class BasicAuthProvider(OadrAuthProvider):
             raise AuthException('Provided credentials are invalid')
         client_id, client_secret = result
         if client_id == AUTH_BASIC_VEN_CLIENT_ID and client_secret == AUTH_BASIC_VEN_SECRET:
+            return ['test/VEN']
+        if client_id == AUTH_BASIC_VEN2_CLIENT_ID and client_secret == AUTH_BASIC_VEN2_SECRET:
             return ['test/VEN']
         if client_id == AUTH_BASIC_BL_CLIENT_ID and client_secret == AUTH_BASIC_BL_SECRET:
             return ['test/BL']
