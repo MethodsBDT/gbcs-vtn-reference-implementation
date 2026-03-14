@@ -73,20 +73,26 @@ def getClientRole(request):
 
 def getAllowedTargets(client_id):
     # get targets of ven object with client_id associated with requestor's token, and targets of associated resources
-    # TBD: allowed targets include all those in associated resources
+    # Returns None when VEN has no explicit targets (meaning all targets are allowed)
+    # Returns a list of targets when VEN or its resources have targets
     vens = objStore.search_all("VEN")
     venList = [ven for ven in vens if ven.client_id == client_id]
     if 0 == len(venList) or len(venList) > 1:
-        logging.warning(f"vens_controller.getAllowedTargets(): none or multiple vens with client_id {client_id} venList={venList}")
-        return []
+        logging.warning(f"getAllowedTargets(): none or multiple vens with client_id {client_id} venList={venList}")
+        return None
     ven = venList[0]
     logging.debug(f"getAllowedTargets(): ven={ven}")
-    targetsList =  ven.targets
+
+    targetsList = list(ven.targets) if ven.targets else []
 
     resources = objStore.search_all("RESOURCE")
     resourceList = [r for r in resources if r.client_id == client_id]
     for resource in resourceList:
-        if resource.targets != None:
-            targetsList.append(resource.targets)
+        if resource.targets is not None:
+            targetsList.extend(resource.targets)
+
+    # If no targets found on VEN or its resources, return None to indicate unrestricted access
+    if len(targetsList) == 0:
+        return None
 
     return targetsList

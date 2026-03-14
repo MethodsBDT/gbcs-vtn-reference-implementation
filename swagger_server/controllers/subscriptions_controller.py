@@ -264,18 +264,22 @@ def subscription_callback(resourceName, operation, object):
         if objOperation is not None:
             match = True
             if hasattr(object, "targets") and object.targets is not None and subscription.targets is not None:
-                # If subscription is created by VEN, get associated ven.targets to determine 'allowed' targets
-                # TDB: we currently do not have a way to determine if subscription is associated with a BL or VEN client
+                # Get VEN's allowed targets (None means unrestricted)
                 allowed_targets = objectUtils.getAllowedTargets(subscription.client_id)
-                # get intersection of allowed targets and targets in subscription
-                targets = [t for t in allowed_targets if t in subscription.targets]
 
-                match = False
-                for t in targets:
-                    # if any target string in subscription matches any target in object, there is a match
-                    if t in object.targets:
-                        match = True
-                        break
+                if allowed_targets is None:
+                    # VEN has no explicit targets — unrestricted, receives all notifications
+                    match = True
+                else:
+                    # Get intersection of allowed targets and subscription targets
+                    targets = [t for t in allowed_targets if t in subscription.targets]
+
+                    match = False
+                    for t in targets:
+                        # if any target in subscription matches any target in object, there is a match
+                        if t in object.targets:
+                            match = True
+                            break
 
             if match is True:
                 notification = Notification(object_type=resourceName, operation=operation, targets=None, object=object)
