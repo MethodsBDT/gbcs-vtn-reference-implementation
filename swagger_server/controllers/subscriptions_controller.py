@@ -288,7 +288,7 @@ def subscription_callback(resourceName, operation, object):
                 headers = { "Authorization": f"Bearer {objOperation.bearer_token}"}
 
                 try:
-                    response = requests.post(objOperation.callback_url, json=notification.to_json_dict(), headers=headers)
+                    response = requests.post(objOperation.callback_url, json=notification.to_json_dict(), headers=headers, timeout=5)
                     if response.status_code != HTTPStatus.OK:
                         logging.warning(f"subscription_callback: callback response.status_code={response.status_code}")
                 except Exception as e:
@@ -306,7 +306,7 @@ def subscription_callback_echo_test(operations):
         params = {"echo": "test_echo"}
 
         try:
-            response = requests.get(operation.callback_url+"/echo", params=params, headers=headers)
+            response = requests.get(operation.callback_url+"/echo", params=params, headers=headers, timeout=5)
 
             if response.status_code != HTTPStatus.OK:
                 logging.warning(f"subscription_callback: callback response.status_code={response.status_code}")
