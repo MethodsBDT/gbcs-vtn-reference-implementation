@@ -1,7 +1,6 @@
 import connexion
 from datetime import datetime, timezone
 from http import HTTPStatus
-import json
 import logging
 import requests
 from flask import request
@@ -285,7 +284,7 @@ def subscription_callback(resourceName, operation, object):
                 headers = { "Authorization": f"Bearer {objOperation.bearer_token}"}
 
                 # FS TBD: address timeout error
-                response = requests.post(objOperation.callback_url, json=json.dumps(notification.to_dict()), headers=headers)
+                response = requests.post(objOperation.callback_url, json=notification.to_json_dict(), headers=headers)
                 if response.status_code != HTTPStatus.OK:
                     logging.warning(f"subscription_callback: callback response.status_code={response.status_code}")
 
