@@ -117,16 +117,20 @@ def ven_and_resource_targets(ven_id: str) -> Set:
 
 def resolve_ven_ids_from_targets(targets_list: List) -> Set:
     """
-    Returns a set containing the ven.id of each ven that has been assigned one of the targets
+    Returns a set containing the ven.id of each ven that has been assigned one of the targets.
+    Also checks if any target value is itself a ven_id (direct VEN targeting).
     """
     result = set()
     targets = set(targets_list)
     if not targets:
         return result
     for ven_id in VENS.keys():
-        if targets.intersection(ven_and_resource_targets(ven_id)):
-            # At least one of the targets for the ven with this ven_id are contained within the targets
-            result.update(ven_id)
+        # Direct VEN ID targeting: target value is the ven_id itself
+        if ven_id in targets:
+            result.add(ven_id)
+        # Indirect targeting: VEN's assigned targets intersect with notification targets
+        elif targets.intersection(ven_and_resource_targets(ven_id)):
+            result.add(ven_id)
     return result
 
 
