@@ -10,8 +10,6 @@ from typing import Any, Callable, Union, Dict, List, Set
 
 def clean_targets(targets):
     """
-    IDK why this is necesary, but without this I cannot get the tests to pass!
-
     Cleans and flattens a targets list for OpenADR compliance.
     Also removes duplicates while preserving order.
     Example
@@ -43,7 +41,7 @@ def get_targets(notification_object: Dict) -> Set:
     """
     .get(targets) often returns None, so this is a workaround
     """
-    logging.info(f"reason=DEBUGTHIS,targets={notification_object.get('targets', None)}")
+    logging.debug(f"reason=getTargets,raw_targets={notification_object.get('targets', None)}")
     targets = clean_targets(notification_object.get('targets', None))
     logging.debug(f"reason=getTargets,targets={targets}")
     if targets:
