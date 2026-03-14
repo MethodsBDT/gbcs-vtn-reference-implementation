@@ -244,7 +244,7 @@ def topic_names(resourceName: str, operation: str, notification: Dict) -> List:
         return targetable_object_type_topic_names('programID',
                                                   MQTT_TOPIC_BASE_EVENTS,
                                                   MQTT_TOPIC_BASE_PROGRAM_EVENTS,
-                                                  MQTT_TOPIC_BASE_VEN_PROGRAMS,
+                                                  MQTT_TOPIC_BASE_VEN_EVENTS,
                                                   operation,
                                                   notification_object)
     elif resourceName == 'VEN':
