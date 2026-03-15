@@ -1,27 +1,92 @@
 # OpenADR 3 Virtual Top Node (VTN) Reference Implementation
 
 ## Requirements
-Python 3.13 (lower version can break)
+Python 3.10 (newer versions may break gevent/connexion dependencies)
+
+## Configuration
+
+The VTN is configured via `config.yaml` in the project root. All settings can also be
+overridden by environment variables. If `config.yaml` is not present or PyYAML is not
+installed, the server falls back to environment variables and built-in defaults.
+
+To use a different config file path, set the `VTN_CONFIG` environment variable:
+```bash
+VTN_CONFIG=/path/to/my-config.yaml python -m swagger_server
+```
+
+Key configuration sections:
+
+| Section | Description |
+|---------|-------------|
+| `server` | Bind address, port, log level |
+| `storage` | Backend (`IN_MEMORY` or `IN_FILE`) and file path |
+| `auth` | Provider (`basic` or `oidc`) and client credentials |
+| `notifications` | Enabled bindings (`WEBHOOK`, `MQTT`) |
+| `mqtt` | Broker connection, auth method, topic base paths |
+| `mdns` | Optional mDNS service advertisement |
+
+See `config.yaml` for the full list of settings with comments.
+
+### MQTT Support
+
+OpenADR >= 3.1.0 defines optional support for notifications via pub-sub messaging.
+See [Messaging and MQTT Support](docs/MESSAGING.md) for details.
+
+To use MQTT, an MQTT broker must be running. [Mosquitto](https://mosquitto.org) is
+recommended for development and testing.
+
+To disable MQTT, remove `MQTT` from `notifications.bindings` in `config.yaml`:
+```yaml
+notifications:
+  bindings:
+    - WEBHOOK
+```
 
 ## Running locally with Python
-To run the server, execute the following from the root directory:
 
-```
-virtualenv venv
+```bash
+python3.10 -m venv venv
 source venv/bin/activate
-pip3 install -r requirements.txt
+pip install 'setuptools<81'
+pip install -r requirements.txt
 python -m swagger_server
 ```
 
-Note that OpenADR >= 3.1.0 defines optional support for notifications via pub-sub messaging,
-see [Messaging and MQTT Support in OpenADR >= 3.1.0](docs/MESSAGING.md) for details.
+### Using the startup scripts
 
-In order to utilize MQTT messaging support, a MQTT broker will need to be running, and the server
-will need to be configured for messaging and MQTT, in `config.py`.
+Shell scripts are provided in `bin/` for managing the VTN and supporting services
+via [tmux](https://github.com/tmux/tmux):
 
-[Mosquitto](https://mosquitto.org) was used for development and testing.
+```bash
+bin/vtn-start.sh              # Start VTN-RI in a tmux session
+bin/vtn-stop.sh               # Stop VTN-RI
+bin/vtn-status.sh             # Check if running + HTTP health
+bin/stack-start.sh             # Start Mosquitto + VTN-RI
+bin/stack-start.sh --with-callback  # Also start the test callback service
+bin/stack-stop.sh              # Stop VTN-RI + callback service
+```
 
-To disable messaging and MQTT support, set `NOTIFIER_BINDINGS = []` in `config.py`
+`vtn-start.sh` handles venv creation, dependency installation, and waits for
+the HTTP server to be ready. It accepts an optional config file path argument:
+```bash
+bin/vtn-start.sh my-custom-config.yaml
+```
+
+#### MQTT broker management
+
+`stack-start.sh` auto-detects the platform and uses `brew services` (macOS) or
+`systemctl` (Linux) to start Mosquitto. To use a different broker or command:
+
+```bash
+# Custom start command
+MQTT_START_CMD="docker start mosquitto" bin/stack-start.sh
+
+# Skip broker management (e.g. using a remote broker)
+MQTT_START_CMD=none bin/stack-start.sh
+
+# Or skip MQTT entirely
+bin/stack-start.sh --no-mqtt
+```
 ## Building and Running with Docker
 
 To run the server in a Docker container, execute the following from the root directory:
@@ -72,18 +137,21 @@ for full prerequisites, configuration options, and example requests.
 
 The VTN listens for requests on
 
-	http://localhost:8080/openadr3/3.0.1
+	http://localhost:8080/openadr3/3.1.0
 
 Currently, the VTN only uses HTTP, not HTTPS, and
-it is not necessary to obtain an API token via `POST /auth/token`,
-two pre-configured tokens are available for test requests:
+uses Basic auth with base64-encoded `client_id:secret` tokens.
+The default clients are configured in `config.yaml`:
 
-* `bl_token`
-* `ven_token`
+| Client | client_id:secret | Role | Base64 Token |
+|--------|-----------------|------|-------------|
+| BL | `bl_client:1001` | Business Logic | `YmxfY2xpZW50OjEwMDE=` |
+| VEN | `ven_client:999` | VEN | `dmVuX2NsaWVudDo5OTk=` |
+| VEN2 | `ven_client2:9999` | VEN | `dmVuX2NsaWVudDI6OTk5OQ==` |
 
-A simple way to verify the VTN is running and accessible is to execute the following curl cmd:
+A simple way to verify the VTN is running and accessible:
 ```bash
-$ curl -H "Content-type: application/json" -H "Authorization: Bearer bl_token" http://localhost:8080/openadr3/3.0.1/programs
+curl -H "Authorization: Bearer YmxfY2xpZW50OjEwMDE=" http://localhost:8080/openadr3/3.1.0/programs
 ```
 The expected result:
 ```bash
