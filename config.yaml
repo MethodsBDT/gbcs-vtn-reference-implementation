@@ -1,0 +1,60 @@
+# OpenADR 3 VTN Reference Implementation Configuration
+# All values can be overridden by environment variables (see config.py for mappings).
+
+server:
+  host: 0.0.0.0
+  port: 8080
+  log_level: INFO
+
+storage:
+  # IN_MEMORY or IN_FILE
+  implementation: IN_FILE
+  file_path: ./tmp/fileStorage.json
+
+auth:
+  # basic or oidc
+  provider: basic
+  oidc:
+    base_url: https://test-tool.auth.us-east-1.amazoncognito.com
+    known_issuer: https://cognito-idp.us-east-1.amazonaws.com/us-east-1_N5wIYtzuO
+  clients:
+    - id: ven_client
+      secret: "999"
+      role: VEN
+    - id: ven_client2
+      secret: "9999"
+      role: VEN
+    - id: bl_client
+      secret: "1001"
+      role: BL
+
+notifications:
+  # List of enabled notification bindings: WEBHOOK, MQTT
+  bindings:
+    - WEBHOOK
+    - MQTT
+
+mqtt:
+  broker:
+    host: 127.0.0.1
+    port: 1883
+    client_id: OpenADR3-VTN-RI
+    # ANONYMOUS, OAUTH2_BEARER_TOKEN, or CERTIFICATE
+    auth: ANONYMOUS
+    serialization: JSON
+    certs: null
+  topics:
+    programs: programs
+    program_events: events/programs
+    events: events
+    reports: reports
+    resources: resources
+    subscriptions: subscriptions
+    vens: vens
+    ven_resources: resources/vens
+    ven_programs: programs/vens
+    ven_events: events/vens
+
+mdns:
+  enabled: false
+  service_name: OpenADR3 VTN
