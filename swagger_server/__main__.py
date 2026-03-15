@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 
+import gevent.monkey
+gevent.monkey.patch_all()
+
 import connexion
 import logging
 
 from swagger_server import encoder, mqtt, globals
-from gevent.pywsgi import WSGIServer
+from gevent.pywsgi import WSGIServer, WSGIHandler
 from config import SERVER_IP, SERVER_PORT, NOTIFIER_BINDINGS, MQTT_VTN_BROKER_IP, MQTT_VTN_BROKER_PORT, MQTT_BROKER_CLIENT_ID
+
+
+class CloseConnectionHandler(WSGIHandler):
+    """Force Connection: close on every response to prevent keep-alive connection accumulation."""
+    close_connection = True
 
 
 def main():
@@ -32,7 +40,7 @@ def main():
                 pythonic_params=True)
     # Note that the OpenADR3 protocol can run on any path; we're choosing to run it
     # on /openadr3/3.1.0.
-    http_server = WSGIServer((SERVER_IP, SERVER_PORT), app)
+    http_server = WSGIServer((SERVER_IP, SERVER_PORT), app, handler_class=CloseConnectionHandler)
     http_server.serve_forever()
 
 
