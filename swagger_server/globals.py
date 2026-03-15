@@ -11,6 +11,9 @@ DYNSEC = None
 # VEN_MQTT_CREDENTIALS maps ven_id -> {'username': str, 'password': str}
 VEN_MQTT_CREDENTIALS = {}
 
+# BL_MQTT_CREDENTIALS maps client_id -> {'username': str, 'password': str}
+BL_MQTT_CREDENTIALS = {}
+
 # VENS contains a dict of ven objects, keyed by client_id
 
 VENS = {}

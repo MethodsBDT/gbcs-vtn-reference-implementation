@@ -87,7 +87,8 @@ OIDC_KNOWN_ISSUER = _get(_cfg, 'auth.oidc.known_issuer', 'OIDC_KNOWN_ISSUER',
                           'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_N5wIYtzuO')
 
 # Auth clients — read from YAML list or fall back to env vars / defaults
-_clients = _get(_cfg, 'auth.clients', None, None)
+AUTH_CLIENTS = _get(_cfg, 'auth.clients', None, None) or []
+_clients = AUTH_CLIENTS
 
 def _find_client(clients, role, index=0):
     """Find the nth client with the given role from the YAML clients list."""

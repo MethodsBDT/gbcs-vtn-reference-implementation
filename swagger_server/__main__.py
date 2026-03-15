@@ -10,7 +10,8 @@ from swagger_server import encoder, mqtt, mdns, dynsec, globals
 from gevent.pywsgi import WSGIServer, WSGIHandler
 from config import SERVER_IP, SERVER_PORT, NOTIFIER_BINDINGS, MQTT_VTN_BROKER_IP, MQTT_VTN_BROKER_PORT, MQTT_BROKER_CLIENT_ID, \
     MQTT_BROKER_USERNAME, MQTT_BROKER_PASSWORD, MQTT_BROKER_AUTH, \
-    MDNS_ENABLED, MDNS_SERVICE_NAME, OIDC_AUTH_ENABLED
+    MDNS_ENABLED, MDNS_SERVICE_NAME, OIDC_AUTH_ENABLED, \
+    AUTH_CLIENTS
 
 
 class CloseConnectionHandler(WSGIHandler):
@@ -54,6 +55,17 @@ def main():
                     gevent.sleep(1)  # Allow MQTT connection to establish
                     globals.DYNSEC = dynsec.DynsecManager(globals.MQTTC)
                     logging.info(f"main(), Initialized DynsecManager")
+                    # Store BL MQTT credentials (same as auth.clients — bootstrap provisions these)
+                    for client in AUTH_CLIENTS:
+                        if client.get('role') == 'BL':
+                            bl_id = client.get('id')
+                            bl_secret = str(client.get('secret'))
+                            if bl_id and bl_secret:
+                                globals.BL_MQTT_CREDENTIALS[bl_id] = {
+                                    'username': bl_id,
+                                    'password': bl_secret
+                                }
+                                logging.info(f"main(), Stored BL MQTT credentials for {bl_id}")
                     # Regenerate MQTT credentials for all existing VENs
                     _regenerate_ven_credentials()
                 except:

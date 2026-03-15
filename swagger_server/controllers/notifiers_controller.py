@@ -15,20 +15,26 @@ from config import NOTIFIER_BINDINGS, MQTT_BROKER_AUTH
 from http import HTTPStatus
 
 
-def _lookup_ven_mqtt_credentials(request):
-    """Look up MQTT credentials for the calling VEN, if dynsec is active."""
+def _lookup_mqtt_credentials(request):
+    """Look up MQTT credentials for the caller, if dynsec is active."""
     if not globals.DYNSEC or MQTT_BROKER_AUTH == 'ANONYMOUS':
         return None, None
     client_id = objectUtils.getClientId(request)
     if not client_id:
         return None, None
-    # Find the VEN with this client_id
-    for ven_id, ven_record in globals.VENS.items():
-        if ven_record.get('client_id') == client_id:
-            creds = globals.VEN_MQTT_CREDENTIALS.get(ven_id)
-            if creds:
-                return creds.get('username'), creds.get('password')
-            break
+    role = objectUtils.getClientRole(request)
+    if role == 'BL':
+        creds = globals.BL_MQTT_CREDENTIALS.get(client_id)
+        if creds:
+            return creds.get('username'), creds.get('password')
+    else:
+        # VEN — look up by ven_id
+        for ven_id, ven_record in globals.VENS.items():
+            if ven_record.get('client_id') == client_id:
+                creds = globals.VEN_MQTT_CREDENTIALS.get(ven_id)
+                if creds:
+                    return creds.get('username'), creds.get('password')
+                break
     return None, None
 
 
@@ -43,7 +49,7 @@ def list_all_notifiers():  # noqa: E501
     logging.info(f"list_all_notifiers()")
 
     if 'MQTT' in NOTIFIER_BINDINGS:
-        mqtt_username, mqtt_password = _lookup_ven_mqtt_credentials(request)
+        mqtt_username, mqtt_password = _lookup_mqtt_credentials(request)
         mqtt_binding = mqtt.binding(mqtt_username=mqtt_username, mqtt_password=mqtt_password)
         if mqtt_binding:
             notifiers_response = NotifiersResponse(webhook=True,
