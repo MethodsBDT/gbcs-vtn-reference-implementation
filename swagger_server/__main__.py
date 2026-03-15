@@ -6,9 +6,10 @@ gevent.monkey.patch_all()
 import connexion
 import logging
 
-from swagger_server import encoder, mqtt, globals
+from swagger_server import encoder, mqtt, mdns, globals
 from gevent.pywsgi import WSGIServer, WSGIHandler
-from config import SERVER_IP, SERVER_PORT, NOTIFIER_BINDINGS, MQTT_VTN_BROKER_IP, MQTT_VTN_BROKER_PORT, MQTT_BROKER_CLIENT_ID
+from config import SERVER_IP, SERVER_PORT, NOTIFIER_BINDINGS, MQTT_VTN_BROKER_IP, MQTT_VTN_BROKER_PORT, MQTT_BROKER_CLIENT_ID, \
+    MDNS_ENABLED, MDNS_SERVICE_NAME, OIDC_AUTH_ENABLED
 
 
 class CloseConnectionHandler(WSGIHandler):
@@ -40,8 +41,16 @@ def main():
                 pythonic_params=True)
     # Note that the OpenADR3 protocol can run on any path; we're choosing to run it
     # on /openadr3/3.1.0.
+    if MDNS_ENABLED:
+        # Auth is always required (basic or OIDC)
+        mdns.start(SERVER_IP, SERVER_PORT, MDNS_SERVICE_NAME, requires_auth=True)
+
     http_server = WSGIServer((SERVER_IP, SERVER_PORT), app, handler_class=CloseConnectionHandler)
-    http_server.serve_forever()
+    try:
+        http_server.serve_forever()
+    finally:
+        if MDNS_ENABLED:
+            mdns.stop()
 
 
 if __name__ == '__main__':

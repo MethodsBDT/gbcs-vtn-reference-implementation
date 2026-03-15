@@ -42,6 +42,22 @@ notifications:
     - WEBHOOK
 ```
 
+### mDNS Service Advertisement
+
+The VTN can optionally advertise itself via mDNS (Bonjour/Avahi) so that local
+clients can discover it without hardcoding URLs. The service is advertised as
+`_openadr3._tcp.local.` with the VTN's port and base path.
+
+Enable in `config.yaml`:
+```yaml
+mdns:
+  enabled: true
+  service_name: OpenADR3 VTN
+```
+
+Requires the `zeroconf` Python package (included in `requirements.txt`).
+Disabled by default — zero impact when off.
+
 ## Running locally with Python
 
 ```bash
