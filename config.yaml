@@ -43,6 +43,9 @@ mqtt:
     auth: ANONYMOUS
     serialization: JSON
     certs: null
+    # VTN broker credentials (required when auth is not ANONYMOUS)
+    username: null
+    password: null
   topics:
     programs: programs
     program_events: events/programs

@@ -128,6 +128,8 @@ MQTT_BROKER_CLIENT_ID = _get(_cfg, 'mqtt.broker.client_id', None, 'OpenADR3-VTN-
 MQTT_SERIALIZATION = _get(_cfg, 'mqtt.broker.serialization', None, 'JSON')
 MQTT_BROKER_AUTH = _get(_cfg, 'mqtt.broker.auth', None, 'ANONYMOUS')
 MQTT_BROKER_CLIENT_CERTS = _get(_cfg, 'mqtt.broker.certs', None, None)
+MQTT_BROKER_USERNAME = _get(_cfg, 'mqtt.broker.username', 'MQTT_BROKER_USERNAME', None)
+MQTT_BROKER_PASSWORD = _get(_cfg, 'mqtt.broker.password', 'MQTT_BROKER_PASSWORD', None)
 
 # MQTT topic base paths
 MQTT_TOPIC_BASE_PROGRAMS = _get(_cfg, 'mqtt.topics.programs', None, 'programs')
@@ -159,5 +161,7 @@ _log.info(f"config: notifications={NOTIFIER_BINDINGS}")
 if 'MQTT' in NOTIFIER_BINDINGS:
     _log.info(f"config: mqtt broker={MQTT_CLIENT_BROKER_FQDN}:{MQTT_CLIENT_BROKER_PORT}, auth={MQTT_BROKER_AUTH}, client_id={MQTT_BROKER_CLIENT_ID}")
 _log.info(f"config: auth clients=[{AUTH_BASIC_VEN_CLIENT_ID}, {AUTH_BASIC_VEN2_CLIENT_ID}, {AUTH_BASIC_BL_CLIENT_ID}]")
+if MQTT_BROKER_USERNAME:
+    _log.info(f"config: mqtt broker auth user={MQTT_BROKER_USERNAME}")
 if MDNS_ENABLED:
     _log.info(f"config: mdns enabled, service_name={MDNS_SERVICE_NAME}")

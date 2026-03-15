@@ -5,6 +5,12 @@
 
 global MQTTC
 
+# DYNSEC contains a DynsecManager instance when dynsec is configured, else None
+DYNSEC = None
+
+# VEN_MQTT_CREDENTIALS maps ven_id -> {'username': str, 'password': str}
+VEN_MQTT_CREDENTIALS = {}
+
 # VENS contains a dict of ven objects, keyed by client_id
 
 VENS = {}

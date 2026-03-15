@@ -109,9 +109,10 @@ class MqttClient:
             logging.warning(f"reason=onMessageClientCallbackException,topic={msg.topic}", exc_info=True)
 
 
-def binding():
+def binding(mqtt_username=None, mqtt_password=None):
     """
-    Returns a MqttBindingObject, or None
+    Returns a MqttBindingObject, or None.
+    When mqtt_username/mqtt_password are provided, includes credentials in the binding.
     """
     if MQTT_CLIENT_BROKER_FQDN and MQTT_CLIENT_BROKER_PORT and MQTT_BROKER_AUTH:
         if MQTT_CLIENT_BROKER_PORT == 1883:
@@ -131,13 +132,15 @@ def binding():
                 serialization=serialization,
                 authentication=MqttNotifierAuthenticationAnonymous('ANONYMOUS'))
         elif MQTT_BROKER_AUTH == 'OAUTH2_BEARER_TOKEN':
-            # TODO FIXME username below is a hack/example!
+            username = mqtt_username or 'oauth2'
+            auth = MqttNotifierAuthenticationOauth2BearerToken(
+                'OAUTH2_BEARER_TOKEN',
+                username=username,
+                password=mqtt_password)
             return MqttNotifierBindingObject(
                 uris=[connection_uri],
                 serialization=serialization,
-                authentication=MqttNotifierAuthenticationOauth2BearerToken(
-                    'OAUTH2_BEARER_TOKEN',
-                    username='oauth2'))
+                authentication=auth)
         elif MQTT_BROKER_AUTH == 'CERTIFICATE':
             return MqttNotifierBindingObject(
                 uris=[connection_uri],

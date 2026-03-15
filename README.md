@@ -42,6 +42,11 @@ notifications:
     - WEBHOOK
 ```
 
+#### MQTT Broker Authentication
+
+For authenticated broker access with per-VEN topic-level ACLs, see
+[MQTT Broker Authentication](docs/MQTT-AUTH.md).
+
 ### mDNS Service Advertisement
 
 The VTN can optionally advertise itself via mDNS (Bonjour/Avahi) so that local

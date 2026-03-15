@@ -14,25 +14,30 @@ class MqttNotifierAuthenticationOauth2BearerToken(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, method: str=None, username: str=None):  # noqa: E501
+    def __init__(self, method: str=None, username: str=None, password: str=None):  # noqa: E501
         """MqttNotifierAuthenticationOauth2BearerToken - a model defined in Swagger
 
         :param method: The method of this MqttNotifierAuthenticationOauth2BearerToken.  # noqa: E501
         :type method: str
         :param username: The username of this MqttNotifierAuthenticationOauth2BearerToken.  # noqa: E501
         :type username: str
+        :param password: The password of this MqttNotifierAuthenticationOauth2BearerToken.  # noqa: E501
+        :type password: str
         """
         self.swagger_types = {
             'method': str,
-            'username': str
+            'username': str,
+            'password': str
         }
 
         self.attribute_map = {
             'method': 'method',
-            'username': 'username'
+            'username': 'username',
+            'password': 'password'
         }
         self._method = method
         self._username = username
+        self._password = password
 
     @classmethod
     def from_dict(cls, dikt) -> 'MqttNotifierAuthenticationOauth2BearerToken':
@@ -98,3 +103,21 @@ class MqttNotifierAuthenticationOauth2BearerToken(Model):
             raise ValueError("Invalid value for `username`, must not be `None`")  # noqa: E501
 
         self._username = username
+
+    @property
+    def password(self) -> str:
+        """Gets the password of this MqttNotifierAuthenticationOauth2BearerToken.
+
+        :return: The password of this MqttNotifierAuthenticationOauth2BearerToken.
+        :rtype: str
+        """
+        return self._password
+
+    @password.setter
+    def password(self, password: str):
+        """Sets the password of this MqttNotifierAuthenticationOauth2BearerToken.
+
+        :param password: The password of this MqttNotifierAuthenticationOauth2BearerToken.
+        :type password: str
+        """
+        self._password = password

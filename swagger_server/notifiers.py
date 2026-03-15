@@ -1,6 +1,7 @@
 
 from swagger_server.models.notification import Notification  # noqa: E501
 from swagger_server import mqtt
+from swagger_server import globals
 from config import NOTIFIER_BINDINGS
 import logging
 from pprint import pformat
@@ -74,9 +75,21 @@ def ven_tracker(resource_name: str, operation: str, notification: Dict):
                            'client_id': client_id,
                            'targets': targets})
             VENS.update({ven_id: record})
+            # Create dynsec client on VEN creation
+            if operation == "CREATE" and globals.DYNSEC:
+                try:
+                    globals.DYNSEC.create_ven_client(ven_id)
+                except:
+                    logging.warning(f"ven_tracker: exception creating dynsec client for ven_id={ven_id}", exc_info=True)
         elif ven_id and (operation == "DELETE"):
             # TODO Is removing a ven on DELETE correct?  TBD...
             VENS.pop(ven_id, None)
+            # Delete dynsec client on VEN deletion
+            if globals.DYNSEC:
+                try:
+                    globals.DYNSEC.delete_ven_client(ven_id)
+                except:
+                    logging.warning(f"ven_tracker: exception deleting dynsec client for ven_id={ven_id}", exc_info=True)
     elif resource_name == 'RESOURCE':
         resource_id = notification_object.get('id', None)
         ven_id = notification_object.get('venID', None)
