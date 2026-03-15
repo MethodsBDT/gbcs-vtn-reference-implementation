@@ -54,8 +54,9 @@ This creates two files in `cfg/mosquitto/dynsec/`:
 
 - **`mosquitto-dynsec.conf`** — Mosquitto config that loads the dynsec plugin,
   sets the listener port, and disables anonymous access.
-- **`dynamic-security.json`** — Initial dynsec state with the VTN admin user
-  and three static roles.
+- **`dynamic-security.json`** — Initial dynsec state with the VTN admin user,
+  BL client accounts (from `auth.clients` in config.yaml), and three static
+  roles.
 
 The script reads all settings from `config.yaml` (single source of truth). Pass
 a custom config path as the first argument or via `VTN_CONFIG`:
@@ -115,9 +116,9 @@ All access is denied by default (`publishClientSend: false`,
 
 ## Credential Delivery
 
-A VEN discovers its MQTT credentials by calling `GET /notifiers`. When dynsec is
-active, the response includes the VEN's broker username and password in the MQTT
-binding:
+Both VEN and BL clients discover their MQTT credentials by calling
+`GET /notifiers`. When dynsec is active, the response includes the caller's
+broker username and password in the MQTT binding:
 
 ```json
 {
@@ -135,27 +136,40 @@ binding:
 ```
 
 The `password` field is only present when dynsec is active. With anonymous auth,
-the binding omits credentials.
+the binding returns `method: "ANONYMOUS"` with no credentials.
 
-## VEN MQTT Username Convention
+The endpoint is role-aware: VEN callers receive their VEN-specific MQTT
+credentials, BL callers receive their BL credentials.
 
-VEN broker usernames follow the pattern `ven-{venID}`. This is:
-- Unique per VEN
-- Maps directly to topic paths for ACL scoping
-- Easy to identify in broker logs
+## Username Conventions
+
+- **VEN clients:** `ven-{venID}` — unique per VEN, maps to topic paths for
+  ACL scoping, easy to identify in broker logs.
+- **BL clients:** Same `client_id` as in `auth.clients` config (e.g.
+  `bl_client`). Provisioned at bootstrap with the `bl-subscriber` role.
 
 ## Credential Lifecycle
+
+### VEN credentials
 
 | Event | Action |
 |-------|--------|
 | VEN created (REST API) | Broker account + per-VEN role provisioned |
-| VEN calls `GET /notifiers` | Credentials returned in binding |
+| VEN calls `GET /notifiers` | VEN MQTT credentials returned in binding |
 | VEN deleted (REST API) | Broker account + role deleted |
 | VTN restart | Fresh passwords generated for all existing VENs |
 
-Credentials are stored in-memory only (`globals.VEN_MQTT_CREDENTIALS`). On VTN
-restart, all VEN passwords are regenerated via `setClientPassword`. A VEN must
-call `GET /notifiers` after a VTN restart to obtain its new credentials.
+VEN credentials are stored in-memory only (`globals.VEN_MQTT_CREDENTIALS`). On
+VTN restart, all VEN passwords are regenerated via `setClientPassword`. A VEN
+must call `GET /notifiers` after a VTN restart to obtain its new credentials.
+
+### BL credentials
+
+BL broker accounts are provisioned statically by the bootstrap script, using the
+`client_id` and `secret` from `auth.clients` in `config.yaml`. The VTN stores
+these at startup in `globals.BL_MQTT_CREDENTIALS` and returns them from
+`GET /notifiers` when called by a BL client. BL credentials do not change at
+runtime.
 
 ## Files
 
