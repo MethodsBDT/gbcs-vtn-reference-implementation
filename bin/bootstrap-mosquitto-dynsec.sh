@@ -145,18 +145,38 @@ roles = [
     },
 ]
 
+# --- Build client list ---
+clients = [
+    {
+        "username": admin_username,
+        "textName": "VTN admin user",
+        "encoded_password": encode_password(admin_password),
+        "roles": [
+            {"rolename": "vtn-publisher", "priority": -1}
+        ]
+    }
+]
+
+# Add BL clients from auth.clients config
+auth_clients = cfg.get('auth', {}).get('clients', [])
+for client in auth_clients:
+    if client.get('role') == 'BL':
+        bl_id = client.get('id')
+        bl_secret = str(client.get('secret'))
+        if bl_id and bl_secret:
+            clients.append({
+                "username": bl_id,
+                "textName": f"BL client {bl_id}",
+                "encoded_password": encode_password(bl_secret),
+                "roles": [
+                    {"rolename": "bl-subscriber", "priority": 0}
+                ]
+            })
+            print(f"BL client: {bl_id}")
+
 # --- Build the dynamic-security.json ---
 dynsec = {
-    "clients": [
-        {
-            "username": admin_username,
-            "textName": "VTN admin user",
-            "encoded_password": encode_password(admin_password),
-            "roles": [
-                {"rolename": "vtn-publisher", "priority": -1}
-            ]
-        }
-    ],
+    "clients": clients,
     "groups": [],
     "roles": roles,
     "defaultACLAccess": {
