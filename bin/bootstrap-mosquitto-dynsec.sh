@@ -34,6 +34,11 @@ echo "Output directory: $OUTPUT_DIR"
 
 mkdir -p "$OUTPUT_DIR"
 
+# --- Activate project venv if available ---
+if [ -f "$VTN_DIR/venv/bin/activate" ]; then
+    source "$VTN_DIR/venv/bin/activate"
+fi
+
 # --- Find the dynsec plugin path ---
 DYNSEC_PLUGIN=""
 for candidate in \
@@ -89,15 +94,14 @@ if not admin_username or not admin_password:
     print("Error: mqtt.broker.username and mqtt.broker.password must be set in config.yaml", file=sys.stderr)
     sys.exit(1)
 
-# --- Password hashing (PBKDF2-SHA512, matching mosquitto dynsec format) ---
-def hash_password(password, iterations=101):
+# --- Password hashing (PBKDF2-SHA512, matching mosquitto dynsec encoded_password format) ---
+# Mosquitto v2.x uses: $7$iterations$base64_salt$base64_hash
+def encode_password(password, iterations=1000):
     salt = secrets.token_bytes(12)
     dk = hashlib.pbkdf2_hmac('sha512', password.encode('utf-8'), salt, iterations, dklen=64)
-    return {
-        "iterations": iterations,
-        "salt": base64.b64encode(salt).decode('ascii'),
-        "password": base64.b64encode(dk).decode('ascii')
-    }
+    salt_b64 = base64.b64encode(salt).decode('ascii')
+    hash_b64 = base64.b64encode(dk).decode('ascii')
+    return f"$7${iterations}${salt_b64}${hash_b64}"
 
 # --- Topic base paths from config ---
 topics = cfg.get('mqtt', {}).get('topics', {})
@@ -147,7 +151,7 @@ dynsec = {
         {
             "username": admin_username,
             "textName": "VTN admin user",
-            "password": hash_password(admin_password),
+            "encoded_password": encode_password(admin_password),
             "roles": [
                 {"rolename": "vtn-publisher", "priority": -1}
             ]
