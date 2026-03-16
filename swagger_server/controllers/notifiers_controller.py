@@ -28,13 +28,27 @@ def _lookup_mqtt_credentials(request):
         if creds:
             return creds.get('username'), creds.get('password')
     else:
-        # VEN — look up by ven_id
-        for ven_id, ven_record in globals.VENS.items():
+        # VEN — find ven_id by client_id, first check in-memory VENS dict,
+        # then fall back to object store (needed after VTN restart when VENS
+        # dict hasn't been populated yet by ven_tracker)
+        ven_id = None
+        for vid, ven_record in globals.VENS.items():
             if ven_record.get('client_id') == client_id:
-                creds = globals.VEN_MQTT_CREDENTIALS.get(ven_id)
-                if creds:
-                    return creds.get('username'), creds.get('password')
+                ven_id = vid
                 break
+        if ven_id is None:
+            # Fall back to object store
+            from swagger_server.objStore.storageInterface import objStore
+            vens = objStore.search_all("VEN")
+            if isinstance(vens, list):
+                for ven in vens:
+                    if getattr(ven, 'client_id', None) == client_id:
+                        ven_id = getattr(ven, 'id', None)
+                        break
+        if ven_id:
+            creds = globals.VEN_MQTT_CREDENTIALS.get(ven_id)
+            if creds:
+                return creds.get('username'), creds.get('password')
     return None, None
 
 
