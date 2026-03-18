@@ -5,6 +5,7 @@ import tempfile
 import threading
 from http import HTTPStatus
 
+from config import CLEAN_START
 from swagger_server.models import Event, Program, Report, Resource, Subscription, Ven
 from swagger_server.objStore.objStore import ObjStore
 
@@ -37,6 +38,9 @@ class FileStore(ObjStore):
     def __init__(self, file_path: str):
         self._lock = threading.Lock()
         self.file_path = file_path
+        if CLEAN_START and os.path.isfile(file_path):
+            logging.info(f"FileStore: CLEAN_START enabled, removing {file_path}")
+            os.remove(file_path)
         if not os.path.isfile(file_path):
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
             self._write(dict(_EMPTY_DATA))

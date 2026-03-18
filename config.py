@@ -15,6 +15,7 @@ OIDC_KNOWN_ISSUER = os.getenv('OIDC_KNOWN_ISSUER', 'https://cognito-idp.us-east-
 # Storage Implementation
 STORAGE_IMPLEMENTATION = os.getenv('STORAGE_IMPLEMENTATION', 'IN_FILE')  # Values: IN_MEMORY, IN_FILE
 STORAGE_FILE_PATH = os.getenv('STORAGE_FILE_PATH', "./tmp/fileStorage.json")
+CLEAN_START = os.getenv('CLEAN_START', 'false').lower() in ('true', '1', 'yes')
 
 AUTH_BASIC_VEN_CLIENT_ID = os.getenv('AUTH_BASIC_VEN_CLIENT_ID', 'ven_client')
 AUTH_BASIC_VEN_SECRET = os.getenv('AUTH_BASIC_VEN_SECRET', '999')
