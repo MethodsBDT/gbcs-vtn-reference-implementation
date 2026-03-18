@@ -14,7 +14,7 @@ class AuthServiceProvider:
         try:
             return self.auth_provider.get_token(client_id, secret_id)
         except AuthException as e:
-            raise ProblemException(status=403, title='Forbidden', detail=e.description)
+            raise ProblemException(status=401, title='Unauthorized', detail=e.description)
 
     def get_scopes(self, token: str) -> list[str]:
         if self.auth_provider.validate_token(token):

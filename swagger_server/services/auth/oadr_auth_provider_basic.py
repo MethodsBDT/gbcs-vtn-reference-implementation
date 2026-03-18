@@ -28,6 +28,8 @@ class BasicAuthProvider(OadrAuthProvider):
         message_bytes = message.encode()
         base64_bytes = base64.b64encode(message_bytes)
         base64_message = base64_bytes.decode()
+        if not self.validate_token(base64_message):
+            raise AuthException('Invalid client credentials')
         return base64_message
 
     def validate_token(self, token: str) -> bool:
