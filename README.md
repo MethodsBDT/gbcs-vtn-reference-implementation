@@ -13,15 +13,11 @@ pip3 install -r requirements.txt
 python -m swagger_server
 ```
 
-Note that OpenADR >= 3.1.0 defines optional support for notifications via pub-sub messaging,
-see [Messaging and MQTT Support in OpenADR >= 3.1.0](docs/MESSAGING.md) for details.
+This implementation supports MQTT notifications (OpenADR >= 3.1.0), including VEN-targeted topics for programs and events.
+See [docs/MESSAGING.md](docs/MESSAGING.md) for details.
 
-In order to utilize MQTT messaging support, a MQTT broker will need to be running, and the server
-will need to be configured for messaging and MQTT, in `config.py`.
-
-[Mosquitto](https://mosquitto.org) was used for development and testing.
-
-To disable messaging and MQTT support, set `NOTIFIER_BINDINGS = []` in `config.py`
+To enable MQTT, set `NOTIFIER_BINDINGS = ['WEBHOOK', 'MQTT']` in `config.py` and ensure an MQTT broker is running.
+[Mosquitto](https://mosquitto.org) is used for development and testing (`docker compose up` starts one automatically).
 ## Building and Running with Docker
 
 To run the server in a Docker container, execute the following from the root directory:

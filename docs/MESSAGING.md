@@ -72,6 +72,8 @@ The following OpenADR3 REST API endpoints are defined for the MQTT messaging bin
 - `/brokers/mqtt/topics/programs/{programID}/subscriptions`
 - `/brokers/mqtt/topics/vens`
 - `/brokers/mqtt/topics/vens/{venID}/resources`
+- `/brokers/mqtt/topics/vens/{venID}/events`
+- `/brokers/mqtt/topics/vens/{venID}/programs`
 
 ### MQTT binding endpoint response when messaging/MQTT not supported by VTN:
 
@@ -111,6 +113,17 @@ When MQTT messaging support is enabled in the VTN-RI, an example request/respons
 ```
 
 This response provides the topic paths a client may subscribe to in order to receive notifications of operations on the requested/indicated `object_type`.
+
+### VEN-Targeted Topics
+
+When a `PROGRAM` or `EVENT` has `targets` that match a VEN's targets, notifications are also published to VEN-specific topics. This allows VEN clients to subscribe only to topics relevant to them.
+
+For example, if a VEN with `venID=5` is targeted by a program, the notification is published to both the general `programs/create` topic and the VEN-targeted `programs/vens/5/create` topic.
+
+The VEN-targeted topic endpoints are:
+
+- `/brokers/mqtt/topics/vens/{venID}/events` — events targeted at a specific VEN
+- `/brokers/mqtt/topics/vens/{venID}/programs` — programs targeted at a specific VEN
 
 An example of a failing request for topics:
 

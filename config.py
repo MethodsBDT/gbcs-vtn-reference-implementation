@@ -13,7 +13,7 @@ OIDC_BASE_URL = os.getenv('OIDC_BASE_URL', 'https://test-tool.auth.us-east-1.ama
 OIDC_KNOWN_ISSUER = os.getenv('OIDC_KNOWN_ISSUER', 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_N5wIYtzuO')
 
 # Storage Implementation
-STORAGE_IMPLEMENTATION = os.getenv('STORAGE_IMPLEMENTATION', 'IN_FILE')  # Values: IN_MEMORY, IN_FILE
+STORAGE_IMPLEMENTATION = os.getenv('STORAGE_IMPLEMENTATION', 'IN_MEMORY')  # Values: IN_MEMORY, IN_FILE
 STORAGE_FILE_PATH = os.getenv('STORAGE_FILE_PATH', "./tmp/fileStorage.json")
 CLEAN_START = os.getenv('CLEAN_START', 'false').lower() in ('true', '1', 'yes')
 
@@ -22,7 +22,7 @@ AUTH_BASIC_VEN_SECRET = os.getenv('AUTH_BASIC_VEN_SECRET', '999')
 AUTH_BASIC_BL_CLIENT_ID = os.getenv('AUTH_BASIC_BL_CLIENT_ID', 'bl_client')
 AUTH_BASIC_BL_SECRET = os.getenv('AUTH_BASIC_BL_SECRET', '1001')
 
-NOTIFIER_BINDINGS = ['WEBHOOK']
+NOTIFIER_BINDINGS = ['WEBHOOK'] # Values: WEBHOOK, MQTT
 
 MQTT_VTN_BROKER_IP = '0.0.0.0'
 MQTT_VTN_BROKER_PORT = 1883
@@ -49,3 +49,4 @@ MQTT_TOPIC_BASE_SUBSCRIPTIONS = 'subscriptions'
 MQTT_TOPIC_BASE_VENS = 'vens'
 MQTT_TOPIC_BASE_VEN_RESOURCES = 'resources/vens'
 MQTT_TOPIC_BASE_VEN_EVENTS = 'events/vens'
+MQTT_TOPIC_BASE_VEN_PROGRAMS = 'programs/vens'

@@ -7,11 +7,12 @@ from typing import Any, Callable, Union, Dict, List
 
 import json
 from swagger_server import globals
+from swagger_server.objStore.storageInterface import objStore
 from swagger_server.models.mqtt_notifier_binding_object import MqttNotifierBindingObject
 from swagger_server.models.mqtt_notifier_authentication_anonymous import MqttNotifierAuthenticationAnonymous
 from swagger_server.models.mqtt_notifier_authentication_oauth2_bearer_token import MqttNotifierAuthenticationOauth2BearerToken
 from swagger_server.models.mqtt_notifier_authentication_certificate import MqttNotifierAuthenticationCertificate
-from config import MQTT_SERIALIZATION, MQTT_SERIALIZATION, MQTT_CLIENT_BROKER_FQDN, MQTT_CLIENT_BROKER_PORT, MQTT_BROKER_AUTH, MQTT_BROKER_CLIENT_CERTS,MQTT_TOPIC_BASE_PROGRAMS,MQTT_TOPIC_BASE_PROGRAMS,MQTT_TOPIC_BASE_PROGRAM_EVENTS,MQTT_TOPIC_BASE_EVENTS,MQTT_TOPIC_BASE_REPORTS,MQTT_TOPIC_BASE_SUBSCRIPTIONS,MQTT_TOPIC_BASE_VENS,MQTT_TOPIC_BASE_VEN_RESOURCES,MQTT_TOPIC_BASE_RESOURCES,MQTT_TOPIC_BASE_VEN_EVENTS
+from config import MQTT_SERIALIZATION, MQTT_SERIALIZATION, MQTT_CLIENT_BROKER_FQDN, MQTT_CLIENT_BROKER_PORT, MQTT_BROKER_AUTH, MQTT_BROKER_CLIENT_CERTS,MQTT_TOPIC_BASE_PROGRAMS,MQTT_TOPIC_BASE_PROGRAMS,MQTT_TOPIC_BASE_PROGRAM_EVENTS,MQTT_TOPIC_BASE_EVENTS,MQTT_TOPIC_BASE_REPORTS,MQTT_TOPIC_BASE_SUBSCRIPTIONS,MQTT_TOPIC_BASE_VENS,MQTT_TOPIC_BASE_VEN_RESOURCES,MQTT_TOPIC_BASE_RESOURCES,MQTT_TOPIC_BASE_VEN_EVENTS,MQTT_TOPIC_BASE_VEN_PROGRAMS
 
 
 class MqttClient:
@@ -191,6 +192,46 @@ def is_private_event(notification: Dict) -> bool:
     return False
 
 
+def _get_targeted_ven_ids(notification: Dict) -> List:
+    """
+    Returns list of VEN IDs whose targets overlap with the notification object's targets.
+    Handles targets as both ValuesMap dicts ({"type": ..., "values": [...]}) and plain strings.
+    """
+    try:
+        targets = (get_in(notification, ['object', 'targets']) or [])
+        if not targets or not isinstance(targets, list):
+            return []
+        target_values = set()
+        for target in targets:
+            if isinstance(target, dict):
+                for value in (target.get('values', []) or []):
+                    target_values.add(value)
+            elif isinstance(target, str):
+                target_values.add(target)
+        if not target_values:
+            return []
+        ven_ids = []
+        all_vens = objStore.search_all("VEN")
+        if not isinstance(all_vens, list):
+            return []
+        for ven in all_vens:
+            ven_targets = getattr(ven, 'targets', None) or []
+            for vt in ven_targets:
+                if isinstance(vt, str):
+                    vt_values = {vt}
+                else:
+                    vt_values = set(getattr(vt, 'values', []) or [])
+                if target_values & vt_values:
+                    ven_id = getattr(ven, 'id', None)
+                    if ven_id:
+                        ven_ids.append(ven_id)
+                    break
+        return ven_ids
+    except Exception as e:
+        logging.warning(f"mqtt._get_targeted_ven_ids(): error={e}")
+        return []
+
+
 def topic_names(resourceName: str, operation: str, notification: Dict) -> List:
     """
     Returns list of topic names for which to publish the notification
@@ -198,24 +239,42 @@ def topic_names(resourceName: str, operation: str, notification: Dict) -> List:
     remove the or get_in()s below that are working around that...
     """
     if resourceName == 'PROGRAM':
-        return [path(MQTT_TOPIC_BASE_PROGRAMS, operation),
-                path(MQTT_TOPIC_BASE_PROGRAMS, operation, get_in(notification, ['object', 'id']))]
+        topics = [path(MQTT_TOPIC_BASE_PROGRAMS, operation),
+                  path(MQTT_TOPIC_BASE_PROGRAMS, 'all'),
+                  path(MQTT_TOPIC_BASE_PROGRAMS, operation, get_in(notification, ['object', 'id']))]
+        for ven_id in _get_targeted_ven_ids(notification):
+            topics.append(path(MQTT_TOPIC_BASE_VEN_PROGRAMS, operation, ven_id))
+            topics.append(path(MQTT_TOPIC_BASE_VEN_PROGRAMS, 'all', ven_id))
+        return topics
     elif resourceName == 'VEN':
         return [path(MQTT_TOPIC_BASE_VENS, operation),
+                path(MQTT_TOPIC_BASE_VENS, 'all'),
                 path(MQTT_TOPIC_BASE_VENS, operation, get_in(notification, ['object', 'id']))]
     elif resourceName == 'RESOURCE':
+        ven_id = (get_in(notification, ['object', 'venID']) or
+                  get_in(notification, ['object', 'ven_id']))
         return [path(MQTT_TOPIC_BASE_RESOURCES, operation),
-                path(MQTT_TOPIC_BASE_VEN_RESOURCES, operation, (get_in(notification, ['object', 'venID']) or
-                                                                get_in(notification, ['object', 'ven_id'])))]
+                path(MQTT_TOPIC_BASE_RESOURCES, 'all'),
+                path(MQTT_TOPIC_BASE_VEN_RESOURCES, operation, ven_id),
+                path(MQTT_TOPIC_BASE_VEN_RESOURCES, 'all', ven_id)]
     elif resourceName == 'REPORT':
-        return [path(MQTT_TOPIC_BASE_REPORTS, operation)]
+        return [path(MQTT_TOPIC_BASE_REPORTS, operation),
+                path(MQTT_TOPIC_BASE_REPORTS, 'all')]
     elif resourceName == 'SUBSCRIPTION':
-        return [path(MQTT_TOPIC_BASE_SUBSCRIPTIONS, operation)]
+        return [path(MQTT_TOPIC_BASE_SUBSCRIPTIONS, operation),
+                path(MQTT_TOPIC_BASE_SUBSCRIPTIONS, 'all')]
     elif resourceName == 'EVENT':
         if not is_private_event(notification):
-            return [path(MQTT_TOPIC_BASE_EVENTS, operation),
-                    path(MQTT_TOPIC_BASE_PROGRAM_EVENTS, operation, (get_in(notification, ['object', 'programID']) or
-                                                                     get_in(notification, ['object', 'program_id'])))]
+            program_id = (get_in(notification, ['object', 'programID']) or
+                          get_in(notification, ['object', 'program_id']))
+            topics = [path(MQTT_TOPIC_BASE_EVENTS, operation),
+                      path(MQTT_TOPIC_BASE_EVENTS, 'all'),
+                      path(MQTT_TOPIC_BASE_PROGRAM_EVENTS, operation, program_id),
+                      path(MQTT_TOPIC_BASE_PROGRAM_EVENTS, 'all', program_id)]
+            for ven_id in _get_targeted_ven_ids(notification):
+                topics.append(path(MQTT_TOPIC_BASE_VEN_EVENTS, operation, ven_id))
+                topics.append(path(MQTT_TOPIC_BASE_VEN_EVENTS, 'all', ven_id))
+            return topics
     else:
         logging.warning(f"mqtt.topic_names(), Unsupported resource: {resourceName}, operation: {operation}")
         return []
