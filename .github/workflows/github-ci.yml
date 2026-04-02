@@ -9,6 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     env:
       STORAGE_IMPLEMENTATION: IN_FILE
+      AUTH_BASIC_VEN_CLIENT_ID: aaa
+      AUTH_BASIC_VEN_SECRET: bbb
+      AUTH_BASIC_BL_CLIENT_ID: ccc
+      AUTH_BASIC_BL_SECRET: ddd
+      TEST_VEN_CLIENT_ID: aaa
+      TEST_VEN_CLIENT_SECRET: bbb
+      TEST_BL_CLIENT_ID: ccc
+      TEST_BL_CLIENT_SECRET: ddd
     steps:
       - name: Checkout Test-tool
         uses: actions/checkout@v6
@@ -16,7 +24,7 @@ jobs:
           repository: oadr3-org/openadr3-test-tool
           token: ${{ secrets.PAT }}
           path: test-tool
-          ref: 'v3_0_1'
+          ref: refs/heads/stable
       - name: Checkout VTN 3.1.0 repo
         uses: actions/checkout@v6
         with:
@@ -27,7 +35,7 @@ jobs:
           repository: oadr3-org/test-callback-service
           token: ${{ secrets.PAT }}
           path: test-callback-service
-          ref: 'main'
+          ref: refs/heads/main
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -47,7 +55,7 @@ jobs:
           python -m swagger_server > /dev/null &
           cd ..
           sleep 5s
-          pytest test-tool/OpenADR_tests/v3_1_0/VTN_test --vtn_base_url=http://127.0.0.1:8080/openadr3/3.1.0
+          pytest test-tool/OpenADR_tests/v3_1_0/VTN_test --vtn_base_url=http://127.0.0.1:8080/openadr3/3.1.0 --ven_client_id=$AUTH_BASIC_VEN_CLIENT_ID --ven_client_secret=$AUTH_BASIC_VEN_SECRET --bl_client_id=$AUTH_BASIC_BL_CLIENT_ID --bl_client_secret=$AUTH_BASIC_BL_SECRET
 
   build-and-push-image:
     if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
