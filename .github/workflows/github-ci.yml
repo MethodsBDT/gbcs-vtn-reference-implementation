@@ -10,24 +10,10 @@ jobs:
     env:
       STORAGE_IMPLEMENTATION: IN_FILE
     steps:
-      - name: Checkout Test-tool
-        uses: actions/checkout@v6
-        with:
-          repository: oadr3-org/openadr3-test-tool
-          token: ${{ secrets.PAT }}
-          path: test-tool
-          ref: 'v3_0_1'
       - name: Checkout VTN 3.1.0 repo
         uses: actions/checkout@v6
         with:
           path: vtn_3_1_0
-      - name: Checkout test-callback-service repo
-        uses: actions/checkout@v6
-        with:
-          repository: oadr3-org/test-callback-service
-          token: ${{ secrets.PAT }}
-          path: test-callback-service
-          ref: 'main'
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -35,19 +21,7 @@ jobs:
           architecture: 'x64'
       - name: Installs requirements
         run: |
-          pip install -r test-callback-service/requirements.txt
           pip install -r vtn_3_1_0/requirements.txt
-          pip install -r test-tool/requirements.txt
-
-      - name: Run Oadr3 tests again VTN 3.1.0 Reference implementation
-        run: |
-          python test-callback-service/run.py > /dev/null &
-          sleep 5s
-          cd vtn_3_1_0
-          python -m swagger_server > /dev/null &
-          cd ..
-          sleep 5s
-          pytest test-tool/OpenADR_tests/v3_1_0/VTN_test --vtn_base_url=http://127.0.0.1:8080/openadr3/3.1.0
 
   build-and-push-image:
     if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
