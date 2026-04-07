@@ -30,6 +30,33 @@ class ListStore(ObjStore):
     def __init__(self):
         logging.info(f"ListStore.__init__():")
 
+    def reset(self):
+        logging.info(f"ListStore.reset():")
+        global programs
+        programs = []
+        global programID
+        programID = 0
+        global events
+        events = []
+        global eventID
+        eventID = 0
+        global reports
+        reports = []
+        global reportID
+        reportID = 0
+        global subscriptions
+        subscriptions = []
+        global subscriptionID
+        subscriptionID = 0
+        global vens
+        vens = []
+        global venID
+        venID = 0
+        global resources
+        resources = []
+        global resourcesID
+        resourcesID = 0
+
     def insert(self, obj):
         logging.info(f"ListStore.insert(): obj={obj}")
         logging.debug(f"ListStore.insert(): obj.object_type={obj.object_type}")

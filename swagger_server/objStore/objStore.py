@@ -26,3 +26,7 @@ class ObjStore(ABC):
     @abstractmethod
     def search(self, object_type, id):
         pass
+
+    @abstractmethod
+    def reset(self):
+        pass

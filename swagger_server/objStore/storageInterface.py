@@ -28,5 +28,7 @@ class StorageInterface(ObjStore):
     def search(self, object_type, id):
         return self.storage.search(object_type, id)
 
+    def reset(self):
+        return self.storage.reset()
 
 objStore = StorageInterface()

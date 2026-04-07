@@ -49,6 +49,10 @@ class FileStore(ObjStore):
     # ObjStore interface
     # ------------------------------------------------------------------
 
+    def reset(self):
+        logging.info(f"ListStore.reset():")
+        self.__init__(self.file_path)
+
     def insert(self, obj):
         logging.info(f"FileStore.insert(): obj={obj}")
         entry = self._get_list_and_cls(obj.object_type)

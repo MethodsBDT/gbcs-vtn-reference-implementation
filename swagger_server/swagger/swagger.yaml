@@ -55,6 +55,16 @@ servers:
 - url: https://virtserver.swaggerhub.com/OPENADR3_1/openADR3.1.0/1.0.0
   description: SwaggerHub API Auto Mocking
 paths:
+  /reset:
+    get:
+      tags:
+      - reset
+      summary: resets the VTN for GBCS testing
+      operationId: reset_vtn
+      responses:
+        "200":
+          description: OK.
+      x-openapi-router-controller: swagger_server.controllers.reset_controller
   /programs:
     get:
       tags:
