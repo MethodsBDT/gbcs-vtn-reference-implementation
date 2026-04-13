@@ -1,4 +1,4 @@
-name: Build image in ECR
+name: Build image in Docker Hub
 
 on:
   push:
@@ -52,5 +52,5 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: stevekay72/gbcs-vtn-new:latest
+          tags: stevekay72/gbcs-vtn:latest
 
