@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: gbcs-vtn
+  IMAGE_NAME: methodsbdt/gbcs-vtn
 
 jobs:
   check-compatibility-vtn-3-1-0:
